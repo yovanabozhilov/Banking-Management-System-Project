@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "ALblRkw31rI=",
+  "dgSpecHash": "L9km8JT5z1M=",
   "success": true,
-  "projectFilePath": "C:\\Users\\viole\\OneDrive\\Работен плот\\BankingManagmentApp\\BankingManagmentApp\\BankingManagmentApp.csproj",
+  "projectFilePath": "C:\\Users\\viole\\OneDrive\\Работен плот\\Banking-Management-System-Project\\BankingManagmentApp\\BankingManagmentApp.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\viole\\.nuget\\packages\\azure.core\\1.38.0\\azure.core.1.38.0.nupkg.sha512",
     "C:\\Users\\viole\\.nuget\\packages\\azure.identity\\1.11.4\\azure.identity.1.11.4.nupkg.sha512",
