@@ -49,7 +49,7 @@ namespace BankingManagmentApp.Services
                 FirstName = "Experian",
                 LastName = "WorkShop",
                 PhoneNumber = "0899999999",
-                Address="Sofia",
+                Address = "Sofia",
                 EmailConfirmed = true,
                 PhoneNumberConfirmed = true,
 
