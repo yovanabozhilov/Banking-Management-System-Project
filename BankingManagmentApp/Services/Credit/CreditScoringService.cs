@@ -1,4 +1,7 @@
 // Services/Credit/CreditScoringService.cs
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 using BankingManagmentApp.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -27,9 +30,9 @@ namespace BankingManagmentApp.Services
 
         public async Task<CreditScoreResult> ComputeAsync(string userId)
         {
-            // Loans на потребителя
+            // Loans на потребителя (вече филтрираме по истинското FK поле CustomerId)
             var loanIds = await _db.Loans
-                .Where(l => EF.Property<string>(l, "CustomerId1") == userId)
+                .Where(l => l.CustomerId == userId)
                 .Select(l => l.Id)
                 .ToListAsync();
 
@@ -42,9 +45,9 @@ namespace BankingManagmentApp.Services
             var paid = reps.Count(r => r.Status != null && r.Status.Equals("Paid", StringComparison.OrdinalIgnoreCase));
             var overdue = reps.Count(r => r.Status != null && r.Status.Equals("Overdue", StringComparison.OrdinalIgnoreCase));
 
-            // Сметки/баланси
+            // Сметки/баланси (също по CustomerId)
             var accounts = await _db.Accounts
-                .Where(a => EF.Property<string>(a, "CustomerId1") == userId)
+                .Where(a => a.CustomerId == userId)
                 .ToListAsync();
 
             var totalBalance = accounts.Sum(a => a.Balance);

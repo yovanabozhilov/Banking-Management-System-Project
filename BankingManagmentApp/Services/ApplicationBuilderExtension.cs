@@ -25,13 +25,10 @@ namespace BankingManagmentApp.Services
 
                 var superAdmin = await SeedSuperAdminAsync(userManager);
                 await SeedBankDataForUserAsync(db, superAdmin);
-
-                // Ако искаш – демо потребител:
-                // await SeedBankDataForEmailAsync(db, userManager, "user22@example.com");
             }
             catch (Exception ex)
             {
-                var logger = loggerFactory.CreateLogger<Program>();
+                var logger = loggerFactory.CreateLogger("DbSeed");
                 logger.LogError(ex, "An error occurred seeding the DB.");
             }
 
@@ -63,6 +60,8 @@ namespace BankingManagmentApp.Services
                 Address = "Sofia",
                 EmailConfirmed = true,
                 PhoneNumberConfirmed = true,
+                IsActive = true,
+                CreateAt = DateTime.UtcNow,
             };
 
             var result = await userManager.CreateAsync(defaultUser, "123!@#Qwe");
@@ -78,8 +77,8 @@ namespace BankingManagmentApp.Services
 
         private static async Task SeedBankDataForUserAsync(ApplicationDbContext db, Customers user)
         {
-            // 1) Account + няколко транзакции
-            var hasAccount = await db.Accounts.AnyAsync(a => EF.Property<string>(a, "CustomerId1") == user.Id);
+            // 1) Account + transactions
+            var hasAccount = await db.Accounts.AnyAsync(a => a.CustomerId == user.Id);
             if (!hasAccount)
             {
                 var acc = new Accounts
@@ -89,7 +88,9 @@ namespace BankingManagmentApp.Services
                     Balance = 1250.50m,
                     Currency = "BGN",
                     Status = "Active",
-                    Customer = user
+                    CustomerId = user.Id,
+                    Customer = user,
+                    CreateAt = DateTime.UtcNow
                 };
                 db.Accounts.Add(acc);
                 await db.SaveChangesAsync();
@@ -117,10 +118,8 @@ namespace BankingManagmentApp.Services
                 await db.SaveChangesAsync();
             }
 
-            // 2) Един заем
-            var loan = await db.Loans
-                .Where(l => EF.Property<string>(l, "CustomerId1") == user.Id)
-                .FirstOrDefaultAsync();
+            // 2) One loan
+            var loan = await db.Loans.FirstOrDefaultAsync(l => l.CustomerId == user.Id);
 
             if (loan == null)
             {
@@ -133,13 +132,14 @@ namespace BankingManagmentApp.Services
                     Term = DateOnly.FromDateTime(DateTime.Today.AddYears(1)),
                     Date = DateTime.UtcNow,
                     ApprovalDate = DateTime.UtcNow,
+                    CustomerId = user.Id,
                     Customer = user
                 };
                 db.Loans.Add(loan);
                 await db.SaveChangesAsync();
             }
 
-            // 3) Падежи (употребяваме навигацията Loans = loan, НЯМА LoansId свойство)
+            // 3) Repayments
             var hasRepayments = await db.LoanRepayments.AnyAsync(r => r.LoanId == loan.Id);
             if (!hasRepayments)
             {
@@ -148,51 +148,34 @@ namespace BankingManagmentApp.Services
                 db.LoanRepayments.AddRange(
                     new LoanRepayments
                     {
-                        Loans = loan,
                         LoanId = loan.Id,
                         DueDate = today.AddMonths(1),
                         AmountDue = 420.00m,
                         AmountPaid = 0m,
-                        PaymentDate = today,
+                        PaymentDate = null,
                         Status = "Due"
                     },
                     new LoanRepayments
                     {
-                        Loans = loan,
                         LoanId = loan.Id,
                         DueDate = today.AddMonths(2),
                         AmountDue = 420.00m,
                         AmountPaid = 0m,
-                        PaymentDate = today,
+                        PaymentDate = null,
                         Status = "Scheduled"
                     },
                     new LoanRepayments
                     {
-                        Loans = loan,
                         LoanId = loan.Id,
                         DueDate = today.AddMonths(3),
                         AmountDue = 420.00m,
                         AmountPaid = 0m,
-                        PaymentDate = today,
+                        PaymentDate = null,
                         Status = "Scheduled"
                     }
                 );
                 await db.SaveChangesAsync();
             }
-            else
-            {
-                // Фикс на евентуални "осиротели" редове
-                var toFix = await db.LoanRepayments
-                    .Where(r => r.LoanId == loan.Id && r.Loans == null)
-                    .ToListAsync();
-                if (toFix.Count > 0)
-                {
-                    foreach (var r in toFix) r.Loans = loan;
-                    await db.SaveChangesAsync();
-                }
-            }
-
-            // НЯМА seed за CreditAssessments – скорът се смята динамично в контролера.
         }
     }
 }

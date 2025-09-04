@@ -35,8 +35,9 @@ namespace BankingManagmentApp.Controllers
             var user = await _userManager.GetUserAsync(User);
             if (user == null) return Challenge();
 
+            // Accounts на текущия user
             var accounts = await _db.Accounts
-                .Where(a => EF.Property<string>(a, "CustomerId1") == user.Id)
+                .Where(a => a.CustomerId == user.Id)                // <-- FIX
                 .OrderByDescending(a => a.CreateAt)
                 .ToListAsync();
 
@@ -48,8 +49,9 @@ namespace BankingManagmentApp.Controllers
                 .Take(10)
                 .ToListAsync();
 
+            // Loans на текущия user
             var loans = await _db.Loans
-                .Where(l => EF.Property<string>(l, "CustomerId1") == user.Id)
+                .Where(l => l.CustomerId == user.Id)                // <-- FIX
                 .OrderByDescending(l => l.Date)
                 .ToListAsync();
 
@@ -96,12 +98,12 @@ namespace BankingManagmentApp.Controllers
             if (user == null) return Challenge();
 
             var query = _db.Accounts
-                .Where(a => EF.Property<string>(a, "CustomerId1") == user.Id);
+                .Where(a => a.CustomerId == user.Id);               // <-- FIX
 
             if (accountId.HasValue)
             {
                 var belongs = await _db.Accounts.AnyAsync(a => a.Id == accountId.Value &&
-                                                               EF.Property<string>(a, "CustomerId1") == user.Id);
+                                                               a.CustomerId == user.Id); // <-- FIX
                 if (!belongs) return Forbid();
                 query = query.Where(a => a.Id == accountId.Value);
             }
@@ -148,13 +150,13 @@ namespace BankingManagmentApp.Controllers
 
             var query = _db.Transactions
                 .Include(t => t.Accounts)
-                .Where(t => EF.Property<string>(t.Accounts, "CustomerId1") == user.Id)
+                .Where(t => t.Accounts != null && t.Accounts.CustomerId == user.Id) // <-- FIX
                 .AsQueryable();
 
             if (accountId.HasValue)
             {
                 var belongs = await _db.Accounts.AnyAsync(a => a.Id == accountId.Value &&
-                                                               EF.Property<string>(a, "CustomerId1") == user.Id);
+                                                               a.CustomerId == user.Id); // <-- FIX
                 if (!belongs) return Forbid();
                 query = query.Where(t => t.AccountsId == accountId.Value);
             }
