@@ -1,0 +1,45 @@
+@{
+    ViewData["Title"] = "AI Chat";
+}
+
+<h2>AI Chat</h2>
+
+<div id="chat-box" style="border:1px solid #ccc; padding:10px; height:300px; overflow-y:scroll;"></div>
+
+<input type="text" id="user-input" placeholder="Write a question..." style="width:80%;" />
+<button id="send-btn">Send</button>
+
+<script>
+    const sendBtn = document.getElementById("send-btn");
+    const input = document.getElementById("user-input");
+    const chatBox = document.getElementById("chat-box");
+
+    sendBtn.addEventListener("click", sendMessage);
+    input.addEventListener("keypress", function (e) {
+        if (e.key === "Enter") sendMessage();
+    });
+
+    async function sendMessage() {
+        const message = input.value.trim();
+        if (!message) return;
+
+        appendMessage("You", message);
+        input.value = "";
+
+        const response = await fetch("@Url.Action("SendMessage", "Chat")", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ input: message })
+        });
+
+        const data = await response.json();
+        appendMessage("Bot", data.response);
+    }
+
+    function appendMessage(sender, text) {
+        const div = document.createElement("div");
+        div.innerHTML = `<strong>${sender}:</strong> ${text}`;
+        chatBox.appendChild(div);
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }
+</script>

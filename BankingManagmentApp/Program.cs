@@ -5,6 +5,8 @@ using BankingManagmentApp.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
+using Azure;
+using Azure.AI.OpenAI; // ново
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -41,9 +43,16 @@ builder.Services.AddSession(options =>
 
 // DI
 builder.Services.AddScoped<ICreditScoringService, CreditScoringService>();
-// Ако EmailSender.cs го има и искаш да пращаш имейли, махни коментара на реда долу:
 builder.Services.AddTransient<IEmailSender, EmailSender>();
 
+// OpenAI клиентът (взима ключа от User Secrets / appsettings.json)
+builder.Services.AddSingleton(new OpenAIClient(
+    builder.Configuration["ConnectionStrings:OpenAI"]
+));
+
+builder.Services.AddScoped<ChatService>();
+builder.Services.AddScoped<ChatHistoryRepository>();
+builder.Services.AddScoped<TemplateAnswerRepository>();
 
 var app = builder.Build();
 

@@ -2,6 +2,23 @@
   "version": 3,
   "targets": {
     "net8.0": {
+      "Azure.AI.OpenAI/1.0.0-beta.5": {
+        "type": "package",
+        "dependencies": {
+          "Azure.Core": "1.30.0",
+          "System.Text.Json": "4.7.2"
+        },
+        "compile": {
+          "lib/netstandard2.0/Azure.AI.OpenAI.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/netstandard2.0/Azure.AI.OpenAI.dll": {
+            "related": ".xml"
+          }
+        }
+      },
       "Azure.Core/1.38.0": {
         "type": "package",
         "dependencies": {
@@ -3118,6 +3135,22 @@
     }
   },
   "libraries": {
+    "Azure.AI.OpenAI/1.0.0-beta.5": {
+      "sha512": "wlCf4D6iutnXQXVgNMT9SuO6gFH5e6JHb3yCK4ZF6lL+VtTrTspluqZfySE/C3KK5j2Cqdu6PbsUnZfsu/PPOQ==",
+      "type": "package",
+      "path": "azure.ai.openai/1.0.0-beta.5",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "CHANGELOG.md",
+        "README.md",
+        "azure.ai.openai.1.0.0-beta.5.nupkg.sha512",
+        "azure.ai.openai.nuspec",
+        "azureicon.png",
+        "lib/netstandard2.0/Azure.AI.OpenAI.dll",
+        "lib/netstandard2.0/Azure.AI.OpenAI.xml"
+      ]
+    },
     "Azure.Core/1.38.0": {
       "sha512": "IuEgCoVA0ef7E4pQtpC3+TkPbzaoQfa77HlfJDmfuaJUCVJmn7fT0izamZiryW5sYUFKizsftIxMkXKbgIcPMQ==",
       "type": "package",
@@ -8517,6 +8550,7 @@
   },
   "projectFileDependencyGroups": {
     "net8.0": [
+      "Azure.AI.OpenAI >= 1.0.0-beta.5",
       "MailKit >= 4.13.0",
       "Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore >= 8.0.19",
       "Microsoft.AspNetCore.Identity.EntityFrameworkCore >= 8.0.19",
@@ -8531,31 +8565,24 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\viole\\.nuget\\packages\\": {},
-    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
+    "/Users/gerganabrezova/.nuget/packages/": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\viole\\OneDrive\\Работен плот\\Banking-Management-System-Project\\BankingManagmentApp\\BankingManagmentApp.csproj",
+      "projectUniqueName": "/Users/gerganabrezova/Desktop/Banking-Management-System-Project/BankingManagmentApp/BankingManagmentApp.csproj",
       "projectName": "BankingManagmentApp",
-      "projectPath": "C:\\Users\\viole\\OneDrive\\Работен плот\\Banking-Management-System-Project\\BankingManagmentApp\\BankingManagmentApp.csproj",
-      "packagesPath": "C:\\Users\\viole\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\viole\\OneDrive\\Работен плот\\Banking-Management-System-Project\\BankingManagmentApp\\obj\\",
+      "projectPath": "/Users/gerganabrezova/Desktop/Banking-Management-System-Project/BankingManagmentApp/BankingManagmentApp.csproj",
+      "packagesPath": "/Users/gerganabrezova/.nuget/packages/",
+      "outputPath": "/Users/gerganabrezova/Desktop/Banking-Management-System-Project/BankingManagmentApp/obj/",
       "projectStyle": "PackageReference",
-      "fallbackFolders": [
-        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-      ],
       "configFilePaths": [
-        "C:\\Users\\viole\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        "/Users/gerganabrezova/.nuget/NuGet/NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net8.0"
       ],
       "sources": {
-        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
@@ -8580,6 +8607,10 @@
       "net8.0": {
         "targetAlias": "net8.0",
         "dependencies": {
+          "Azure.AI.OpenAI": {
+            "target": "Package",
+            "version": "[1.0.0-beta.5, )"
+          },
           "MailKit": {
             "target": "Package",
             "version": "[4.13.0, )"
@@ -8646,7 +8677,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.304/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/9.0.304/PortableRuntimeIdentifierGraph.json"
       }
     }
   }
