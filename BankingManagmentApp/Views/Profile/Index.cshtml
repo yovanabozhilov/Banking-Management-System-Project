@@ -148,7 +148,7 @@
     </div>
 
     <!-- TRANSACTIONS -->
-    <div class="card shadow-sm mb-3 mt-2 mt-lg-4">
+    <div class="card shadow-sm mb-4 mt-2 mt-lg-4">
         <div class="card-header d-flex align-items-center justify-content-between flex-wrap gap-2">
             <strong>Recent transactions</strong>
             @if (Model.Accounts.Any())
@@ -171,10 +171,15 @@
                         <label class="form-label xsmall mb-1">To</label>
                         <input type="date" name="to" class="form-control form-control-sm" />
                     </div>
-                    <button type="submit" class="btn btn-sm btn-outline-secondary">Export CSV</button>
+                    <button type="submit" class="btn btn-sm btn-primary">Export CSV</button>
+                    <button type="submit" class="btn btn-sm btn-primary"
+                            formaction="@Url.Action("ExportTransactionsPdf", "Profile")">
+                        Export PDF
+                    </button>
                 </form>
             }
         </div>
+
         <div class="card-body p-0">
             @if (!Model.LastTransactions.Any())
             {
@@ -183,8 +188,8 @@
             else
             {
                 <div class="table-responsive">
-                    <table class="table table-hover table-sm align-middle mb-0">
-                        <thead class="table-light">
+                    <table class="table table-sm table-striped table-hover align-middle mb-0">
+                        <thead class="table-light sticky-top">
                             <tr>
                                 <th style="width: 110px;">Date</th>
                                 <th style="width: 110px;">Type</th>
@@ -200,9 +205,7 @@
                                 <tr>
                                     <td>@t.Date.ToString("dd.MM.yyyy")</td>
                                     <td>
-                                        <span class="badge @(isDebit ? "bg-danger" : "bg-success")">
-                                            @t.TransactionType
-                                        </span>
+                                        <span class="badge @(isDebit ? "bg-danger" : "bg-success")">@t.TransactionType</span>
                                     </td>
                                     <td class="text-end @(isDebit ? "amount-negative" : "amount-positive")">
                                         @(isDebit ? "-" : "+")@t.Amount.ToString("N2", bg)
@@ -213,12 +216,16 @@
                             }
                         </tbody>
                     </table>
-
                 </div>
             }
         </div>
-        <hr />
-        <!--Transactions "Automatic expense categorization" -->
+    </div>
+
+    <!-- HARD SPACER (работи дори без Bootstrap утилити класове) -->
+    <div style="height: 15px;"></div>
+
+    <!-- TRANSACTIONS CATEGORIZATION -->
+    <div class="card shadow-sm mb-4">
         <div class="card-header d-flex align-items-center justify-content-between flex-wrap gap-2">
             <strong>Transactions categorization</strong>
             @if (Model.Accounts.Any())
@@ -241,7 +248,6 @@
                         <label class="form-label xsmall mb-1">To</label>
                         <input type="date" name="to" class="form-control form-control-sm" />
                     </div>
-
                     <div>
                         <label class="form-label xsmall mb-1">Transaction Type</label>
                         <select name="type" class="form-select form-select-sm">
@@ -251,31 +257,25 @@
                                 <option value="@type">@type</option>
                             }
                         </select>
-
                     </div>
-
-                    @*  <div>
-                        <label class="form-label xsmall mb-1">Transaction Type</label>
-                        <input type="search" name="type" class="form-control form-control-sm"/>
-                    </div> *@
                     <button type="submit" class="btn btn-sm btn-outline-secondary">Search</button>
                 </form>
             }
         </div>
 
         <div class="card-body p-0">
-            @if (!Model.LastTransactions.Any())
+            @if (!Model.TransactionType.Any())
             {
-                <div class="p-3 text-muted">You have no transactions.</div>
+                <div class="p-3 text-muted">No categorized transactions.</div>
             }
             else
             {
                 <div class="table-responsive">
-                    <table class="table table-hover table-sm align-middle mb-0">
-                        <thead class="table-light">
+                    <table class="table table-sm table-striped table-hover align-middle mb-0">
+                        <thead class="table-light sticky-top">
                             <tr>
                                 <th style="width: 110px;">Date</th>
-                                <th style="width: 110px;">Type</th>
+                                <th style="width: 140px;">Type</th>
                                 <th class="text-end" style="width: 160px;">Amount</th>
                                 <th>Description</th>
                                 <th style="width: 110px;">Ref.</th>
@@ -288,9 +288,7 @@
                                 <tr>
                                     <td>@t.Date.ToString("dd.MM.yyyy")</td>
                                     <td>
-                                        <span class="badge bg-danger bg-success">
-                                            @t.TransactionType
-                                        </span>
+                                        <span class="badge @(isDebit ? "bg-danger" : "bg-success")">@t.TransactionType</span>
                                     </td>
                                     <td class="text-end @(isDebit ? "amount-negative" : "amount-positive")">
                                         @(isDebit ? "-" : "+")@t.Amount.ToString("N2", bg)
@@ -305,7 +303,7 @@
             }
         </div>
     </div>
-    <div />
+
 
 
     <!-- LOANS + UPCOMING REPAYMENTS + CREDIT SCORE -->

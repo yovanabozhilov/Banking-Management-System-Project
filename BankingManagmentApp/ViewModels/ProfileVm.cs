@@ -5,7 +5,7 @@ namespace BankingManagmentApp.ViewModels
 {
     public class ProfileVm
     {
-        public Customers User { get; set; }
+        public Customers User { get; set; } = new();
 
         public List<Accounts> Accounts { get; set; } = new();
         public List<Transactions> LastTransactions { get; set; } = new();

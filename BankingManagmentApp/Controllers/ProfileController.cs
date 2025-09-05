@@ -10,6 +10,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Client;
 using Org.BouncyCastle.Utilities;
 using System;
+using QuestPDF.Fluent;
+using BankingManagmentApp.Services.Pdf;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -216,6 +218,53 @@ namespace BankingManagmentApp.Controllers
             fname += $"_{DateTime.UtcNow:yyyyMMdd_HHmmss}.csv";
 
             return File(bytes, "text/csv", fname);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ExportTransactionsPdf(int? accountId, DateTime? from, DateTime? to)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return Challenge();
+
+            var query = _db.Transactions
+                .Include(t => t.Accounts)
+                .Where(t => t.Accounts != null && t.Accounts.CustomerId == user.Id)
+                .AsQueryable();
+
+            Accounts? account = null;
+            if (accountId.HasValue)
+            {
+                account = await _db.Accounts
+                    .FirstOrDefaultAsync(a => a.Id == accountId.Value && a.CustomerId == user.Id);
+                if (account is null) return Forbid();
+                query = query.Where(t => t.AccountsId == accountId.Value);
+            }
+
+            DateOnly? fromD = from.HasValue ? DateOnly.FromDateTime(from.Value.Date) : null;
+            DateOnly? toD = to.HasValue ? DateOnly.FromDateTime(to.Value.Date) : null;
+
+            if (fromD.HasValue) query = query.Where(t => t.Date >= fromD.Value);
+            if (toD.HasValue)   query = query.Where(t => t.Date <= toD.Value);
+
+            var list = await query
+                .OrderBy(t => t.Date)
+                .ThenBy(t => t.Id)
+                .ToListAsync();
+
+            var doc = new TransactionsStatementPdf(user, account, list, fromD, toD);
+            var bytes = doc.GeneratePdf();
+
+            var fname = "transactions";
+            if (accountId.HasValue) fname += $"_acc{accountId.Value}";
+            if (fromD.HasValue || toD.HasValue)
+            {
+                var f = fromD?.ToString("yyyyMMdd") ?? "min";
+                var tt = toD?.ToString("yyyyMMdd") ?? "max";
+                fname += $"_{f}-{tt}";
+            }
+            fname += $"_{DateTime.UtcNow:yyyyMMdd_HHmmss}.pdf";
+
+            return File(bytes, "application/pdf", fname);
         }
 
         public async Task<IActionResult> TransactionType(int? accountId, DateTime? from, DateTime? to, string type)
