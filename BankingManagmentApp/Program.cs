@@ -1,4 +1,5 @@
 // Program.cs
+using QuestPDF.Infrastructure; 
 using BankingManagmentApp.Data;
 using BankingManagmentApp.Models;
 using BankingManagmentApp.Services;
@@ -7,6 +8,8 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
+
+QuestPDF.Settings.License = LicenseType.Community;
 
 // DB
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
