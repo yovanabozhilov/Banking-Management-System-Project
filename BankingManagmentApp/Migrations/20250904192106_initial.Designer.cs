@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BankingManagmentApp.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250905080015_AddChatTables")]
-    partial class AddChatTables
+    [Migration("20250904192106_initial")]
+    partial class initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -232,7 +232,7 @@ namespace BankingManagmentApp.Migrations
 
                     b.HasIndex("CustomerId");
 
-                    b.ToTable("ChatHistories");
+                    b.ToTable("ChatHistory");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -468,7 +468,7 @@ namespace BankingManagmentApp.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("TemplateAnswers");
+                    b.ToTable("TemplateAnswer");
                 });
 
             modelBuilder.Entity("BankingManagmentApp.Models.Customers", b =>

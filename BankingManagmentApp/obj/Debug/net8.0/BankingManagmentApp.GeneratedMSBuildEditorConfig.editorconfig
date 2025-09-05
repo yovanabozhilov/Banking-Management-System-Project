@@ -17,117 +17,165 @@ build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property.RootNamespace = BankingManagmentApp
 build_property.RootNamespace = BankingManagmentApp
-build_property.ProjectDir = /Users/gerganabrezova/Desktop/Banking-Management-System-Project/BankingManagmentApp/
+build_property.ProjectDir = C:\Users\viole\OneDrive\Картини\Banking-Management-System-Project\BankingManagmentApp\
 build_property.EnableComHosting = 
 build_property.EnableGeneratedComInterfaceComImportInterop = 
 build_property.RazorLangVersion = 8.0
 build_property.SupportLocalizedComponentNames = 
 build_property.GenerateRazorMetadataSourceChecksumAttributes = 
-build_property.MSBuildProjectDirectory = /Users/gerganabrezova/Desktop/Banking-Management-System-Project/BankingManagmentApp
+build_property.MSBuildProjectDirectory = C:\Users\viole\OneDrive\Картини\Banking-Management-System-Project\BankingManagmentApp
 build_property._RazorSourceGeneratorDebug = 
 build_property.EffectiveAnalysisLevelStyle = 8.0
 build_property.EnableCodeStyleSeverity = 
 
-[/Users/gerganabrezova/Desktop/Banking-Management-System-Project/BankingManagmentApp/Areas/Identity/Pages/Account/Login.cshtml]
-build_metadata.AdditionalFiles.TargetPath = QXJlYXMvSWRlbnRpdHkvUGFnZXMvQWNjb3VudC9Mb2dpbi5jc2h0bWw=
+[C:/Users/viole/OneDrive/Картини/Banking-Management-System-Project/BankingManagmentApp/Areas/Identity/Pages/Account/Login.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXNcSWRlbnRpdHlcUGFnZXNcQWNjb3VudFxMb2dpbi5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[/Users/gerganabrezova/Desktop/Banking-Management-System-Project/BankingManagmentApp/Areas/Identity/Pages/Account/Logout.cshtml]
-build_metadata.AdditionalFiles.TargetPath = QXJlYXMvSWRlbnRpdHkvUGFnZXMvQWNjb3VudC9Mb2dvdXQuY3NodG1s
+[C:/Users/viole/OneDrive/Картини/Banking-Management-System-Project/BankingManagmentApp/Areas/Identity/Pages/Account/Logout.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXNcSWRlbnRpdHlcUGFnZXNcQWNjb3VudFxMb2dvdXQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[/Users/gerganabrezova/Desktop/Banking-Management-System-Project/BankingManagmentApp/Areas/Identity/Pages/Account/Manage/EnableAuthenticator.cshtml]
-build_metadata.AdditionalFiles.TargetPath = QXJlYXMvSWRlbnRpdHkvUGFnZXMvQWNjb3VudC9NYW5hZ2UvRW5hYmxlQXV0aGVudGljYXRvci5jc2h0bWw=
+[C:/Users/viole/OneDrive/Картини/Banking-Management-System-Project/BankingManagmentApp/Areas/Identity/Pages/Account/Manage/Appearance.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXNcSWRlbnRpdHlcUGFnZXNcQWNjb3VudFxNYW5hZ2VcQXBwZWFyYW5jZS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[/Users/gerganabrezova/Desktop/Banking-Management-System-Project/BankingManagmentApp/Areas/Identity/Pages/Account/Manage/TwoFactorAuthentication.cshtml]
-build_metadata.AdditionalFiles.TargetPath = QXJlYXMvSWRlbnRpdHkvUGFnZXMvQWNjb3VudC9NYW5hZ2UvVHdvRmFjdG9yQXV0aGVudGljYXRpb24uY3NodG1s
+[C:/Users/viole/OneDrive/Картини/Banking-Management-System-Project/BankingManagmentApp/Areas/Identity/Pages/Account/Manage/ChangePassword.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXNcSWRlbnRpdHlcUGFnZXNcQWNjb3VudFxNYW5hZ2VcQ2hhbmdlUGFzc3dvcmQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[/Users/gerganabrezova/Desktop/Banking-Management-System-Project/BankingManagmentApp/Areas/Identity/Pages/Account/Manage/_ManageNav.cshtml]
-build_metadata.AdditionalFiles.TargetPath = QXJlYXMvSWRlbnRpdHkvUGFnZXMvQWNjb3VudC9NYW5hZ2UvX01hbmFnZU5hdi5jc2h0bWw=
+[C:/Users/viole/OneDrive/Картини/Banking-Management-System-Project/BankingManagmentApp/Areas/Identity/Pages/Account/Manage/DeletePersonalData.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXNcSWRlbnRpdHlcUGFnZXNcQWNjb3VudFxNYW5hZ2VcRGVsZXRlUGVyc29uYWxEYXRhLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[/Users/gerganabrezova/Desktop/Banking-Management-System-Project/BankingManagmentApp/Areas/Identity/Pages/Account/Manage/_ViewImports.cshtml]
-build_metadata.AdditionalFiles.TargetPath = QXJlYXMvSWRlbnRpdHkvUGFnZXMvQWNjb3VudC9NYW5hZ2UvX1ZpZXdJbXBvcnRzLmNzaHRtbA==
+[C:/Users/viole/OneDrive/Картини/Banking-Management-System-Project/BankingManagmentApp/Areas/Identity/Pages/Account/Manage/Disable2fa.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXNcSWRlbnRpdHlcUGFnZXNcQWNjb3VudFxNYW5hZ2VcRGlzYWJsZTJmYS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[/Users/gerganabrezova/Desktop/Banking-Management-System-Project/BankingManagmentApp/Areas/Identity/Pages/Account/Register.cshtml]
-build_metadata.AdditionalFiles.TargetPath = QXJlYXMvSWRlbnRpdHkvUGFnZXMvQWNjb3VudC9SZWdpc3Rlci5jc2h0bWw=
+[C:/Users/viole/OneDrive/Картини/Banking-Management-System-Project/BankingManagmentApp/Areas/Identity/Pages/Account/Manage/DownloadPersonalData.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXNcSWRlbnRpdHlcUGFnZXNcQWNjb3VudFxNYW5hZ2VcRG93bmxvYWRQZXJzb25hbERhdGEuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[/Users/gerganabrezova/Desktop/Banking-Management-System-Project/BankingManagmentApp/Areas/Identity/Pages/Account/_ViewImports.cshtml]
-build_metadata.AdditionalFiles.TargetPath = QXJlYXMvSWRlbnRpdHkvUGFnZXMvQWNjb3VudC9fVmlld0ltcG9ydHMuY3NodG1s
+[C:/Users/viole/OneDrive/Картини/Banking-Management-System-Project/BankingManagmentApp/Areas/Identity/Pages/Account/Manage/Email.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXNcSWRlbnRpdHlcUGFnZXNcQWNjb3VudFxNYW5hZ2VcRW1haWwuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[/Users/gerganabrezova/Desktop/Banking-Management-System-Project/BankingManagmentApp/Areas/Identity/Pages/_ValidationScriptsPartial.cshtml]
-build_metadata.AdditionalFiles.TargetPath = QXJlYXMvSWRlbnRpdHkvUGFnZXMvX1ZhbGlkYXRpb25TY3JpcHRzUGFydGlhbC5jc2h0bWw=
+[C:/Users/viole/OneDrive/Картини/Banking-Management-System-Project/BankingManagmentApp/Areas/Identity/Pages/Account/Manage/EnableAuthenticator.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXNcSWRlbnRpdHlcUGFnZXNcQWNjb3VudFxNYW5hZ2VcRW5hYmxlQXV0aGVudGljYXRvci5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[/Users/gerganabrezova/Desktop/Banking-Management-System-Project/BankingManagmentApp/Areas/Identity/Pages/_ViewImports.cshtml]
-build_metadata.AdditionalFiles.TargetPath = QXJlYXMvSWRlbnRpdHkvUGFnZXMvX1ZpZXdJbXBvcnRzLmNzaHRtbA==
+[C:/Users/viole/OneDrive/Картини/Banking-Management-System-Project/BankingManagmentApp/Areas/Identity/Pages/Account/Manage/GenerateRecoveryCodes.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXNcSWRlbnRpdHlcUGFnZXNcQWNjb3VudFxNYW5hZ2VcR2VuZXJhdGVSZWNvdmVyeUNvZGVzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[/Users/gerganabrezova/Desktop/Banking-Management-System-Project/BankingManagmentApp/Areas/Identity/Pages/_ViewStart.cshtml]
-build_metadata.AdditionalFiles.TargetPath = QXJlYXMvSWRlbnRpdHkvUGFnZXMvX1ZpZXdTdGFydC5jc2h0bWw=
+[C:/Users/viole/OneDrive/Картини/Banking-Management-System-Project/BankingManagmentApp/Areas/Identity/Pages/Account/Manage/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXNcSWRlbnRpdHlcUGFnZXNcQWNjb3VudFxNYW5hZ2VcSW5kZXguY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[/Users/gerganabrezova/Desktop/Banking-Management-System-Project/BankingManagmentApp/Views/Chat/Index.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQ2hhdC9JbmRleC5jc2h0bWw=
+[C:/Users/viole/OneDrive/Картини/Banking-Management-System-Project/BankingManagmentApp/Areas/Identity/Pages/Account/Manage/PersonalData.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXNcSWRlbnRpdHlcUGFnZXNcQWNjb3VudFxNYW5hZ2VcUGVyc29uYWxEYXRhLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[/Users/gerganabrezova/Desktop/Banking-Management-System-Project/BankingManagmentApp/Views/Customers/Create.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQ3VzdG9tZXJzL0NyZWF0ZS5jc2h0bWw=
+[C:/Users/viole/OneDrive/Картини/Banking-Management-System-Project/BankingManagmentApp/Areas/Identity/Pages/Account/Manage/ResetAuthenticator.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXNcSWRlbnRpdHlcUGFnZXNcQWNjb3VudFxNYW5hZ2VcUmVzZXRBdXRoZW50aWNhdG9yLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[/Users/gerganabrezova/Desktop/Banking-Management-System-Project/BankingManagmentApp/Views/Customers/Delete.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQ3VzdG9tZXJzL0RlbGV0ZS5jc2h0bWw=
+[C:/Users/viole/OneDrive/Картини/Banking-Management-System-Project/BankingManagmentApp/Areas/Identity/Pages/Account/Manage/ShowRecoveryCodes.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXNcSWRlbnRpdHlcUGFnZXNcQWNjb3VudFxNYW5hZ2VcU2hvd1JlY292ZXJ5Q29kZXMuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[/Users/gerganabrezova/Desktop/Banking-Management-System-Project/BankingManagmentApp/Views/Customers/Details.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQ3VzdG9tZXJzL0RldGFpbHMuY3NodG1s
+[C:/Users/viole/OneDrive/Картини/Banking-Management-System-Project/BankingManagmentApp/Areas/Identity/Pages/Account/Manage/TwoFactorAuthentication.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXNcSWRlbnRpdHlcUGFnZXNcQWNjb3VudFxNYW5hZ2VcVHdvRmFjdG9yQXV0aGVudGljYXRpb24uY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[/Users/gerganabrezova/Desktop/Banking-Management-System-Project/BankingManagmentApp/Views/Customers/Edit.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQ3VzdG9tZXJzL0VkaXQuY3NodG1s
+[C:/Users/viole/OneDrive/Картини/Banking-Management-System-Project/BankingManagmentApp/Areas/Identity/Pages/Account/Manage/_Layout.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXNcSWRlbnRpdHlcUGFnZXNcQWNjb3VudFxNYW5hZ2VcX0xheW91dC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[/Users/gerganabrezova/Desktop/Banking-Management-System-Project/BankingManagmentApp/Views/Customers/Index.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQ3VzdG9tZXJzL0luZGV4LmNzaHRtbA==
+[C:/Users/viole/OneDrive/Картини/Banking-Management-System-Project/BankingManagmentApp/Areas/Identity/Pages/Account/Manage/_ManageNav.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXNcSWRlbnRpdHlcUGFnZXNcQWNjb3VudFxNYW5hZ2VcX01hbmFnZU5hdi5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[/Users/gerganabrezova/Desktop/Banking-Management-System-Project/BankingManagmentApp/Views/Home/Index.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3MvSG9tZS9JbmRleC5jc2h0bWw=
+[C:/Users/viole/OneDrive/Картини/Banking-Management-System-Project/BankingManagmentApp/Areas/Identity/Pages/Account/Manage/_StatusMessage.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXNcSWRlbnRpdHlcUGFnZXNcQWNjb3VudFxNYW5hZ2VcX1N0YXR1c01lc3NhZ2UuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[/Users/gerganabrezova/Desktop/Banking-Management-System-Project/BankingManagmentApp/Views/Home/Privacy.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3MvSG9tZS9Qcml2YWN5LmNzaHRtbA==
+[C:/Users/viole/OneDrive/Картини/Banking-Management-System-Project/BankingManagmentApp/Areas/Identity/Pages/Account/Manage/_ViewImports.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXNcSWRlbnRpdHlcUGFnZXNcQWNjb3VudFxNYW5hZ2VcX1ZpZXdJbXBvcnRzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[/Users/gerganabrezova/Desktop/Banking-Management-System-Project/BankingManagmentApp/Views/Profile/Index.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUHJvZmlsZS9JbmRleC5jc2h0bWw=
+[C:/Users/viole/OneDrive/Картини/Banking-Management-System-Project/BankingManagmentApp/Areas/Identity/Pages/Account/Register.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXNcSWRlbnRpdHlcUGFnZXNcQWNjb3VudFxSZWdpc3Rlci5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[/Users/gerganabrezova/Desktop/Banking-Management-System-Project/BankingManagmentApp/Views/Shared/Error.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU2hhcmVkL0Vycm9yLmNzaHRtbA==
+[C:/Users/viole/OneDrive/Картини/Banking-Management-System-Project/BankingManagmentApp/Areas/Identity/Pages/Account/_ViewImports.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXNcSWRlbnRpdHlcUGFnZXNcQWNjb3VudFxfVmlld0ltcG9ydHMuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[/Users/gerganabrezova/Desktop/Banking-Management-System-Project/BankingManagmentApp/Views/Shared/_LoginPartial.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU2hhcmVkL19Mb2dpblBhcnRpYWwuY3NodG1s
+[C:/Users/viole/OneDrive/Картини/Banking-Management-System-Project/BankingManagmentApp/Areas/Identity/Pages/_ValidationScriptsPartial.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXNcSWRlbnRpdHlcUGFnZXNcX1ZhbGlkYXRpb25TY3JpcHRzUGFydGlhbC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[/Users/gerganabrezova/Desktop/Banking-Management-System-Project/BankingManagmentApp/Views/Shared/_ValidationScriptsPartial.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU2hhcmVkL19WYWxpZGF0aW9uU2NyaXB0c1BhcnRpYWwuY3NodG1s
+[C:/Users/viole/OneDrive/Картини/Banking-Management-System-Project/BankingManagmentApp/Areas/Identity/Pages/_ViewImports.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXNcSWRlbnRpdHlcUGFnZXNcX1ZpZXdJbXBvcnRzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[/Users/gerganabrezova/Desktop/Banking-Management-System-Project/BankingManagmentApp/Views/_ViewImports.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3MvX1ZpZXdJbXBvcnRzLmNzaHRtbA==
+[C:/Users/viole/OneDrive/Картини/Banking-Management-System-Project/BankingManagmentApp/Areas/Identity/Pages/_ViewStart.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXNcSWRlbnRpdHlcUGFnZXNcX1ZpZXdTdGFydC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[/Users/gerganabrezova/Desktop/Banking-Management-System-Project/BankingManagmentApp/Views/_ViewStart.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3MvX1ZpZXdTdGFydC5jc2h0bWw=
+[C:/Users/viole/OneDrive/Картини/Banking-Management-System-Project/BankingManagmentApp/Views/Customers/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ3VzdG9tZXJzXENyZWF0ZS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[/Users/gerganabrezova/Desktop/Banking-Management-System-Project/BankingManagmentApp/Views/Shared/_Layout.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU2hhcmVkL19MYXlvdXQuY3NodG1s
-build_metadata.AdditionalFiles.CssScope = b-mb4hnq8ylz
+[C:/Users/viole/OneDrive/Картини/Banking-Management-System-Project/BankingManagmentApp/Views/Customers/Delete.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ3VzdG9tZXJzXERlbGV0ZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/viole/OneDrive/Картини/Banking-Management-System-Project/BankingManagmentApp/Views/Customers/Details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ3VzdG9tZXJzXERldGFpbHMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/viole/OneDrive/Картини/Banking-Management-System-Project/BankingManagmentApp/Views/Customers/Edit.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ3VzdG9tZXJzXEVkaXQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/viole/OneDrive/Картини/Banking-Management-System-Project/BankingManagmentApp/Views/Customers/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ3VzdG9tZXJzXEluZGV4LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/viole/OneDrive/Картини/Banking-Management-System-Project/BankingManagmentApp/Views/Home/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxJbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/viole/OneDrive/Картини/Banking-Management-System-Project/BankingManagmentApp/Views/Home/Privacy.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxQcml2YWN5LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/viole/OneDrive/Картини/Banking-Management-System-Project/BankingManagmentApp/Views/Profile/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUHJvZmlsZVxJbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/viole/OneDrive/Картини/Banking-Management-System-Project/BankingManagmentApp/Views/Shared/Error.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEVycm9yLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/viole/OneDrive/Картини/Banking-Management-System-Project/BankingManagmentApp/Views/Shared/_LoginPartial.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9Mb2dpblBhcnRpYWwuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/viole/OneDrive/Картини/Banking-Management-System-Project/BankingManagmentApp/Views/Shared/_ValidationScriptsPartial.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9WYWxpZGF0aW9uU2NyaXB0c1BhcnRpYWwuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/viole/OneDrive/Картини/Banking-Management-System-Project/BankingManagmentApp/Views/_ViewImports.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdJbXBvcnRzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/viole/OneDrive/Картини/Banking-Management-System-Project/BankingManagmentApp/Views/_ViewStart.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdTdGFydC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/viole/OneDrive/Картини/Banking-Management-System-Project/BankingManagmentApp/Views/Shared/_Layout.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9MYXlvdXQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = b-hy8ibbw37v

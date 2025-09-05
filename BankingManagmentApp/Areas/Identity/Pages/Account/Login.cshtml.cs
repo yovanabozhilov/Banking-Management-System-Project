@@ -1,7 +1,4 @@
-﻿// Licensed to the .NET Foundation under one or more agreements.
-// The .NET Foundation licenses this file to you under the MIT license.
-#nullable disable
-
+﻿#nullable disable
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -13,6 +10,12 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
+using SixLabors.Fonts;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
+using SixLabors.ImageSharp.Processing;
+using SixLabors.ImageSharp.Drawing.Processing;
+using System.IO;
 using BankingManagmentApp.Models;
 
 namespace BankingManagmentApp.Areas.Identity.Pages.Account
@@ -50,6 +53,10 @@ namespace BankingManagmentApp.Areas.Identity.Pages.Account
             [DataType(DataType.Password)]
             public string Password { get; set; }
 
+            [Required]
+            [Display(Name = "CAPTCHA")]
+            public string CaptchaInput { get; set; }
+
             [Display(Name = "Remember me?")]
             public bool RememberMe { get; set; }
         }
@@ -70,6 +77,33 @@ namespace BankingManagmentApp.Areas.Identity.Pages.Account
             ReturnUrl = returnUrl;
         }
 
+        // Handler за CAPTCHA изображение
+        public IActionResult OnGetCaptcha()
+        {
+            var captchaText = new Random().Next(1000, 9999).ToString();
+            HttpContext.Session.SetString("Captcha", captchaText);
+
+            using var image = new Image<Rgba32>(120, 40);
+            image.Mutate(ctx => ctx.Fill(Color.White));
+
+            // Вземи системен шрифт
+            Font font;
+            try
+            {
+                font = SystemFonts.CreateFont("Arial", 20, FontStyle.Bold);
+            }
+            catch
+            {
+                font = SystemFonts.CreateFont("DejaVu Sans", 20, FontStyle.Bold); // fallback за Linux/macOS
+            }
+
+            image.Mutate(ctx => ctx.DrawText(captchaText, font, Color.Black, new PointF(10, 5)));
+
+            using var ms = new MemoryStream();
+            image.SaveAsPng(ms);
+            return File(ms.ToArray(), "image/png");
+        }
+
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)
         {
             returnUrl ??= Url.Content("~/");
@@ -78,11 +112,18 @@ namespace BankingManagmentApp.Areas.Identity.Pages.Account
 
             if (ModelState.IsValid)
             {
+                var captchaSession = HttpContext.Session.GetString("Captcha") ?? "";
+
+                if (captchaSession != Input.CaptchaInput?.Trim())
+                {
+                    ModelState.AddModelError(string.Empty, "CAPTCHA е неправилна.");
+                    return Page();
+                }
+
                 var user = await _userManager.FindByEmailAsync(Input.Email);
 
                 if (user != null)
                 {
-                   
                     var result = await _signInManager.PasswordSignInAsync(user.UserName, Input.Password, Input.RememberMe, lockoutOnFailure: false);
 
                     if (result.Succeeded)
@@ -101,7 +142,6 @@ namespace BankingManagmentApp.Areas.Identity.Pages.Account
                     }
                 }
 
-               
                 ModelState.AddModelError(string.Empty, "Invalid login attempt.");
                 return Page();
             }
