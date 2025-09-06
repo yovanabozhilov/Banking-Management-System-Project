@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "jeOERQKjnRA=",
+  "dgSpecHash": "0KyCdwTp0fQ=",
   "success": true,
   "projectFilePath": "/Users/gerganabrezova/Desktop/Banking-Management-System-Project/BankingManagmentApp/BankingManagmentApp.csproj",
   "expectedPackageFiles": [
@@ -140,6 +140,7 @@
     "/Users/gerganabrezova/.nuget/packages/nuget.protocol/6.11.0/nuget.protocol.6.11.0.nupkg.sha512",
     "/Users/gerganabrezova/.nuget/packages/nuget.versioning/6.11.0/nuget.versioning.6.11.0.nupkg.sha512",
     "/Users/gerganabrezova/.nuget/packages/qrcoder/1.4.3/qrcoder.1.4.3.nupkg.sha512",
+    "/Users/gerganabrezova/.nuget/packages/questpdf/2024.3.0/questpdf.2024.3.0.nupkg.sha512",
     "/Users/gerganabrezova/.nuget/packages/sixlabors.fonts/2.1.3/sixlabors.fonts.2.1.3.nupkg.sha512",
     "/Users/gerganabrezova/.nuget/packages/sixlabors.imagesharp/3.1.11/sixlabors.imagesharp.3.1.11.nupkg.sha512",
     "/Users/gerganabrezova/.nuget/packages/sixlabors.imagesharp.drawing/2.1.7/sixlabors.imagesharp.drawing.2.1.7.nupkg.sha512",
@@ -186,5 +187,18 @@
     "/Users/gerganabrezova/.nuget/packages/system.threading.tasks.extensions/4.5.4/system.threading.tasks.extensions.4.5.4.nupkg.sha512",
     "/Users/gerganabrezova/.nuget/packages/system.windows.extensions/7.0.0/system.windows.extensions.7.0.0.nupkg.sha512"
   ],
-  "logs": []
+  "logs": [
+    {
+      "code": "NU1603",
+      "level": "Warning",
+      "message": "BankingManagmentApp depends on QuestPDF (>= 2024.2.0) but QuestPDF 2024.2.0 was not found. QuestPDF 2024.3.0 was resolved instead.",
+      "projectPath": "/Users/gerganabrezova/Desktop/Banking-Management-System-Project/BankingManagmentApp/BankingManagmentApp.csproj",
+      "warningLevel": 1,
+      "filePath": "/Users/gerganabrezova/Desktop/Banking-Management-System-Project/BankingManagmentApp/BankingManagmentApp.csproj",
+      "libraryId": "QuestPDF",
+      "targetGraphs": [
+        "net8.0"
+      ]
+    }
+  ]
 }

@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BankingManagmentApp.Data
 {
-    public class ApplicationDbContext : IdentityDbContext
+    public class ApplicationDbContext : IdentityDbContext<Customers>
     {
         public DbSet<Customers> Customers { get; set; }
         public DbSet<Accounts> Accounts { get; set; }
