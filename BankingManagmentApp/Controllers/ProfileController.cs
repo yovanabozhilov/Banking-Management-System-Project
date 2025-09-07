@@ -152,29 +152,34 @@ namespace BankingManagmentApp.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> ExportTransactions(int? accountId, DateTime? from, DateTime? to)
+        public async Task<IActionResult> ExportTransactions(int? accountId, DateTime? from, DateTime? to, string? q)
         {
             var user = await _userManager.GetUserAsync(User);
             if (user == null) return Challenge();
 
             var query = _db.Transactions
                 .Include(t => t.Accounts)
-                .Where(t => t.Accounts != null && t.Accounts.CustomerId == user.Id) // <-- FIX
+                .Where(t => t.Accounts != null && t.Accounts.CustomerId == user.Id)
                 .AsQueryable();
 
             if (accountId.HasValue)
             {
-                var belongs = await _db.Accounts.AnyAsync(a => a.Id == accountId.Value &&
-                                                               a.CustomerId == user.Id); // <-- FIX
+                var belongs = await _db.Accounts.AnyAsync(a => a.Id == accountId.Value && a.CustomerId == user.Id);
                 if (!belongs) return Forbid();
                 query = query.Where(t => t.AccountsId == accountId.Value);
             }
 
             DateOnly? fromD = from.HasValue ? DateOnly.FromDateTime(from.Value.Date) : null;
-            DateOnly? toD = to.HasValue ? DateOnly.FromDateTime(to.Value.Date) : null;
+            DateOnly? toD   = to.HasValue   ? DateOnly.FromDateTime(to.Value.Date)   : null;
 
             if (fromD.HasValue) query = query.Where(t => t.Date >= fromD.Value);
-            if (toD.HasValue) query = query.Where(t => t.Date <= toD.Value);
+            if (toD.HasValue)   query = query.Where(t => t.Date <= toD.Value);
+
+            if (!string.IsNullOrWhiteSpace(q))
+            {
+                var term = q.Trim();
+                query = query.Where(t => t.Description != null && EF.Functions.Like(t.Description, $"%{term}%"));
+            }
 
             var list = await query
                 .OrderBy(t => t.Date)
@@ -211,17 +216,19 @@ namespace BankingManagmentApp.Controllers
             if (accountId.HasValue) fname += $"_acc{accountId.Value}";
             if (fromD.HasValue || toD.HasValue)
             {
-                var f = fromD?.ToString("yyyyMMdd") ?? "min";
+                var f  = fromD?.ToString("yyyyMMdd") ?? "min";
                 var tt = toD?.ToString("yyyyMMdd") ?? "max";
                 fname += $"_{f}-{tt}";
             }
+            if (!string.IsNullOrWhiteSpace(q)) fname += $"_desc"; // по желание добави белег
             fname += $"_{DateTime.UtcNow:yyyyMMdd_HHmmss}.csv";
 
             return File(bytes, "text/csv", fname);
         }
 
-        [HttpGet]
-        public async Task<IActionResult> ExportTransactionsPdf(int? accountId, DateTime? from, DateTime? to)
+
+                [HttpGet]
+        public async Task<IActionResult> ExportTransactionsPdf(int? accountId, DateTime? from, DateTime? to, string? q)
         {
             var user = await _userManager.GetUserAsync(User);
             if (user == null) return Challenge();
@@ -241,10 +248,16 @@ namespace BankingManagmentApp.Controllers
             }
 
             DateOnly? fromD = from.HasValue ? DateOnly.FromDateTime(from.Value.Date) : null;
-            DateOnly? toD = to.HasValue ? DateOnly.FromDateTime(to.Value.Date) : null;
+            DateOnly? toD   = to.HasValue   ? DateOnly.FromDateTime(to.Value.Date)   : null;
 
             if (fromD.HasValue) query = query.Where(t => t.Date >= fromD.Value);
             if (toD.HasValue)   query = query.Where(t => t.Date <= toD.Value);
+
+            if (!string.IsNullOrWhiteSpace(q))
+            {
+                var term = q.Trim();
+                query = query.Where(t => t.Description != null && EF.Functions.Like(t.Description, $"%{term}%"));
+            }
 
             var list = await query
                 .OrderBy(t => t.Date)
@@ -258,14 +271,108 @@ namespace BankingManagmentApp.Controllers
             if (accountId.HasValue) fname += $"_acc{accountId.Value}";
             if (fromD.HasValue || toD.HasValue)
             {
-                var f = fromD?.ToString("yyyyMMdd") ?? "min";
+                var f  = fromD?.ToString("yyyyMMdd") ?? "min";
                 var tt = toD?.ToString("yyyyMMdd") ?? "max";
                 fname += $"_{f}-{tt}";
             }
+            if (!string.IsNullOrWhiteSpace(q)) fname += $"_desc";
             fname += $"_{DateTime.UtcNow:yyyyMMdd_HHmmss}.pdf";
 
             return File(bytes, "application/pdf", fname);
         }
+
+
+        [HttpGet]
+        public async Task<IActionResult> SearchTransactions(int? accountId, DateTime? from, DateTime? to, string? q)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return Challenge();
+
+            // Списъци за страницата (като в Index)
+            var accounts = await _db.Accounts
+                .Where(a => a.CustomerId == user.Id)
+                .OrderByDescending(a => a.CreateAt)
+                .ToListAsync();
+
+            var accountIds = accounts.Select(a => a.Id).ToList();
+
+            var query = _db.Transactions
+                .Include(t => t.Accounts)
+                .Where(t => t.Accounts != null && t.Accounts.CustomerId == user.Id)
+                .AsQueryable();
+
+            if (accountId.HasValue)
+            {
+                var belongs = await _db.Accounts.AnyAsync(a => a.Id == accountId.Value && a.CustomerId == user.Id);
+                if (!belongs) return Forbid();
+                query = query.Where(t => t.AccountsId == accountId.Value);
+            }
+
+            DateOnly? fromD = from.HasValue ? DateOnly.FromDateTime(from.Value.Date) : null;
+            DateOnly? toD   = to.HasValue   ? DateOnly.FromDateTime(to.Value.Date)   : null;
+
+            if (fromD.HasValue) query = query.Where(t => t.Date >= fromD.Value);
+            if (toD.HasValue)   query = query.Where(t => t.Date <= toD.Value);
+
+            if (!string.IsNullOrWhiteSpace(q))
+            {
+                var term = q.Trim();
+                // SQL LIKE за частично съвпадение; пазим се от null описания
+                query = query.Where(t => t.Description != null && EF.Functions.Like(t.Description, $"%{term}%"));
+            }
+
+            // Показваме до 200 реда, за да не „залеем“ UI; коригирай по желание
+            var filteredTx = await query
+                .OrderByDescending(t => t.Id)
+                .Take(200)
+                .ToListAsync();
+
+            // Loans / Repayments / Credit / Типове – както в Index
+            var loans = await _db.Loans
+                .Where(l => l.CustomerId == user.Id)
+                .OrderByDescending(l => l.Date)
+                .ToListAsync();
+
+            var loanIds = loans.Select(l => l.Id).ToList();
+
+            var upcomingRepayments = await _db.LoanRepayments
+                .Where(r => loanIds.Contains(r.LoanId))
+                .OrderBy(r => r.DueDate)
+                .Take(5)
+                .ToListAsync();
+
+            CreditAssessments? credit = null;
+            var computed = await _scoring.ComputeAsync(user.Id);
+            if (computed is not null)
+            {
+                credit = new CreditAssessments
+                {
+                    CreditScore = computed.Score,
+                    RiskLevel = computed.RiskLevel,
+                    Notes = computed.Notes
+                };
+            }
+
+            var availableTypes = await _db.Transactions
+                .Where(t => t.Accounts != null && t.Accounts.CustomerId == user.Id)
+                .Select(t => t.TransactionType)
+                .Distinct()
+                .ToListAsync();
+
+            var vm = new ProfileVm
+            {
+                User = user,
+                Accounts = accounts,
+                LastTransactions = filteredTx,              // <-- тук са резултатите от търсенето
+                Loans = loans,
+                UpcomingRepayments = upcomingRepayments,
+                Credit = credit,
+                AvailableTransactionTypes = availableTypes
+            };
+
+            return View("Index", vm);
+        }
+
 
         public async Task<IActionResult> TransactionType(int? accountId, DateTime? from, DateTime? to, string type)
         {
