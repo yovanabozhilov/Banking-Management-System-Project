@@ -39,20 +39,19 @@ namespace BankingManagmentApp.Controllers
             var user = await _userManager.GetUserAsync(User);
             if (user == null) return Challenge();
 
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 loan.CustomerId = user.Id;
                 loan.Status = "Pending";
                 loan.Date = DateTime.Now;
-
-                _context.Add(loan);
+                loan.Amount = loan.Amount;
+                loan.Type = "credit";
+                _context.Loans.Add(loan);
                 await _context.SaveChangesAsync();
 
                 // Redirect to Profile dashboard (loans will show there)
-                return RedirectToAction("Index", "Profile");
             }
-
-            return View(loan);
+                return RedirectToAction("Index", "Profile");
         }
 
         // GET: Loans/MyLoans
@@ -134,11 +133,12 @@ namespace BankingManagmentApp.Controllers
         {
             if (id != loans.Id) return NotFound();
 
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 try
                 {
-                    _context.Update(loans);
+                    loans.CustomerId = _userManager.GetUserId(User);
+                    _context.Loans.Update(loans);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)

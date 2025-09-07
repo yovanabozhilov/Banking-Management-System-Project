@@ -1,13 +1,6 @@
 ﻿#nullable disable
 
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Text.Encodings.Web;
-using System.Threading;
-using System.Threading.Tasks;
+using BankingManagmentApp.Data;
 using BankingManagmentApp.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
@@ -17,6 +10,15 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
+using System.Text.Encodings.Web;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace BankingManagmentApp.Areas.Identity.Pages.Account
 {
@@ -28,13 +30,15 @@ namespace BankingManagmentApp.Areas.Identity.Pages.Account
         private readonly IUserEmailStore<Customers> _emailStore;
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
+        private readonly ApplicationDbContext _context;
 
         public RegisterModel(
             UserManager<Customers> userManager,
             IUserStore<Customers> userStore,
             SignInManager<Customers> signInManager,
             ILogger<RegisterModel> logger,
-            IEmailSender emailSender)
+            IEmailSender emailSender,
+            ApplicationDbContext context)
         {
             _userManager = userManager;
             _userStore = userStore;
@@ -42,6 +46,7 @@ namespace BankingManagmentApp.Areas.Identity.Pages.Account
             _signInManager = signInManager;
             _logger = logger;
             _emailSender = emailSender;
+            _context = context;
         }
 
         [BindProperty]
@@ -73,7 +78,7 @@ namespace BankingManagmentApp.Areas.Identity.Pages.Account
             [Required]
             [Display(Name = "PhoneNumber")]
             public string PhoneNumber { get; set; }
-           
+
             [Required]
             [Display(Name = "DateOfBirth")]
             public DateOnly DateOfBirth { get; set; }
@@ -114,17 +119,55 @@ namespace BankingManagmentApp.Areas.Identity.Pages.Account
                     PhoneNumber = Input.PhoneNumber,
                     CreateAt = DateTime.Now,
                     DateOfBirth = Input.DateOfBirth,
-                    IsActive =true 
+                    IsActive = true
                 };
 
-                
+
+
                 var result = await _userManager.CreateAsync(user, Input.Password);
 
                 if (result.Succeeded)
                 {
+                    await _userManager.AddToRoleAsync(user, "User");
                     _logger.LogInformation("User created a new account with password.");
 
-                    
+                    const string digits = "0123456789";
+                    const string letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+                    char[] ibanChars = new char[20];
+
+                    // първо 10 цифри
+                    for (int i = 0; i < 10; i++)
+                    {
+                        int idx = RandomNumberGenerator.GetInt32(digits.Length);
+                        ibanChars[i] = digits[idx];
+                    }
+
+                    // после 10 букви
+                    for (int i = 8; i < 20; i++)
+                    {
+                        int idx = RandomNumberGenerator.GetInt32(letters.Length);
+                        ibanChars[i] = letters[idx];
+                    }
+
+                    // разбъркваме, за да не са подредени
+                    ibanChars = ibanChars.OrderBy(c => RandomNumberGenerator.GetInt32(1000)).ToArray();
+
+                    string iban = "BG" + new string(ibanChars);
+
+                    Accounts acc = new Accounts();
+                    acc.CreateAt = DateTime.Now;
+                    acc.Currency = "BGN";
+                    acc.Status = "Active";
+                    acc.IBAN = iban;
+                    acc.CustomerId = user.Id;
+                    acc.AccountType = "User";
+                    acc.Balance = 0;
+                    _context.Accounts.Add(acc);
+                    _context.SaveChanges();
+
+
+
                     var userId = await _userManager.GetUserIdAsync(user);
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                     code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
