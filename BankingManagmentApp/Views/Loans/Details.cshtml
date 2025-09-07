@@ -1,66 +1,52 @@
 ﻿@model BankingManagmentApp.Models.Loans
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Loan Details";
 }
 
-<h1>Details</h1>
+<div class="container mt-5">
+    <div class="card shadow-lg border-0 mx-auto" style="max-width: 700px;">
+        <div class="card-header bg-primary text-white text-center">
+            <h3 class="mb-0">Loan Details</h3>
+        </div>
 
-<div>
-    <h4>Loans</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Type)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Type)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Amount)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Amount)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Term)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Term)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Date)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Date)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Status)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Status)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ApprovedAmount)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ApprovedAmount)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ApprovalDate)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ApprovalDate)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Customer)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Customer.Id)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+        <div class="card-body p-4">
+            <dl class="row mb-0">
+                <dt class="col-sm-4 text-muted">Type</dt>
+                <dd class="col-sm-8">@Html.DisplayFor(model => model.Type)</dd>
+
+                <dt class="col-sm-4 text-muted">Amount</dt>
+                <dd class="col-sm-8">@Html.DisplayFor(model => model.Amount)</dd>
+
+                <dt class="col-sm-4 text-muted">Term</dt>
+                <dd class="col-sm-8">@Html.DisplayFor(model => model.Term)</dd>
+
+                <dt class="col-sm-4 text-muted">Date</dt>
+                <dd class="col-sm-8">@Html.DisplayFor(model => model.Date)</dd>
+
+                <dt class="col-sm-4 text-muted">Status</dt>
+                <dd class="col-sm-8">
+                    <span class="badge @(Model.Status?.ToLower() == "approved" ? "bg-success" 
+                                    : Model.Status?.ToLower() == "pending" ? "bg-warning text-dark" 
+                                    : "bg-secondary")">
+                        @Html.DisplayFor(model => model.Status)
+                    </span>
+                </dd>
+
+                <dt class="col-sm-4 text-muted">Approved Amount</dt>
+                <dd class="col-sm-8">@Html.DisplayFor(model => model.ApprovedAmount)</dd>
+
+                <dt class="col-sm-4 text-muted">Approval Date</dt>
+                <dd class="col-sm-8">@Html.DisplayFor(model => model.ApprovalDate)</dd>
+
+                <dt class="col-sm-4 text-muted">Customer</dt>
+                <dd class="col-sm-8">@Html.DisplayFor(model => model.Customer.Id)</dd>
+            </dl>
+        </div>
+
+        <div class="card-footer d-flex justify-content-between">
+            <a asp-action="Edit" asp-route-id="@Model?.Id" class="btn btn-primary btn-sm">Edit</a>
+            <a asp-action="Index" class="btn btn-outline-secondary btn-sm">Back to List</a>
+        </div>
+    </div>
 </div>

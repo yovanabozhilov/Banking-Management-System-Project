@@ -1,69 +1,49 @@
 ﻿@model BankingManagmentApp.Models.Loans
 
 @{
-    ViewData["Title"] = "Delete";
+    ViewData["Title"] = "Delete Loan";
 }
 
-<h1>Delete</h1>
+<div class="container mt-5">
+    <div class="card shadow-lg border-0 mx-auto" style="max-width: 700px;">
+        <div class="card-header bg-danger text-white text-center">
+            <h3 class="mb-0">Delete Loan</h3>
+        </div>
 
-<h3>Are you sure you want to delete this?</h3>
-<div>
-    <h4>Loans</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Type)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Type)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Amount)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Amount)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Term)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Term)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Date)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Date)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Status)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Status)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ApprovedAmount)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ApprovedAmount)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ApprovalDate)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ApprovalDate)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Customer)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Customer.Id)
-        </dd>
-    </dl>
-    
-    <form asp-action="Delete">
-        <input type="hidden" asp-for="Id" />
-        <input type="submit" value="Delete" class="btn btn-danger" /> |
-        <a asp-action="Index">Back to List</a>
-    </form>
+        <div class="card-body p-4">
+            <h5 class="text-center text-muted mb-4">Are you sure you want to delete this loan?</h5>
+
+            <dl class="row mb-4">
+                <dt class="col-sm-4 text-muted">Type</dt>
+                <dd class="col-sm-8">@Html.DisplayFor(model => model.Type)</dd>
+
+                <dt class="col-sm-4 text-muted">Amount</dt>
+                <dd class="col-sm-8">@Html.DisplayFor(model => model.Amount)</dd>
+
+                <dt class="col-sm-4 text-muted">Term</dt>
+                <dd class="col-sm-8">@Html.DisplayFor(model => model.Term)</dd>
+
+                <dt class="col-sm-4 text-muted">Date</dt>
+                <dd class="col-sm-8">@Html.DisplayFor(model => model.Date)</dd>
+
+                <dt class="col-sm-4 text-muted">Status</dt>
+                <dd class="col-sm-8">@Html.DisplayFor(model => model.Status)</dd>
+
+                <dt class="col-sm-4 text-muted">Approved Amount</dt>
+                <dd class="col-sm-8">@Html.DisplayFor(model => model.ApprovedAmount)</dd>
+
+                <dt class="col-sm-4 text-muted">Approval Date</dt>
+                <dd class="col-sm-8">@Html.DisplayFor(model => model.ApprovalDate)</dd>
+
+                <dt class="col-sm-4 text-muted">Customer</dt>
+                <dd class="col-sm-8">@Html.DisplayFor(model => model.Customer.Id)</dd>
+            </dl>
+
+            <form asp-action="Delete" class="d-flex justify-content-between">
+                <input type="hidden" asp-for="Id" />
+                <button type="submit" class="btn btn-danger">Delete</button>
+                <a asp-action="Index" class="btn btn-outline-secondary">Back to List</a>
+            </form>
+        </div>
+    </div>
 </div>
