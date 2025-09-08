@@ -4,6 +4,7 @@ using BankingManagmentApp.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BankingManagmentApp.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250908123614_AddCreditFeaturesView")]
+    partial class AddCreditFeaturesView
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -251,42 +254,6 @@ namespace BankingManagmentApp.Migrations
                     b.HasIndex("CustomerId");
 
                     b.ToTable("Loans");
-                });
-
-            modelBuilder.Entity("BankingManagmentApp.Models.ML.CreditFeatures", b =>
-                {
-                    b.Property<decimal>("AvgMonthlyInflow")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("AvgMonthlyOutflow")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<double?>("LoanAgeDaysAvg")
-                        .HasColumnType("float");
-
-                    b.Property<int>("NumAccounts")
-                        .HasColumnType("int");
-
-                    b.Property<int>("NumLoans")
-                        .HasColumnType("int");
-
-                    b.Property<double?>("OnTimeRatio")
-                        .HasColumnType("float");
-
-                    b.Property<double?>("OverdueRatio")
-                        .HasColumnType("float");
-
-                    b.Property<decimal>("TotalBalance")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("UserId");
-
-                    b.ToTable((string)null);
-
-                    b.ToView("vw_CreditFeatures", (string)null);
                 });
 
             modelBuilder.Entity("BankingManagmentApp.Models.Transactions", b =>
