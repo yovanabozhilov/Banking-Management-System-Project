@@ -75,6 +75,15 @@ namespace BankingManagmentApp.Services
             throw new InvalidOperationException("Failed to seed super admin: " + err);
         }
 
+        // локален helper за статус (копие на този от LoansService)
+        private static string CalcStatus(DateOnly due, decimal dueAmt, decimal paidAmt, DateOnly today)
+        {
+            if (paidAmt >= dueAmt && dueAmt > 0) return "Paid";
+            if (due < today)                     return "Overdue";
+            if (due == today)                    return "Due";
+            return "Scheduled";
+        }
+
         private static async Task SeedBankDataForUserAsync(ApplicationDbContext db, Customers user)
         {
             // 1) Account + transactions
@@ -139,41 +148,46 @@ namespace BankingManagmentApp.Services
                 await db.SaveChangesAsync();
             }
 
-            // 3) Repayments
+            // 3) Repayments (статусите се изчисляват, не се хардкодират)
             var hasRepayments = await db.LoanRepayments.AnyAsync(r => r.LoanId == loan.Id);
             if (!hasRepayments)
             {
                 var today = DateOnly.FromDateTime(DateTime.Today);
 
-                db.LoanRepayments.AddRange(
-                    new LoanRepayments
-                    {
-                        LoanId = loan.Id,
-                        DueDate = today.AddMonths(1),
-                        AmountDue = 420.00m,
-                        AmountPaid = 0m,
-                        PaymentDate = null,
-                        Status = "Due"
-                    },
-                    new LoanRepayments
-                    {
-                        LoanId = loan.Id,
-                        DueDate = today.AddMonths(2),
-                        AmountDue = 420.00m,
-                        AmountPaid = 0m,
-                        PaymentDate = null,
-                        Status = "Scheduled"
-                    },
-                    new LoanRepayments
-                    {
-                        LoanId = loan.Id,
-                        DueDate = today.AddMonths(3),
-                        AmountDue = 420.00m,
-                        AmountPaid = 0m,
-                        PaymentDate = null,
-                        Status = "Scheduled"
-                    }
-                );
+                var r1 = new LoanRepayments
+                {
+                    LoanId = loan.Id,
+                    DueDate = today.AddMonths(1),
+                    AmountDue = 420.00m,
+                    AmountPaid = 0m,
+                    PaymentDate = null,
+                    Status = "" // ще се изчисли
+                };
+                r1.Status = CalcStatus(r1.DueDate, r1.AmountDue, r1.AmountPaid, today);
+
+                var r2 = new LoanRepayments
+                {
+                    LoanId = loan.Id,
+                    DueDate = today.AddMonths(2),
+                    AmountDue = 420.00m,
+                    AmountPaid = 0m,
+                    PaymentDate = null,
+                    Status = ""
+                };
+                r2.Status = CalcStatus(r2.DueDate, r2.AmountDue, r2.AmountPaid, today);
+
+                var r3 = new LoanRepayments
+                {
+                    LoanId = loan.Id,
+                    DueDate = today.AddMonths(3),
+                    AmountDue = 420.00m,
+                    AmountPaid = 0m,
+                    PaymentDate = null,
+                    Status = ""
+                };
+                r3.Status = CalcStatus(r3.DueDate, r3.AmountDue, r3.AmountPaid, today);
+
+                db.LoanRepayments.AddRange(r1, r2, r3);
                 await db.SaveChangesAsync();
             }
         }

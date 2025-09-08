@@ -1,10 +1,9 @@
 // Program.cs
-using QuestPDF.Infrastructure; 
+using QuestPDF.Infrastructure;
 using BankingManagmentApp.Data;
 using BankingManagmentApp.Models;
 using BankingManagmentApp.Services;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -31,11 +30,11 @@ builder.Services.AddDefaultIdentity<Customers>(options =>
 .AddRoles<IdentityRole>()
 .AddEntityFrameworkStores<ApplicationDbContext>()
 .AddDefaultTokenProviders();
-builder.Services.AddSession();
+
 // MVC
 builder.Services.AddControllersWithViews();
 
-// Session
+// Session (конфигурация)
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {
@@ -44,12 +43,15 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
 });
 
-// DI
-builder.Services.AddScoped<ICreditScoringService, CreditScoringService>();
+// DI: услуги за кредитен скоринг и кредити
+builder.Services.AddScoped<ICreditScoringService, MlCreditScoringService>();
+builder.Services.AddScoped<LoansService>();
+
+// Background авто-претрениране (стартира на boot и по график)
+builder.Services.AddHostedService<MlRetrainHostedService>();
 
 var app = builder.Build();
 
-// DEVELOPMENT / PROD pipeline
 if (app.Environment.IsDevelopment())
 {
     app.UseMigrationsEndPoint();
@@ -60,9 +62,10 @@ else
     app.UseHsts();
 }
 
-// еднократно seed-ване/миграции
+// seed/миграции
 await app.PrepareDataBase();
 
+// middleware
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
