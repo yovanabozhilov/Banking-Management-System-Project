@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "/home/jovanab/Projects/Banking-Management-System-Project/BankingManagmentApp/BankingManagmentApp.csproj": {}
+    "/Users/gerganabrezova/Desktop/Banking-Management-System-Project/BankingManagmentApp/BankingManagmentApp.csproj": {}
   },
   "projects": {
-    "/home/jovanab/Projects/Banking-Management-System-Project/BankingManagmentApp/BankingManagmentApp.csproj": {
+    "/Users/gerganabrezova/Desktop/Banking-Management-System-Project/BankingManagmentApp/BankingManagmentApp.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/home/jovanab/Projects/Banking-Management-System-Project/BankingManagmentApp/BankingManagmentApp.csproj",
+        "projectUniqueName": "/Users/gerganabrezova/Desktop/Banking-Management-System-Project/BankingManagmentApp/BankingManagmentApp.csproj",
         "projectName": "BankingManagmentApp",
-        "projectPath": "/home/jovanab/Projects/Banking-Management-System-Project/BankingManagmentApp/BankingManagmentApp.csproj",
-        "packagesPath": "/home/jovanab/.nuget/packages/",
-        "outputPath": "/home/jovanab/Projects/Banking-Management-System-Project/BankingManagmentApp/obj/",
+        "projectPath": "/Users/gerganabrezova/Desktop/Banking-Management-System-Project/BankingManagmentApp/BankingManagmentApp.csproj",
+        "packagesPath": "/Users/gerganabrezova/.nuget/packages/",
+        "outputPath": "/Users/gerganabrezova/Desktop/Banking-Management-System-Project/BankingManagmentApp/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "/home/jovanab/.nuget/NuGet/NuGet.Config"
+          "/Users/gerganabrezova/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
@@ -32,7 +32,13 @@
           "warnAsError": [
             "NU1605"
           ]
-        }
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        },
+        "SdkAnalysisLevel": "9.0.300"
       },
       "frameworks": {
         "net8.0": {
@@ -90,11 +96,7 @@
             },
             "QuestPDF": {
               "target": "Package",
-              "version": "[2025.7.1, )"
-            },
-            "SixLabors.Fonts": {
-              "target": "Package",
-              "version": "[2.1.3, )"
+              "version": "[2024.2.0, )"
             },
             "SixLabors.ImageSharp": {
               "target": "Package",
@@ -128,7 +130,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/lib/dotnet/sdk/8.0.119/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/9.0.304/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

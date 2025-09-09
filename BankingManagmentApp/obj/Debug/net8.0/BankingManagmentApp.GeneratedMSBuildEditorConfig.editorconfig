@@ -17,223 +17,225 @@ build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property.RootNamespace = BankingManagmentApp
 build_property.RootNamespace = BankingManagmentApp
-build_property.ProjectDir = /home/jovanab/Projects/Banking-Management-System-Project/BankingManagmentApp/
+build_property.ProjectDir = /Users/gerganabrezova/Desktop/Banking-Management-System-Project/BankingManagmentApp/
 build_property.EnableComHosting = 
 build_property.EnableGeneratedComInterfaceComImportInterop = 
 build_property.RazorLangVersion = 8.0
 build_property.SupportLocalizedComponentNames = 
 build_property.GenerateRazorMetadataSourceChecksumAttributes = 
-build_property.MSBuildProjectDirectory = /home/jovanab/Projects/Banking-Management-System-Project/BankingManagmentApp
+build_property.MSBuildProjectDirectory = /Users/gerganabrezova/Desktop/Banking-Management-System-Project/BankingManagmentApp
 build_property._RazorSourceGeneratorDebug = 
+build_property.EffectiveAnalysisLevelStyle = 8.0
+build_property.EnableCodeStyleSeverity = 
 
-[/home/jovanab/Projects/Banking-Management-System-Project/BankingManagmentApp/Areas/Identity/Pages/Account/Login.cshtml]
+[/Users/gerganabrezova/Desktop/Banking-Management-System-Project/BankingManagmentApp/Areas/Identity/Pages/Account/Login.cshtml]
 build_metadata.AdditionalFiles.TargetPath = QXJlYXMvSWRlbnRpdHkvUGFnZXMvQWNjb3VudC9Mb2dpbi5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/jovanab/Projects/Banking-Management-System-Project/BankingManagmentApp/Areas/Identity/Pages/Account/Logout.cshtml]
+[/Users/gerganabrezova/Desktop/Banking-Management-System-Project/BankingManagmentApp/Areas/Identity/Pages/Account/Logout.cshtml]
 build_metadata.AdditionalFiles.TargetPath = QXJlYXMvSWRlbnRpdHkvUGFnZXMvQWNjb3VudC9Mb2dvdXQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/jovanab/Projects/Banking-Management-System-Project/BankingManagmentApp/Areas/Identity/Pages/Account/Manage/Appearance.cshtml]
+[/Users/gerganabrezova/Desktop/Banking-Management-System-Project/BankingManagmentApp/Areas/Identity/Pages/Account/Manage/Appearance.cshtml]
 build_metadata.AdditionalFiles.TargetPath = QXJlYXMvSWRlbnRpdHkvUGFnZXMvQWNjb3VudC9NYW5hZ2UvQXBwZWFyYW5jZS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/jovanab/Projects/Banking-Management-System-Project/BankingManagmentApp/Areas/Identity/Pages/Account/Manage/ChangePassword.cshtml]
+[/Users/gerganabrezova/Desktop/Banking-Management-System-Project/BankingManagmentApp/Areas/Identity/Pages/Account/Manage/ChangePassword.cshtml]
 build_metadata.AdditionalFiles.TargetPath = QXJlYXMvSWRlbnRpdHkvUGFnZXMvQWNjb3VudC9NYW5hZ2UvQ2hhbmdlUGFzc3dvcmQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/jovanab/Projects/Banking-Management-System-Project/BankingManagmentApp/Areas/Identity/Pages/Account/Manage/DeletePersonalData.cshtml]
+[/Users/gerganabrezova/Desktop/Banking-Management-System-Project/BankingManagmentApp/Areas/Identity/Pages/Account/Manage/DeletePersonalData.cshtml]
 build_metadata.AdditionalFiles.TargetPath = QXJlYXMvSWRlbnRpdHkvUGFnZXMvQWNjb3VudC9NYW5hZ2UvRGVsZXRlUGVyc29uYWxEYXRhLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/jovanab/Projects/Banking-Management-System-Project/BankingManagmentApp/Areas/Identity/Pages/Account/Manage/Disable2fa.cshtml]
+[/Users/gerganabrezova/Desktop/Banking-Management-System-Project/BankingManagmentApp/Areas/Identity/Pages/Account/Manage/Disable2fa.cshtml]
 build_metadata.AdditionalFiles.TargetPath = QXJlYXMvSWRlbnRpdHkvUGFnZXMvQWNjb3VudC9NYW5hZ2UvRGlzYWJsZTJmYS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/jovanab/Projects/Banking-Management-System-Project/BankingManagmentApp/Areas/Identity/Pages/Account/Manage/DownloadPersonalData.cshtml]
+[/Users/gerganabrezova/Desktop/Banking-Management-System-Project/BankingManagmentApp/Areas/Identity/Pages/Account/Manage/DownloadPersonalData.cshtml]
 build_metadata.AdditionalFiles.TargetPath = QXJlYXMvSWRlbnRpdHkvUGFnZXMvQWNjb3VudC9NYW5hZ2UvRG93bmxvYWRQZXJzb25hbERhdGEuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/jovanab/Projects/Banking-Management-System-Project/BankingManagmentApp/Areas/Identity/Pages/Account/Manage/Email.cshtml]
+[/Users/gerganabrezova/Desktop/Banking-Management-System-Project/BankingManagmentApp/Areas/Identity/Pages/Account/Manage/Email.cshtml]
 build_metadata.AdditionalFiles.TargetPath = QXJlYXMvSWRlbnRpdHkvUGFnZXMvQWNjb3VudC9NYW5hZ2UvRW1haWwuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/jovanab/Projects/Banking-Management-System-Project/BankingManagmentApp/Areas/Identity/Pages/Account/Manage/EnableAuthenticator.cshtml]
+[/Users/gerganabrezova/Desktop/Banking-Management-System-Project/BankingManagmentApp/Areas/Identity/Pages/Account/Manage/EnableAuthenticator.cshtml]
 build_metadata.AdditionalFiles.TargetPath = QXJlYXMvSWRlbnRpdHkvUGFnZXMvQWNjb3VudC9NYW5hZ2UvRW5hYmxlQXV0aGVudGljYXRvci5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/jovanab/Projects/Banking-Management-System-Project/BankingManagmentApp/Areas/Identity/Pages/Account/Manage/GenerateRecoveryCodes.cshtml]
+[/Users/gerganabrezova/Desktop/Banking-Management-System-Project/BankingManagmentApp/Areas/Identity/Pages/Account/Manage/GenerateRecoveryCodes.cshtml]
 build_metadata.AdditionalFiles.TargetPath = QXJlYXMvSWRlbnRpdHkvUGFnZXMvQWNjb3VudC9NYW5hZ2UvR2VuZXJhdGVSZWNvdmVyeUNvZGVzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/jovanab/Projects/Banking-Management-System-Project/BankingManagmentApp/Areas/Identity/Pages/Account/Manage/Index.cshtml]
+[/Users/gerganabrezova/Desktop/Banking-Management-System-Project/BankingManagmentApp/Areas/Identity/Pages/Account/Manage/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = QXJlYXMvSWRlbnRpdHkvUGFnZXMvQWNjb3VudC9NYW5hZ2UvSW5kZXguY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/jovanab/Projects/Banking-Management-System-Project/BankingManagmentApp/Areas/Identity/Pages/Account/Manage/PersonalData.cshtml]
+[/Users/gerganabrezova/Desktop/Banking-Management-System-Project/BankingManagmentApp/Areas/Identity/Pages/Account/Manage/PersonalData.cshtml]
 build_metadata.AdditionalFiles.TargetPath = QXJlYXMvSWRlbnRpdHkvUGFnZXMvQWNjb3VudC9NYW5hZ2UvUGVyc29uYWxEYXRhLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/jovanab/Projects/Banking-Management-System-Project/BankingManagmentApp/Areas/Identity/Pages/Account/Manage/ResetAuthenticator.cshtml]
+[/Users/gerganabrezova/Desktop/Banking-Management-System-Project/BankingManagmentApp/Areas/Identity/Pages/Account/Manage/ResetAuthenticator.cshtml]
 build_metadata.AdditionalFiles.TargetPath = QXJlYXMvSWRlbnRpdHkvUGFnZXMvQWNjb3VudC9NYW5hZ2UvUmVzZXRBdXRoZW50aWNhdG9yLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/jovanab/Projects/Banking-Management-System-Project/BankingManagmentApp/Areas/Identity/Pages/Account/Manage/ShowRecoveryCodes.cshtml]
+[/Users/gerganabrezova/Desktop/Banking-Management-System-Project/BankingManagmentApp/Areas/Identity/Pages/Account/Manage/ShowRecoveryCodes.cshtml]
 build_metadata.AdditionalFiles.TargetPath = QXJlYXMvSWRlbnRpdHkvUGFnZXMvQWNjb3VudC9NYW5hZ2UvU2hvd1JlY292ZXJ5Q29kZXMuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/jovanab/Projects/Banking-Management-System-Project/BankingManagmentApp/Areas/Identity/Pages/Account/Manage/TwoFactorAuthentication.cshtml]
+[/Users/gerganabrezova/Desktop/Banking-Management-System-Project/BankingManagmentApp/Areas/Identity/Pages/Account/Manage/TwoFactorAuthentication.cshtml]
 build_metadata.AdditionalFiles.TargetPath = QXJlYXMvSWRlbnRpdHkvUGFnZXMvQWNjb3VudC9NYW5hZ2UvVHdvRmFjdG9yQXV0aGVudGljYXRpb24uY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/jovanab/Projects/Banking-Management-System-Project/BankingManagmentApp/Areas/Identity/Pages/Account/Manage/_Layout.cshtml]
+[/Users/gerganabrezova/Desktop/Banking-Management-System-Project/BankingManagmentApp/Areas/Identity/Pages/Account/Manage/_Layout.cshtml]
 build_metadata.AdditionalFiles.TargetPath = QXJlYXMvSWRlbnRpdHkvUGFnZXMvQWNjb3VudC9NYW5hZ2UvX0xheW91dC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/jovanab/Projects/Banking-Management-System-Project/BankingManagmentApp/Areas/Identity/Pages/Account/Manage/_ManageNav.cshtml]
+[/Users/gerganabrezova/Desktop/Banking-Management-System-Project/BankingManagmentApp/Areas/Identity/Pages/Account/Manage/_ManageNav.cshtml]
 build_metadata.AdditionalFiles.TargetPath = QXJlYXMvSWRlbnRpdHkvUGFnZXMvQWNjb3VudC9NYW5hZ2UvX01hbmFnZU5hdi5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/jovanab/Projects/Banking-Management-System-Project/BankingManagmentApp/Areas/Identity/Pages/Account/Manage/_StatusMessage.cshtml]
+[/Users/gerganabrezova/Desktop/Banking-Management-System-Project/BankingManagmentApp/Areas/Identity/Pages/Account/Manage/_StatusMessage.cshtml]
 build_metadata.AdditionalFiles.TargetPath = QXJlYXMvSWRlbnRpdHkvUGFnZXMvQWNjb3VudC9NYW5hZ2UvX1N0YXR1c01lc3NhZ2UuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/jovanab/Projects/Banking-Management-System-Project/BankingManagmentApp/Areas/Identity/Pages/Account/Manage/_ViewImports.cshtml]
+[/Users/gerganabrezova/Desktop/Banking-Management-System-Project/BankingManagmentApp/Areas/Identity/Pages/Account/Manage/_ViewImports.cshtml]
 build_metadata.AdditionalFiles.TargetPath = QXJlYXMvSWRlbnRpdHkvUGFnZXMvQWNjb3VudC9NYW5hZ2UvX1ZpZXdJbXBvcnRzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/jovanab/Projects/Banking-Management-System-Project/BankingManagmentApp/Areas/Identity/Pages/Account/Register.cshtml]
+[/Users/gerganabrezova/Desktop/Banking-Management-System-Project/BankingManagmentApp/Areas/Identity/Pages/Account/Register.cshtml]
 build_metadata.AdditionalFiles.TargetPath = QXJlYXMvSWRlbnRpdHkvUGFnZXMvQWNjb3VudC9SZWdpc3Rlci5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/jovanab/Projects/Banking-Management-System-Project/BankingManagmentApp/Areas/Identity/Pages/Account/_ViewImports.cshtml]
+[/Users/gerganabrezova/Desktop/Banking-Management-System-Project/BankingManagmentApp/Areas/Identity/Pages/Account/_ViewImports.cshtml]
 build_metadata.AdditionalFiles.TargetPath = QXJlYXMvSWRlbnRpdHkvUGFnZXMvQWNjb3VudC9fVmlld0ltcG9ydHMuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/jovanab/Projects/Banking-Management-System-Project/BankingManagmentApp/Areas/Identity/Pages/_ValidationScriptsPartial.cshtml]
+[/Users/gerganabrezova/Desktop/Banking-Management-System-Project/BankingManagmentApp/Areas/Identity/Pages/_ValidationScriptsPartial.cshtml]
 build_metadata.AdditionalFiles.TargetPath = QXJlYXMvSWRlbnRpdHkvUGFnZXMvX1ZhbGlkYXRpb25TY3JpcHRzUGFydGlhbC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/jovanab/Projects/Banking-Management-System-Project/BankingManagmentApp/Areas/Identity/Pages/_ViewImports.cshtml]
+[/Users/gerganabrezova/Desktop/Banking-Management-System-Project/BankingManagmentApp/Areas/Identity/Pages/_ViewImports.cshtml]
 build_metadata.AdditionalFiles.TargetPath = QXJlYXMvSWRlbnRpdHkvUGFnZXMvX1ZpZXdJbXBvcnRzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/jovanab/Projects/Banking-Management-System-Project/BankingManagmentApp/Areas/Identity/Pages/_ViewStart.cshtml]
+[/Users/gerganabrezova/Desktop/Banking-Management-System-Project/BankingManagmentApp/Areas/Identity/Pages/_ViewStart.cshtml]
 build_metadata.AdditionalFiles.TargetPath = QXJlYXMvSWRlbnRpdHkvUGFnZXMvX1ZpZXdTdGFydC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/jovanab/Projects/Banking-Management-System-Project/BankingManagmentApp/Views/Accounts/Create.cshtml]
+[/Users/gerganabrezova/Desktop/Banking-Management-System-Project/BankingManagmentApp/Views/Accounts/Create.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWNjb3VudHMvQ3JlYXRlLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/jovanab/Projects/Banking-Management-System-Project/BankingManagmentApp/Views/Accounts/Delete.cshtml]
+[/Users/gerganabrezova/Desktop/Banking-Management-System-Project/BankingManagmentApp/Views/Accounts/Delete.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWNjb3VudHMvRGVsZXRlLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/jovanab/Projects/Banking-Management-System-Project/BankingManagmentApp/Views/Accounts/Details.cshtml]
+[/Users/gerganabrezova/Desktop/Banking-Management-System-Project/BankingManagmentApp/Views/Accounts/Details.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWNjb3VudHMvRGV0YWlscy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/jovanab/Projects/Banking-Management-System-Project/BankingManagmentApp/Views/Accounts/Edit.cshtml]
+[/Users/gerganabrezova/Desktop/Banking-Management-System-Project/BankingManagmentApp/Views/Accounts/Edit.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWNjb3VudHMvRWRpdC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/jovanab/Projects/Banking-Management-System-Project/BankingManagmentApp/Views/Accounts/Index.cshtml]
+[/Users/gerganabrezova/Desktop/Banking-Management-System-Project/BankingManagmentApp/Views/Accounts/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWNjb3VudHMvSW5kZXguY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/jovanab/Projects/Banking-Management-System-Project/BankingManagmentApp/Views/Customers/Create.cshtml]
+[/Users/gerganabrezova/Desktop/Banking-Management-System-Project/BankingManagmentApp/Views/Customers/Create.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQ3VzdG9tZXJzL0NyZWF0ZS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/jovanab/Projects/Banking-Management-System-Project/BankingManagmentApp/Views/Customers/Delete.cshtml]
+[/Users/gerganabrezova/Desktop/Banking-Management-System-Project/BankingManagmentApp/Views/Customers/Delete.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQ3VzdG9tZXJzL0RlbGV0ZS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/jovanab/Projects/Banking-Management-System-Project/BankingManagmentApp/Views/Customers/Details.cshtml]
+[/Users/gerganabrezova/Desktop/Banking-Management-System-Project/BankingManagmentApp/Views/Customers/Details.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQ3VzdG9tZXJzL0RldGFpbHMuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/jovanab/Projects/Banking-Management-System-Project/BankingManagmentApp/Views/Customers/Edit.cshtml]
+[/Users/gerganabrezova/Desktop/Banking-Management-System-Project/BankingManagmentApp/Views/Customers/Edit.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQ3VzdG9tZXJzL0VkaXQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/jovanab/Projects/Banking-Management-System-Project/BankingManagmentApp/Views/Customers/Index.cshtml]
+[/Users/gerganabrezova/Desktop/Banking-Management-System-Project/BankingManagmentApp/Views/Customers/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQ3VzdG9tZXJzL0luZGV4LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/jovanab/Projects/Banking-Management-System-Project/BankingManagmentApp/Views/Home/Index.cshtml]
+[/Users/gerganabrezova/Desktop/Banking-Management-System-Project/BankingManagmentApp/Views/Home/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3MvSG9tZS9JbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/jovanab/Projects/Banking-Management-System-Project/BankingManagmentApp/Views/Home/Privacy.cshtml]
+[/Users/gerganabrezova/Desktop/Banking-Management-System-Project/BankingManagmentApp/Views/Home/Privacy.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3MvSG9tZS9Qcml2YWN5LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/jovanab/Projects/Banking-Management-System-Project/BankingManagmentApp/Views/Loans/Create.cshtml]
+[/Users/gerganabrezova/Desktop/Banking-Management-System-Project/BankingManagmentApp/Views/Loans/Create.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3MvTG9hbnMvQ3JlYXRlLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/jovanab/Projects/Banking-Management-System-Project/BankingManagmentApp/Views/Loans/Delete.cshtml]
+[/Users/gerganabrezova/Desktop/Banking-Management-System-Project/BankingManagmentApp/Views/Loans/Delete.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3MvTG9hbnMvRGVsZXRlLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/jovanab/Projects/Banking-Management-System-Project/BankingManagmentApp/Views/Loans/Details.cshtml]
+[/Users/gerganabrezova/Desktop/Banking-Management-System-Project/BankingManagmentApp/Views/Loans/Details.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3MvTG9hbnMvRGV0YWlscy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/jovanab/Projects/Banking-Management-System-Project/BankingManagmentApp/Views/Loans/Edit.cshtml]
+[/Users/gerganabrezova/Desktop/Banking-Management-System-Project/BankingManagmentApp/Views/Loans/Edit.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3MvTG9hbnMvRWRpdC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/jovanab/Projects/Banking-Management-System-Project/BankingManagmentApp/Views/Loans/Index.cshtml]
+[/Users/gerganabrezova/Desktop/Banking-Management-System-Project/BankingManagmentApp/Views/Loans/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3MvTG9hbnMvSW5kZXguY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/jovanab/Projects/Banking-Management-System-Project/BankingManagmentApp/Views/Profile/Index.cshtml]
+[/Users/gerganabrezova/Desktop/Banking-Management-System-Project/BankingManagmentApp/Views/Profile/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUHJvZmlsZS9JbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/jovanab/Projects/Banking-Management-System-Project/BankingManagmentApp/Views/Shared/Error.cshtml]
+[/Users/gerganabrezova/Desktop/Banking-Management-System-Project/BankingManagmentApp/Views/Shared/Error.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU2hhcmVkL0Vycm9yLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/jovanab/Projects/Banking-Management-System-Project/BankingManagmentApp/Views/Shared/_LoginPartial.cshtml]
+[/Users/gerganabrezova/Desktop/Banking-Management-System-Project/BankingManagmentApp/Views/Shared/_LoginPartial.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU2hhcmVkL19Mb2dpblBhcnRpYWwuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/jovanab/Projects/Banking-Management-System-Project/BankingManagmentApp/Views/Shared/_ValidationScriptsPartial.cshtml]
+[/Users/gerganabrezova/Desktop/Banking-Management-System-Project/BankingManagmentApp/Views/Shared/_ValidationScriptsPartial.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU2hhcmVkL19WYWxpZGF0aW9uU2NyaXB0c1BhcnRpYWwuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/jovanab/Projects/Banking-Management-System-Project/BankingManagmentApp/Views/Transactions/Create.cshtml]
+[/Users/gerganabrezova/Desktop/Banking-Management-System-Project/BankingManagmentApp/Views/Transactions/Create.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3MvVHJhbnNhY3Rpb25zL0NyZWF0ZS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/jovanab/Projects/Banking-Management-System-Project/BankingManagmentApp/Views/Transactions/Delete.cshtml]
+[/Users/gerganabrezova/Desktop/Banking-Management-System-Project/BankingManagmentApp/Views/Transactions/Delete.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3MvVHJhbnNhY3Rpb25zL0RlbGV0ZS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/jovanab/Projects/Banking-Management-System-Project/BankingManagmentApp/Views/Transactions/Details.cshtml]
+[/Users/gerganabrezova/Desktop/Banking-Management-System-Project/BankingManagmentApp/Views/Transactions/Details.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3MvVHJhbnNhY3Rpb25zL0RldGFpbHMuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/jovanab/Projects/Banking-Management-System-Project/BankingManagmentApp/Views/Transactions/Edit.cshtml]
+[/Users/gerganabrezova/Desktop/Banking-Management-System-Project/BankingManagmentApp/Views/Transactions/Edit.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3MvVHJhbnNhY3Rpb25zL0VkaXQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/jovanab/Projects/Banking-Management-System-Project/BankingManagmentApp/Views/Transactions/Index.cshtml]
+[/Users/gerganabrezova/Desktop/Banking-Management-System-Project/BankingManagmentApp/Views/Transactions/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3MvVHJhbnNhY3Rpb25zL0luZGV4LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/jovanab/Projects/Banking-Management-System-Project/BankingManagmentApp/Views/_ViewImports.cshtml]
+[/Users/gerganabrezova/Desktop/Banking-Management-System-Project/BankingManagmentApp/Views/_ViewImports.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3MvX1ZpZXdJbXBvcnRzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/jovanab/Projects/Banking-Management-System-Project/BankingManagmentApp/Views/_ViewStart.cshtml]
+[/Users/gerganabrezova/Desktop/Banking-Management-System-Project/BankingManagmentApp/Views/_ViewStart.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3MvX1ZpZXdTdGFydC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/jovanab/Projects/Banking-Management-System-Project/BankingManagmentApp/Views/Shared/_Layout.cshtml]
+[/Users/gerganabrezova/Desktop/Banking-Management-System-Project/BankingManagmentApp/Views/Shared/_Layout.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU2hhcmVkL19MYXlvdXQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = b-mb4hnq8ylz
