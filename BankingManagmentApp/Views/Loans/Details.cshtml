@@ -12,7 +12,7 @@
 
         <div class="card-body p-4">
             <dl class="row mb-0">
-                <dt class="col-sm-4 text-muted">Type</dt>
+                <dt class="col-sm-4 text-muted">Credit Type</dt>
                 <dd class="col-sm-8">@Html.DisplayFor(model => model.Type)</dd>
 
                 <dt class="col-sm-4 text-muted">Amount</dt>
@@ -33,14 +33,25 @@
                     </span>
                 </dd>
 
-                <dt class="col-sm-4 text-muted">Approved Amount</dt>
-                <dd class="col-sm-8">@Html.DisplayFor(model => model.ApprovedAmount)</dd>
+                
 
+                @if (Model.Status == "Pending" || Model.Status == "Rejected")
+                {
+                    <dt class="col-sm-4 text-muted">Approved Amount</dt>
+                    <dd class="col-sm-8">-</dd>
+                    <dt class="col-sm-4 text-muted">Approval Date</dt>
+                    <dd class="col-sm-8">-</dd>
+                }
+                else{
+                <dt class="col-sm-4 text-muted">Approved Amount</dt>
+                <dd class="col-sm-8">@Html.DisplayFor(model => model.ApprovedAmount) lv</dd>
                 <dt class="col-sm-4 text-muted">Approval Date</dt>
                 <dd class="col-sm-8">@Html.DisplayFor(model => model.ApprovalDate)</dd>
-
+                }
                 <dt class="col-sm-4 text-muted">Customer</dt>
-                <dd class="col-sm-8">@Html.DisplayFor(model => model.Customer.Id)</dd>
+                <dd class="col-sm-8">@Html.DisplayFor(model => model.Customer.FirstName)
+                    @Html.DisplayFor(model => model.Customer.LastName)
+                </dd>
             </dl>
         </div>
 

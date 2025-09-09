@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "ldRi4velXQ0=",
+  "dgSpecHash": "L8E7qTcFZbs=",
   "success": true,
-  "projectFilePath": "C:\\Users\\viole\\Downloads\\Banking-Management-System-Project\\BankingManagmentApp\\BankingManagmentApp.csproj",
+  "projectFilePath": "C:\\Users\\viole\\OneDrive\\Работен плот\\Banking-Management-System-Project\\BankingManagmentApp\\BankingManagmentApp.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\viole\\.nuget\\packages\\azure.core\\1.38.0\\azure.core.1.38.0.nupkg.sha512",
     "C:\\Users\\viole\\.nuget\\packages\\azure.identity\\1.11.4\\azure.identity.1.11.4.nupkg.sha512",
@@ -202,9 +202,9 @@
       "code": "NU1603",
       "level": "Warning",
       "message": "BankingManagmentApp depends on QuestPDF (>= 2024.2.0) but QuestPDF 2024.2.0 was not found. QuestPDF 2024.3.0 was resolved instead.",
-      "projectPath": "C:\\Users\\viole\\Downloads\\Banking-Management-System-Project\\BankingManagmentApp\\BankingManagmentApp.csproj",
+      "projectPath": "C:\\Users\\viole\\OneDrive\\Работен плот\\Banking-Management-System-Project\\BankingManagmentApp\\BankingManagmentApp.csproj",
       "warningLevel": 1,
-      "filePath": "C:\\Users\\viole\\Downloads\\Banking-Management-System-Project\\BankingManagmentApp\\BankingManagmentApp.csproj",
+      "filePath": "C:\\Users\\viole\\OneDrive\\Работен плот\\Banking-Management-System-Project\\BankingManagmentApp\\BankingManagmentApp.csproj",
       "libraryId": "QuestPDF",
       "targetGraphs": [
         "net8.0"

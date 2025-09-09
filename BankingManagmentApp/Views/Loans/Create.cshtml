@@ -20,9 +20,9 @@
                     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
                     <div class="mb-3">
-                        <label asp-for="Type" class="form-label"></label>
+                        <label asp-for="Type" class="form-label">Choose loan type</label>
                         <select asp-for="Type" class="form-select">
-                            <option value="">-- Select Loan Type --</option>
+                            <option value="">-- Select --</option>
                             <option value="Personal Loan">Personal Loan</option>
                             <option value="Home Loan">Home Loan</option>
                             <option value="Car Loan">Car Loan</option>
@@ -33,7 +33,7 @@
                     </div>
 
                     <div class="mb-3">
-                        <label asp-for="Amount" class="form-label"></label>
+                        <label asp-for="Amount" class="form-label">Amount</label>
                         <input asp-for="Amount" class="form-control" />
                         <span asp-validation-for="Amount" class="text-danger"></span>
                     </div>
