@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using BankingManagmentApp.Data;
 using BankingManagmentApp.Models;
 using Microsoft.AspNetCore.Identity;
+using System.Diagnostics.CodeAnalysis;
 
 namespace BankingManagmentApp.Controllers
 {
@@ -20,10 +21,6 @@ namespace BankingManagmentApp.Controllers
             _context = context;
             _userManager = userManager;
         }
-
-        // ============================
-        // CUSTOMER FEATURES
-        // ============================
 
         // GET: Loans/Apply
         public IActionResult Apply()
@@ -45,13 +42,14 @@ namespace BankingManagmentApp.Controllers
                 loan.Status = "Pending";
                 loan.Date = DateTime.Now;
                 loan.Amount = loan.Amount;
-                // loan.Type = "credit";
+                //loan.Type = "credit";
+
                 _context.Loans.Add(loan);
                 await _context.SaveChangesAsync();
 
                 // Redirect to Profile dashboard (loans will show there)
             }
-                return RedirectToAction("Index", "Profile");
+            return RedirectToAction("Index", "Profile");
         }
 
         // GET: Loans/MyLoans
@@ -60,12 +58,19 @@ namespace BankingManagmentApp.Controllers
             var user = await _userManager.GetUserAsync(User);
             if (user == null) return Challenge();
 
-            var myLoans = await _context.Loans
-                .Include(l => l.Customer)
-                .Where(l => l.CustomerId == user.Id)
-                .ToListAsync();
-
-            return View(myLoans);
+            if (User.IsInRole("Admin"))
+            {
+                var myDbContext = _context.Loans
+                .Include(l => l.Customer);
+                return View(await myDbContext.ToListAsync());
+            }
+            else
+            {
+                var myGardenDbContext = _context.Loans
+                    .Include(o => o.Customer)
+                    .Where(x => x.CustomerId == _userManager.GetUserId(User));
+                return View(await myGardenDbContext.ToListAsync());
+            }
         }
 
         // ============================
@@ -75,8 +80,23 @@ namespace BankingManagmentApp.Controllers
         // GET: Loans
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Loans.Include(l => l.Customer);
-            return View(await applicationDbContext.ToListAsync());
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return Challenge();
+
+            if (User.IsInRole("Admin"))
+            {
+                var myDbContext = _context.Loans
+                .Include(l => l.Customer)
+                .Where(t => t.Status == "Pending");
+                return View(await myDbContext.ToListAsync());
+            }
+            else
+            {
+                var myGardenDbContext = _context.Loans
+                    .Include(o => o.Customer)
+                    .Where(x => x.CustomerId == _userManager.GetUserId(User));
+                return View(await myGardenDbContext.ToListAsync());
+            }
         }
 
         // GET: Loans/Details/5
@@ -132,12 +152,16 @@ namespace BankingManagmentApp.Controllers
         public async Task<IActionResult> Edit(int id, [Bind("Id,CustomerId,Type,Amount,Term,Date,Status,ApprovedAmount,ApprovalDate")] Loans loans)
         {
             if (id != loans.Id) return NotFound();
-
+            if (_userManager.GetUserId(User) == null)
+            {
+                return NotFound();
+            }
             if (!ModelState.IsValid)
             {
                 try
                 {
                     loans.CustomerId = _userManager.GetUserId(User);
+                    loans.ApprovalDate = DateTime.Now;
                     _context.Loans.Update(loans);
                     await _context.SaveChangesAsync();
                 }

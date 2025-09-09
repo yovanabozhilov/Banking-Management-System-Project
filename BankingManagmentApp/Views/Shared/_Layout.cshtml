@@ -75,13 +75,24 @@
                                 <a class="nav-link" asp-area="" asp-controller="Loans" asp-action="Create">Apply for credit</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" asp-area="" asp-controller="Loans" asp-action="Index">Your Credits</a>
-                            </li>
-                            <li class="nav-item">
                                 <a class="nav-link" asp-area="" asp-controller="Accounts" asp-action="Create">New Card</a>
                             </li>
-
                         }
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-area="" asp-controller="Loans" asp-action="Index">Pending Credits</a>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-area="" asp-controller="Loans" asp-action="Index">Your Credits</a>
+                            </li>
+                        }
+
+
+
                     </ul>
 
                     <partial name="_LoginPartial" />

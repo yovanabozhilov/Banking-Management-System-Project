@@ -38,11 +38,11 @@
                         <span asp-validation-for="Amount" class="text-danger"></span>
                     </div>
 
-                    <div class="mb-3">
+                    @* <div class="mb-3">
                         <label asp-for="Term" class="form-label"></label>
                         <input asp-for="Term" class="form-control" />
                         <span asp-validation-for="Term" class="text-danger"></span>
-                    </div>
+                    </div> *@
 
                     <div class="d-grid">
                         <button type="submit" class="btn btn-primary btn-lg">Apply</button>
@@ -58,5 +58,7 @@
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

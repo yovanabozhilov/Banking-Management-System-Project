@@ -42,24 +42,24 @@
                                     <td>@Html.DisplayFor(modelItem => item.Term)</td>
                                     <td>@Html.DisplayFor(modelItem => item.Date)</td>
                                     <td>
-                                        <span class="badge @(item.Status?.ToLower() == "approved" ? "bg-success" 
-                                                        : item.Status?.ToLower() == "pending" ? "bg-warning text-dark" 
-                                                        : "bg-secondary")">
-                                            @item.Status
-                                        </span>
-                                    </td>
-                                    <td class="text-end">@Html.DisplayFor(modelItem => item.ApprovedAmount)</td>
-                                    <td>@Html.DisplayFor(modelItem => item.ApprovalDate)</td>
-                                    <td>@Html.DisplayFor(modelItem => item.Customer.Id)</td>
-                                    <td class="text-center">
-                                        <div class="btn-group btn-group-sm" role="group">
-                                            <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-outline-primary">Edit</a>
-                                            <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-outline-secondary">Details</a>
-                                            <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-outline-danger">Delete</a>
-                                        </div>
-                                    </td>
-                                </tr>
-                            }
+                                        <span class="badge @(item.Status?.ToLower() == "approved" ? "bg-success"
+                                                                                                      : item.Status?.ToLower() == "pending" ? "bg-warning text-dark"
+                                                                                                      : "bg-secondary")">
+                                    @item.Status
+                                </span>
+                            </td>
+                            <td class="text-end">@Html.DisplayFor(modelItem => item.ApprovedAmount)</td>
+                            <td>@Html.DisplayFor(modelItem => item.ApprovalDate)</td>
+                            <td>@Html.DisplayFor(modelItem => item.Customer.Id)</td>
+                            <td class="text-center">
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-outline-primary">Edit</a>
+                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-outline-secondary">Details</a>
+                                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-outline-danger">Delete</a>
+                                </div>
+                            </td>
+                        </tr>
+                                                }
                         </tbody>
                     </table>
                 </div>

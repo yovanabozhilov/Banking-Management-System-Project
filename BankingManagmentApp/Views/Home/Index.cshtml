@@ -1,8 +1,330 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@* @{
+    ViewData["Title"] = "Welcome";
 }
+<style>
+    /* Hero Section */
+    .hero-section {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px;
+        min-height: 100vh;
+        
+/*         background: linear-gradient(120deg, #3b0d41, #7b2cbf, #ff0080, #ff8c00);
+ */        color: white;
+        font-family: 'Segoe UI', sans-serif;
+    }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    .hero-content {
+        max-width: 50%;
+    }
+
+    .tool-label {
+        font-size: 18px;
+        color: #ffef9f;
+        font-weight: bold;
+    }
+
+    .hero-content h1 {
+        font-size: 60px;
+        font-weight: bold;
+        line-height: 1.2;
+        margin: 20px 0;
+    }
+
+    .subtitle {
+        margin-bottom: 40px;
+        font-size: 16px;
+        opacity: 0.9;
+    }
+
+    .cta-button {
+        background: #d9ff00;
+        color: black;
+        padding: 12px 24px;
+        border-radius: 30px;
+        font-weight: bold;
+        text-decoration: none;
+        transition: 0.3s;
+    }
+
+        .cta-button:hover {
+            background: #c4e600;
+        }
+
+    .stats {
+        display: flex;
+        gap: 50px;
+        margin-top: 40px;
+    }
+
+    .stat-number {
+        font-size: 22px;
+        font-weight: bold;
+        display: block;
+    }
+
+    .stat-label {
+        font-size: 14px;
+        opacity: 0.8;
+    }
+
+    /* Right side cards */
+    .hero-image {
+        position: relative;
+        width: 30%;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .card {
+        background: rgba(255,255,255,0.1);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 20px;
+        width: 350px;
+        margin:50px;
+        color: white;
+        box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+        transform: rotate(20deg);       
+    }
+    .card:hover{
+            transform: scale(1.1);
+        }
+
+    .card-title {
+        font-size: 14px;
+        opacity: 0.8;
+    }
+
+    .card-value {
+        font-size: 24px;
+        font-weight: bold;
+        margin: 5px 0;
+    }
+
+    .card-sub {
+        font-size: 12px;
+        opacity: 0.7;
+    }
+
+
+
+</style>
+<div class="hero-section">
+    <div class="hero-content">
+        <span class="tool-label">ALL-IN-ONE TOOL</span>
+        <h1>
+            Take Control <br />
+            Of Your Finances <br />
+            Anytime, Anywhere
+        </h1>
+        <p class="subtitle">
+            Simplify your financial management with real-time insights, automated tracking,
+            and seamless integrations. Stay in charge and achieve your goals — all in one powerful platform.
+        </p>
+        <a class="cta-button" href="#">
+            Get the App <span>→</span>
+        </a>
+
+        <div class="stats">
+            <div>
+                <span class="stat-number">35K</span>
+                <span class="stat-label">Active User</span>
+            </div>
+            <div>
+                <span class="stat-number">35K</span>
+                <span class="stat-label">Good Feedback</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="hero-image">
+        <div class="card outcome">
+            <p class="card-title">Out Come</p>
+            <p class="card-value">$356.847</p>
+            <p class="card-sub">This month</p>
+        </div>
+
+        <div class="card income">
+            <p class="card-title">Income</p>
+            <p class="card-value">$356.847</p>
+            <p class="card-sub">This month</p>
+        </div>
+    </div>
+</div>
+ *@
+@{
+    ViewData["Title"] = "Welcome";
+}
+<style>
+
+    /* Hero Section with the gradient background */
+    .hero-section {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 40px;
+        min-height: 100vh;
+        color: white;
+    }
+
+    /* Left side content */
+    .hero-content {
+        max-width: 50%;
+    }
+
+    .tool-label {
+        font-size: 18px;
+        color: rgba(255, 255, 255, 0.7);
+        font-weight: bold;
+    }
+
+    .hero-content h1 {
+        font-size: 60px;
+        font-weight: bold;
+        line-height: 1.2;
+        margin: 20px 0;
+        text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.4);
+    }
+
+    .subtitle {
+        margin-bottom: 40px;
+        font-size: 16px;
+        opacity: 0.9;
+    }
+
+    .cta-button {
+        background: #33ccff;
+        color: black;
+        padding: 12px 24px;
+        border-radius: 30px;
+        font-weight: bold;
+        text-decoration: none;
+        transition: transform 0.3s;
+    }
+
+        .cta-button:hover {
+            transform: scale(1.05);
+        }
+
+    .stats {
+        display: flex;
+        gap: 50px;
+        margin-top: 40px;
+    }
+
+    .stat-number {
+        font-size: 22px;
+        font-weight: bold;
+        display: block;
+    }
+
+    .stat-label {
+        font-size: 14px;
+        opacity: 0.8;
+    }
+
+    /* Right side cards visualization */
+    .hero-image {
+        position: relative;
+        width: 30%;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        /* The cards are absolutely positioned relative to this container */
+        height: 500px; /* Give it some height for positioning */
+    }
+
+    .card {
+        background: rgba(255,255,255,0.1);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px); /* For Safari */
+        border-radius: 20px;
+        padding: 20px;
+        width: 350px;
+        color: white;
+        box-shadow: 2px 2px 8px rgba(0, 0, 0.4, 0.4);
+        transition: transform 0.5s ease;
+        margin: 200px;
+    }
+
+        .card.outcome {
+            position: absolute;
+            top: 20%;
+            left: 0;
+            transform: rotate(-10deg);
+        }
+
+        .card.income {
+            position: absolute;
+            bottom: 20%;
+            right: 0;
+            transform: rotate(10deg);
+        }
+
+        .card:hover {
+            transform: scale(1.1) rotate(0deg); /* Zoom and straighten on hover */
+        }
+
+    .card-title {
+        font-size: 14px;
+        opacity: 0.8;
+    }
+
+    .card-value {
+        font-size: 24px;
+        font-weight: bold;
+        margin: 5px 0;
+    }
+
+    .card-sub {
+        font-size: 12px;
+        opacity: 0.7;
+    }
+</style>
+<div class="hero-section">
+    <div class="hero-content">
+        @*         <h1><i>GLOWPAY</i></h1>
+ *@
+        <span class="tool-label">GLOWPAY - ALL-IN-ONE TOOL</span>
+        <h1>
+            Take Control <br />
+            Of Your Finances <br />
+            Anytime, Anywhere
+        </h1>
+        <p class="subtitle">
+            Simplify your financial management with real-time insights, automated tracking,
+            and seamless integrations. Stay in charge and achieve your goals — all in one powerful platform.
+        </p>
+
+        <div class="stats">
+            <div>
+                <span class="stat-number">35K</span>
+                <span class="stat-label">Active User</span>
+            </div>
+            <div>
+                <span class="stat-number">35K</span>
+                <span class="stat-label">Good Feedback</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="hero-image">
+        <div class="card outcome">
+            <p class="card-title">Out Come</p>
+            <p class="card-value">$356.847</p>
+            <p class="card-sub">This month</p>
+        </div>
+
+        <div class="card income">
+            <p class="card-title">Income</p>
+            <p class="card-value">$356.847</p>
+            <p class="card-sub">This month</p>
+        </div>
+    </div>
+
+
+
 </div>

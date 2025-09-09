@@ -35,7 +35,7 @@ namespace BankingManagmentApp.Controllers
 
         // PROFILE DASHBOARD
         public async Task<IActionResult> Index()
-        {
+        { 
             var user = await _userManager.GetUserAsync(User);
             if (user == null) return Challenge();
 
