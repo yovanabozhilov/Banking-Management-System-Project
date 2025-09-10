@@ -7,17 +7,11 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace BankingManagmentApp.Services
 {
-    /// <summary>
-    /// Автоматично обучава/претренира ML модела:
-    /// - при стартиране: TrainIfNeeded
-    /// - след това: веднъж дневно в 03:15 (Europe/Sofia)
-    /// Няма UI/бутон.
-    /// </summary>
     public class MlRetrainHostedService : BackgroundService
     {
         private readonly IServiceProvider _services;
         private readonly ILogger<MlRetrainHostedService> _logger;
-        private readonly TimeSpan _dailyTime = new(3, 15, 0); // 03:15
+        private readonly TimeSpan _dailyTime = new(3, 15, 0);
         private readonly TimeZoneInfo _tz;
 
         public MlRetrainHostedService(IServiceProvider services, ILogger<MlRetrainHostedService> logger)

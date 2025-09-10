@@ -13,6 +13,6 @@
         public DateTime ApprovalDate { get; set; } = DateTime.Now;
         public Customers Customer { get; set; }
         public ICollection<LoanRepayments> LoanRepayments { get; set; } = new List<LoanRepayments>();
-        public ICollection<CreditAssessments> CreditAssessments { get; set; } = new List<CreditAssessments>(); // Добавена колекция за връзка
+        public ICollection<CreditAssessments> CreditAssessments { get; set; } = new List<CreditAssessments>(); 
     }
 }

@@ -30,6 +30,18 @@
         3 => "bg-danger",
         _ => "bg-dark"
     };
+
+    string LoanStatusBadgeClass(string? s)
+    {
+        var st = s?.ToLower();
+        return st switch
+        {
+            "approved" or "autoapproved"  => "bg-success",
+            "pending" or "pendingreview"  => "bg-warning text-dark",
+            "declined" or "autodeclined"  => "bg-danger",
+            _                             => "bg-secondary"
+        };
+    }
 }
 
 <div class="container-profile">
@@ -159,7 +171,6 @@
 
             @if (Model.Accounts.Any())
             {
-                <!-- Unified form: Account + From/To + Description; values persist from query -->
                 <form method="get" class="d-flex align-items-end flex-wrap gap-2">
                     <div>
                         <label class="form-label xsmall mb-1">Account</label>
@@ -197,7 +208,6 @@
                             value="@(ViewContext?.HttpContext?.Request?.Query["q"].ToString())" />
                     </div>
 
-                    <!-- One set of fields; different actions via formaction -->
                     <button type="submit" class="btn btn-sm btn-outline-secondary"
                             formaction="@Url.Action("SearchTransactions", "Profile")">
                         Search
@@ -265,7 +275,6 @@
         </div>
     </div>
 
-    <!-- HARD SPACER -->
     <div style="height: 15px;"></div>
 
     <!-- TRANSACTIONS CATEGORIZATION -->
@@ -350,7 +359,6 @@
 
     <!-- LOANS + UPCOMING REPAYMENTS + CREDIT SCORE -->
     <div class="row g-3 mt-2 align-items-stretch">
-        <!-- Loans (left) -->
         <div class="col-12 col-lg-7 d-flex">
             <div class="card shadow-sm flex-fill d-flex flex-column">
                 <div class="card-header d-flex align-items-center justify-content-between">
@@ -379,16 +387,16 @@
                                 <tbody>
                                     @foreach (var l in Model.Loans)
                                     {
+                                        var st = l.Status?.ToLower();
+                                        var isApproved = st == "approved" || st == "autoapproved";
                                         <tr>
                                             <td>@l.Type</td>
-                                            <td class="text-end">@l.ApprovedAmount.ToString("N2", bg)</td>
+                                            <td class="text-end">@(isApproved ? l.ApprovedAmount.ToString("N2", bg) : "-")</td>
                                             <td>
-                                                <span class="badge @(l.Status?.ToLower() == "approved" ? "bg-success" : l.Status?.ToLower() == "pending" ? "bg-warning text-dark" : "bg-secondary")">
-                                                    @l.Status
-                                                </span>
+                                                <span class="badge @LoanStatusBadgeClass(l.Status)">@l.Status</span>
                                             </td>
                                             <td>@l.Term.ToString("dd.MM.yyyy")</td>
-                                            <td>@l.ApprovalDate.ToString("dd.MM.yyyy")</td>
+                                            <td>@(isApproved ? l.ApprovalDate.ToString("dd.MM.yyyy") : "-")</td>
                                         </tr>
                                     }
                                 </tbody>
@@ -411,7 +419,7 @@
                         </div>
                     </div>
                 }
-                <div class="text-nowrap">
+                <div class="text-nowrap p-2">
                     <button class="btn btn-outline-primary btn-sm">
                         <a class="nav-link" asp-area="" asp-controller="Loans" asp-action="Create">Apply for credit</a>
                     </button>

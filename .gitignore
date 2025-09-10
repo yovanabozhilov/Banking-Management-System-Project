@@ -1,5 +1,8 @@
+**/bin/
+**/obj/
 .vs/
-*/bin/
-*/obj/
-bin/
-obj/
+*.user
+*.suo
+# ML артефакти
+BankingManagmentApp/App_Data/ML/credit_kmeans.zip
+BankingManagmentApp/App_Data/ML/cluster_map.json

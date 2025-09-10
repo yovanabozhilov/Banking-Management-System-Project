@@ -3,6 +3,7 @@ using QuestPDF.Infrastructure;
 using BankingManagmentApp.Data;
 using BankingManagmentApp.Models;
 using BankingManagmentApp.Services;
+using BankingManagmentApp.Services.Approval;   
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -46,6 +47,11 @@ builder.Services.AddSession(options =>
 // DI: услуги за кредитен скоринг и кредити
 builder.Services.AddScoped<ICreditScoringService, MlCreditScoringService>();
 builder.Services.AddScoped<LoansService>();
+
+// Approval/Workflow DI
+builder.Services.AddSingleton<LoanApprovalPolicy>();
+builder.Services.AddScoped<ILoanApprovalEngine, LoanApprovalEngine>();
+builder.Services.AddScoped<ILoanWorkflow, LoanWorkflow>();
 
 // Background авто-претрениране (стартира на boot и по график)
 builder.Services.AddHostedService<MlRetrainHostedService>();

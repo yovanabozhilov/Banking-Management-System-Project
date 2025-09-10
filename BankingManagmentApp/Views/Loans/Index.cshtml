@@ -1,7 +1,23 @@
 ﻿@model IEnumerable<BankingManagmentApp.Models.Loans>
+@using System.Globalization
 
 @{
     ViewData["Title"] = "Loans";
+    var bg = CultureInfo.GetCultureInfo("bg-BG");
+}
+
+@functions {
+    string LoanStatusBadgeClass(string? s)
+    {
+        var st = s?.ToLower();
+        return st switch
+        {
+            "approved" or "autoapproved"  => "bg-success",
+            "pending"  or "pendingreview" => "bg-warning text-dark",
+            "declined" or "autodeclined"  => "bg-danger",
+            _                              => "bg-secondary"
+        };
+    }
 }
 
 <div class="container mt-5">
@@ -36,30 +52,48 @@
                         <tbody>
                             @foreach (var item in Model)
                             {
+                                var st = item.Status?.ToLower();
+                                var isApproved = st == "approved" || st == "autoapproved";
+
                                 <tr>
-                                    <td>@Html.DisplayFor(modelItem => item.Type)</td>
-                                    <td class="text-end">@Html.DisplayFor(modelItem => item.Amount)</td>
-                                    <td>@Html.DisplayFor(modelItem => item.Term)</td>
-                                    <td>@Html.DisplayFor(modelItem => item.Date)</td>
+                                    <td>@item.Type</td>
+                                    <td class="text-end">@item.Amount.ToString("N2", bg)</td>
+
                                     <td>
-                                        <span class="badge @(item.Status?.ToLower() == "approved" ? "bg-success"
-                                                                                                      : item.Status?.ToLower() == "pending" ? "bg-warning text-dark"
-                                                                                                      : "bg-secondary")">
-                                    @item.Status
-                                </span>
-                            </td>
-                            <td class="text-end">@Html.DisplayFor(modelItem => item.ApprovedAmount)</td>
-                            <td>@Html.DisplayFor(modelItem => item.ApprovalDate)</td>
-                            <td>@Html.DisplayFor(modelItem => item.Customer.Id)</td>
-                            <td class="text-center">
-                                <div class="btn-group btn-group-sm" role="group">
-                                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-outline-primary">Edit</a>
-                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-outline-secondary">Details</a>
-                                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-outline-danger">Delete</a>
-                                </div>
-                            </td>
-                        </tr>
-                                                }
+                                        @item.Term.ToString("dd.MM.yyyy")
+                                    </td>
+
+                                    <td>
+                                        @item.Date.ToString("dd.MM.yyyy")
+                                    </td>
+
+                                    <td>
+                                        <span class="badge @LoanStatusBadgeClass(item.Status)">
+                                            @item.Status
+                                        </span>
+                                    </td>
+
+                                    <td class="text-end">
+                                        @(isApproved ? item.ApprovedAmount.ToString("N2", bg) : "-")
+                                    </td>
+
+                                    <td>
+                                        @(isApproved ? item.ApprovalDate.ToString("dd.MM.yyyy") : "-")
+                                    </td>
+
+                                    <td>
+                                        @item.Customer?.Id
+                                    </td>
+
+                                    <td class="text-center">
+                                        <div class="btn-group btn-group-sm" role="group">
+                                            <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-outline-primary">Edit</a>
+                                            <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-outline-secondary">Details</a>
+                                            <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-outline-danger">Delete</a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
                         </tbody>
                     </table>
                 </div>
