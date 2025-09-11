@@ -1,22 +1,25 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using BankingManagmentApp.Data;
+using BankingManagmentApp.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using BankingManagmentApp.Data;
-using BankingManagmentApp.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Security.Claims;
+using System.Threading.Tasks;
 
 namespace BankingManagmentApp.Controllers
 {
     public class TransactionsController : Controller
     {
         private readonly ApplicationDbContext _context;
-
-        public TransactionsController(ApplicationDbContext context)
+        private readonly UserManager<Customers> _userManager;
+        public TransactionsController(ApplicationDbContext context, UserManager<Customers> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         // GET: Transactions
@@ -57,18 +60,41 @@ namespace BankingManagmentApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,AccountsId,TransactionType,Amount,Date,Description,ReferenceNumber")] Transactions transactions)
+        public async Task<IActionResult> Create([Bind("AccountsId,TransactionType,Amount,Date,Description,ReferenceNumber")] Transactions transactions)
         {
-            if (ModelState.IsValid)
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            // намираме акаунта на този потребител
+            var account = await _context.Accounts
+                .Include(a => a.Customer)
+                .FirstOrDefaultAsync(a => a.Customer.Id == userId);
+
+            if (account == null)
             {
-                _context.Add(transactions);
+                return Unauthorized(); // ако няма акаунт за този user
+            }
+
+
+            if (!ModelState.IsValid)
+            {
+                transactions.AccountsId = account.Id;
+
+                // попълваме автоматично някои стойности
+                transactions.TransactionType = "Debit";
+                //var previousMonthDate = DateTime.Now.AddMonths(-1);
+                //transactions.Date = DateOnly.FromDateTime(previousMonthDate);
+                transactions.Date = DateOnly.FromDateTime(DateTime.Now);
+
+                // пример за генериране на референтен номер (може да го смениш според логиката ти)
+                transactions.ReferenceNumber = new Random().Next(10000, 99999);
+                _context.Transactions.Add(transactions);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["AccountsId"] = new SelectList(_context.Accounts, "Id", "Id", transactions.AccountsId);
-            return View(transactions);
-        }
 
+            //ViewData["AccountsId"] = new SelectList(_context.Accounts, "Id", "Id", transactions.AccountsId);
+            return View("Index", "Profile");
+        }
         // GET: Transactions/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
@@ -82,8 +108,8 @@ namespace BankingManagmentApp.Controllers
             {
                 return NotFound();
             }
-            ViewData["AccountsId"] = new SelectList(_context.Accounts, "Id", "Id", transactions.AccountsId);
-            return View(transactions);
+            // ViewData["AccountsId"] = new SelectList(_context.Accounts, "Id", "Id", transactions.AccountsId);
+            return View("Index", "Profile");
         }
 
         // POST: Transactions/Edit/5

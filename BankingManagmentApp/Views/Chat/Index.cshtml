@@ -1,0 +1,81 @@
+﻿@{
+    ViewData["Title"] = "AI Chat";
+}
+<h2>AI Chat</h2>
+
+<div id="chatWindowMain" style="border:1px solid #ccc; padding:10px; width:600px; height:400px; overflow-y:auto; background:#f9f9f9;">
+    <!-- Messages will appear here -->
+</div>
+
+<div style="margin-top:10px;">
+    <input id="prompt" type="text" style="width:500px;" placeholder="Type your message..." />
+    <button id="sendBtn">Send</button>
+    <button id="streamBtn">Send (stream)</button>
+</div>
+
+<script>
+    function addMessage(text, sender) {
+      const chatWindow = document.getElementById('chatWindowMain');
+      const msgDiv = document.createElement('div');
+      msgDiv.textContent = text;
+      msgDiv.style.padding = "8px";
+      msgDiv.style.margin = "5px";
+      msgDiv.style.borderRadius = "10px";
+      msgDiv.style.maxWidth = "80%";
+
+      if (sender === "user") {
+        msgDiv.style.background = "#d1e7dd"; // greenish for user
+        msgDiv.style.alignSelf = "flex-end";
+        msgDiv.style.textAlign = "right";
+      } else {
+        msgDiv.style.background = "#e2e3e5"; // gray for AI
+        msgDiv.style.alignSelf = "flex-start";
+      }
+
+      chatWindow.appendChild(msgDiv);
+      chatWindow.scrollTop = chatWindow.scrollHeight;
+    }
+
+    document.getElementById('sendBtn').onclick = async () => {
+      const prompt = document.getElementById('prompt').value;
+      if (!prompt.trim()) return;
+
+      addMessage(prompt, "user");
+      document.getElementById('prompt').value = "";
+
+      const res = await fetch('/chat/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: prompt })
+      });
+      const data = await res.json();
+      addMessage(data.reply, "ai");
+    };
+
+    document.getElementById('streamBtn').onclick = () => {
+      const prompt = document.getElementById('prompt').value;
+      if (!prompt.trim()) return;
+
+      addMessage(prompt, "user");
+      document.getElementById('prompt').value = "";
+
+      const evt = new EventSource('/chat/stream?prompt=' + encodeURIComponent(prompt));
+      let aiMsg = document.createElement('div');
+      aiMsg.style.padding = "8px";
+      aiMsg.style.margin = "5px";
+      aiMsg.style.borderRadius = "10px";
+      aiMsg.style.maxWidth = "80%";
+      aiMsg.style.background = "#e2e3e5";
+      aiMsg.style.alignSelf = "flex-start";
+
+      document.getElementById('chatWindow').appendChild(aiMsg);
+
+      evt.onmessage = function(e) {
+        aiMsg.textContent += e.data.replace(/\\n/g, "\n");
+        document.getElementById('chatWindow').scrollTop = document.getElementById('chatWindow').scrollHeight;
+      };
+      evt.onerror = function () {
+        evt.close();
+      };
+    };
+</script>

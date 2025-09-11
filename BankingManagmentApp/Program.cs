@@ -1,11 +1,13 @@
-// Program.cs
 using QuestPDF.Infrastructure;
 using BankingManagmentApp.Data;
 using BankingManagmentApp.Models;
 using BankingManagmentApp.Services;
-using BankingManagmentApp.Services.Approval;   
+using BankingManagmentApp.Services.Approval;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.AI;
+using OpenAI;
+using Microsoft.Extensions.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -53,8 +55,28 @@ builder.Services.AddSingleton<LoanApprovalPolicy>();
 builder.Services.AddScoped<ILoanApprovalEngine, LoanApprovalEngine>();
 builder.Services.AddScoped<ILoanWorkflow, LoanWorkflow>();
 
+builder.Services.AddChatClient(sp =>
+{
+    var config = sp.GetRequiredService<IConfiguration>();
+    var key = config["OpenAIKey"] ?? throw new InvalidOperationException("OpenAIKey not set");
+    var model = config["ModelName"] ?? "gpt-4o-mini";
+
+    // create the provider client and adapt to IChatClient
+    var openAiClient = new OpenAI.OpenAIClient(key);
+    var chatClient = openAiClient.GetChatClient(model).AsIChatClient(); // adapt to ME.AI abstraction
+    return chatClient;
+});
+
+// register your wrapper service so controllers can inject it
+builder.Services.AddScoped<AiChatService>();
+
+
 // Background авто-претрениране (стартира на boot и по график)
 builder.Services.AddHostedService<MlRetrainHostedService>();
+
+// register your wrapper service so controllers can inject it
+builder.Services.AddScoped<AiChatService>();
+
 
 var app = builder.Build();
 

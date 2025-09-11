@@ -1,26 +1,50 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "C:\\Users\\viole\\OneDrive\\\u0420\u0430\u0431\u043E\u0442\u0435\u043D \u043F\u043B\u043E\u0442\\Banking-Management-System-Project\\",
+  "WorkspaceRootPath": "C:\\Users\\viole\\Downloads\\Banking-Management-System-Project\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{584A87E8-1FC0-42DD-B80C-7D8D27808F9C}|BankingManagmentApp\\BankingManagmentApp.csproj|c:\\users\\viole\\onedrive\\\u0440\u0430\u0431\u043E\u0442\u0435\u043D \u043F\u043B\u043E\u0442\\banking-management-system-project\\bankingmanagmentapp\\views\\accounts\\create.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{584A87E8-1FC0-42DD-B80C-7D8D27808F9C}|BankingManagmentApp\\BankingManagmentApp.csproj|solutionrelative:bankingmanagmentapp\\views\\accounts\\create.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+      "AbsoluteMoniker": "D:0:0:{584A87E8-1FC0-42DD-B80C-7D8D27808F9C}|BankingManagmentApp\\BankingManagmentApp.csproj|c:\\users\\viole\\downloads\\banking-management-system-project\\bankingmanagmentapp\\services\\approval\\applicationfeatures.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{584A87E8-1FC0-42DD-B80C-7D8D27808F9C}|BankingManagmentApp\\BankingManagmentApp.csproj|solutionrelative:bankingmanagmentapp\\services\\approval\\applicationfeatures.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{584A87E8-1FC0-42DD-B80C-7D8D27808F9C}|BankingManagmentApp\\BankingManagmentApp.csproj|c:\\users\\viole\\onedrive\\\u0440\u0430\u0431\u043E\u0442\u0435\u043D \u043F\u043B\u043E\u0442\\banking-management-system-project\\bankingmanagmentapp\\views\\loans\\create.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{584A87E8-1FC0-42DD-B80C-7D8D27808F9C}|BankingManagmentApp\\BankingManagmentApp.csproj|solutionrelative:bankingmanagmentapp\\views\\loans\\create.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+      "AbsoluteMoniker": "D:0:0:{584A87E8-1FC0-42DD-B80C-7D8D27808F9C}|BankingManagmentApp\\BankingManagmentApp.csproj|c:\\users\\viole\\downloads\\banking-management-system-project\\bankingmanagmentapp\\views\\home\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{584A87E8-1FC0-42DD-B80C-7D8D27808F9C}|BankingManagmentApp\\BankingManagmentApp.csproj|solutionrelative:bankingmanagmentapp\\views\\home\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{584A87E8-1FC0-42DD-B80C-7D8D27808F9C}|BankingManagmentApp\\BankingManagmentApp.csproj|c:\\users\\viole\\onedrive\\\u0440\u0430\u0431\u043E\u0442\u0435\u043D \u043F\u043B\u043E\u0442\\banking-management-system-project\\bankingmanagmentapp\\views\\loans\\delete.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{584A87E8-1FC0-42DD-B80C-7D8D27808F9C}|BankingManagmentApp\\BankingManagmentApp.csproj|solutionrelative:bankingmanagmentapp\\views\\loans\\delete.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+      "AbsoluteMoniker": "D:0:0:{584A87E8-1FC0-42DD-B80C-7D8D27808F9C}|BankingManagmentApp\\BankingManagmentApp.csproj|c:\\users\\viole\\downloads\\banking-management-system-project\\bankingmanagmentapp\\views\\shared\\_layout.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{584A87E8-1FC0-42DD-B80C-7D8D27808F9C}|BankingManagmentApp\\BankingManagmentApp.csproj|solutionrelative:bankingmanagmentapp\\views\\shared\\_layout.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{584A87E8-1FC0-42DD-B80C-7D8D27808F9C}|BankingManagmentApp\\BankingManagmentApp.csproj|c:\\users\\viole\\onedrive\\\u0440\u0430\u0431\u043E\u0442\u0435\u043D \u043F\u043B\u043E\u0442\\banking-management-system-project\\bankingmanagmentapp\\areas\\identity\\pages\\account\\login.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{584A87E8-1FC0-42DD-B80C-7D8D27808F9C}|BankingManagmentApp\\BankingManagmentApp.csproj|solutionrelative:bankingmanagmentapp\\areas\\identity\\pages\\account\\login.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+      "AbsoluteMoniker": "D:0:0:{584A87E8-1FC0-42DD-B80C-7D8D27808F9C}|BankingManagmentApp\\BankingManagmentApp.csproj|c:\\users\\viole\\downloads\\banking-management-system-project\\bankingmanagmentapp\\controllers\\transactionscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{584A87E8-1FC0-42DD-B80C-7D8D27808F9C}|BankingManagmentApp\\BankingManagmentApp.csproj|solutionrelative:bankingmanagmentapp\\controllers\\transactionscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{584A87E8-1FC0-42DD-B80C-7D8D27808F9C}|BankingManagmentApp\\BankingManagmentApp.csproj|c:\\users\\viole\\onedrive\\\u0440\u0430\u0431\u043E\u0442\u0435\u043D \u043F\u043B\u043E\u0442\\banking-management-system-project\\bankingmanagmentapp\\views\\loans\\details.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{584A87E8-1FC0-42DD-B80C-7D8D27808F9C}|BankingManagmentApp\\BankingManagmentApp.csproj|solutionrelative:bankingmanagmentapp\\views\\loans\\details.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+      "AbsoluteMoniker": "D:0:0:{584A87E8-1FC0-42DD-B80C-7D8D27808F9C}|BankingManagmentApp\\BankingManagmentApp.csproj|c:\\users\\viole\\downloads\\banking-management-system-project\\bankingmanagmentapp\\views\\profile\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{584A87E8-1FC0-42DD-B80C-7D8D27808F9C}|BankingManagmentApp\\BankingManagmentApp.csproj|solutionrelative:bankingmanagmentapp\\views\\profile\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{584A87E8-1FC0-42DD-B80C-7D8D27808F9C}|BankingManagmentApp\\BankingManagmentApp.csproj|c:\\users\\viole\\downloads\\banking-management-system-project\\bankingmanagmentapp\\views\\transactions\\create.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{584A87E8-1FC0-42DD-B80C-7D8D27808F9C}|BankingManagmentApp\\BankingManagmentApp.csproj|solutionrelative:bankingmanagmentapp\\views\\transactions\\create.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{584A87E8-1FC0-42DD-B80C-7D8D27808F9C}|BankingManagmentApp\\BankingManagmentApp.csproj|c:\\users\\viole\\downloads\\banking-management-system-project\\bankingmanagmentapp\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{584A87E8-1FC0-42DD-B80C-7D8D27808F9C}|BankingManagmentApp\\BankingManagmentApp.csproj|solutionrelative:bankingmanagmentapp\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{584A87E8-1FC0-42DD-B80C-7D8D27808F9C}|BankingManagmentApp\\BankingManagmentApp.csproj|c:\\users\\viole\\downloads\\banking-management-system-project\\bankingmanagmentapp\\views\\shared\\chatbot.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{584A87E8-1FC0-42DD-B80C-7D8D27808F9C}|BankingManagmentApp\\BankingManagmentApp.csproj|solutionrelative:bankingmanagmentapp\\views\\shared\\chatbot.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{584A87E8-1FC0-42DD-B80C-7D8D27808F9C}|BankingManagmentApp\\BankingManagmentApp.csproj|c:\\users\\viole\\downloads\\banking-management-system-project\\bankingmanagmentapp\\views\\chat\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{584A87E8-1FC0-42DD-B80C-7D8D27808F9C}|BankingManagmentApp\\BankingManagmentApp.csproj|solutionrelative:bankingmanagmentapp\\views\\chat\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{584A87E8-1FC0-42DD-B80C-7D8D27808F9C}|BankingManagmentApp\\BankingManagmentApp.csproj|c:\\users\\viole\\downloads\\banking-management-system-project\\bankingmanagmentapp\\controllers\\chatcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{584A87E8-1FC0-42DD-B80C-7D8D27808F9C}|BankingManagmentApp\\BankingManagmentApp.csproj|solutionrelative:bankingmanagmentapp\\controllers\\chatcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{584A87E8-1FC0-42DD-B80C-7D8D27808F9C}|BankingManagmentApp\\BankingManagmentApp.csproj|c:\\users\\viole\\downloads\\banking-management-system-project\\bankingmanagmentapp\\services\\aichatservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{584A87E8-1FC0-42DD-B80C-7D8D27808F9C}|BankingManagmentApp\\BankingManagmentApp.csproj|solutionrelative:bankingmanagmentapp\\services\\aichatservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -35,63 +59,135 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "Create.cshtml",
-              "DocumentMoniker": "C:\\Users\\viole\\OneDrive\\\u0420\u0430\u0431\u043E\u0442\u0435\u043D \u043F\u043B\u043E\u0442\\Banking-Management-System-Project\\BankingManagmentApp\\Views\\Accounts\\Create.cshtml",
-              "RelativeDocumentMoniker": "BankingManagmentApp\\Views\\Accounts\\Create.cshtml",
-              "ToolTip": "C:\\Users\\viole\\OneDrive\\\u0420\u0430\u0431\u043E\u0442\u0435\u043D \u043F\u043B\u043E\u0442\\Banking-Management-System-Project\\BankingManagmentApp\\Views\\Accounts\\Create.cshtml",
-              "RelativeToolTip": "BankingManagmentApp\\Views\\Accounts\\Create.cshtml",
-              "ViewState": "AgIAAAkAAAAAAAAAAAAAABEAAAAKAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-09-09T16:54:11.1Z",
+              "Title": "ApplicationFeatures.cs",
+              "DocumentMoniker": "C:\\Users\\viole\\Downloads\\Banking-Management-System-Project\\BankingManagmentApp\\Services\\Approval\\ApplicationFeatures.cs",
+              "RelativeDocumentMoniker": "BankingManagmentApp\\Services\\Approval\\ApplicationFeatures.cs",
+              "ToolTip": "C:\\Users\\viole\\Downloads\\Banking-Management-System-Project\\BankingManagmentApp\\Services\\Approval\\ApplicationFeatures.cs",
+              "RelativeToolTip": "BankingManagmentApp\\Services\\Approval\\ApplicationFeatures.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAArAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-11T11:18:20.582Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "Login.cshtml",
-              "DocumentMoniker": "C:\\Users\\viole\\OneDrive\\\u0420\u0430\u0431\u043E\u0442\u0435\u043D \u043F\u043B\u043E\u0442\\Banking-Management-System-Project\\BankingManagmentApp\\Areas\\Identity\\Pages\\Account\\Login.cshtml",
-              "RelativeDocumentMoniker": "BankingManagmentApp\\Areas\\Identity\\Pages\\Account\\Login.cshtml",
-              "ToolTip": "C:\\Users\\viole\\OneDrive\\\u0420\u0430\u0431\u043E\u0442\u0435\u043D \u043F\u043B\u043E\u0442\\Banking-Management-System-Project\\BankingManagmentApp\\Areas\\Identity\\Pages\\Account\\Login.cshtml",
-              "RelativeToolTip": "BankingManagmentApp\\Areas\\Identity\\Pages\\Account\\Login.cshtml",
-              "ViewState": "AgIAAAEAAAAAAAAAAAAAABMAAAArAAAAAAAAAA==",
+              "DocumentIndex": 1,
+              "Title": "Index.cshtml",
+              "DocumentMoniker": "C:\\Users\\viole\\Downloads\\Banking-Management-System-Project\\BankingManagmentApp\\Views\\Home\\Index.cshtml",
+              "RelativeDocumentMoniker": "BankingManagmentApp\\Views\\Home\\Index.cshtml",
+              "ToolTip": "C:\\Users\\viole\\Downloads\\Banking-Management-System-Project\\BankingManagmentApp\\Views\\Home\\Index.cshtml",
+              "RelativeToolTip": "BankingManagmentApp\\Views\\Home\\Index.cshtml",
+              "ViewState": "AgIAAKAAAAAAAAAAAAAgwLQAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-09-09T16:37:21.018Z"
+              "WhenOpened": "2025-09-11T11:17:47.653Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "TransactionsController.cs",
+              "DocumentMoniker": "C:\\Users\\viole\\Downloads\\Banking-Management-System-Project\\BankingManagmentApp\\Controllers\\TransactionsController.cs",
+              "RelativeDocumentMoniker": "BankingManagmentApp\\Controllers\\TransactionsController.cs",
+              "ToolTip": "C:\\Users\\viole\\Downloads\\Banking-Management-System-Project\\BankingManagmentApp\\Controllers\\TransactionsController.cs",
+              "RelativeToolTip": "BankingManagmentApp\\Controllers\\TransactionsController.cs",
+              "ViewState": "AgIAAKEAAAAAAAAAAAAIwL4AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-11T11:14:15.616Z"
             },
             {
               "$type": "Document",
               "DocumentIndex": 4,
-              "Title": "Details.cshtml",
-              "DocumentMoniker": "C:\\Users\\viole\\OneDrive\\\u0420\u0430\u0431\u043E\u0442\u0435\u043D \u043F\u043B\u043E\u0442\\Banking-Management-System-Project\\BankingManagmentApp\\Views\\Loans\\Details.cshtml",
-              "RelativeDocumentMoniker": "BankingManagmentApp\\Views\\Loans\\Details.cshtml",
-              "ToolTip": "C:\\Users\\viole\\OneDrive\\\u0420\u0430\u0431\u043E\u0442\u0435\u043D \u043F\u043B\u043E\u0442\\Banking-Management-System-Project\\BankingManagmentApp\\Views\\Loans\\Details.cshtml",
-              "RelativeToolTip": "BankingManagmentApp\\Views\\Loans\\Details.cshtml",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAAjAAAAAAAAAA==",
+              "Title": "Index.cshtml",
+              "DocumentMoniker": "C:\\Users\\viole\\Downloads\\Banking-Management-System-Project\\BankingManagmentApp\\Views\\Profile\\Index.cshtml",
+              "RelativeDocumentMoniker": "BankingManagmentApp\\Views\\Profile\\Index.cshtml",
+              "ToolTip": "C:\\Users\\viole\\Downloads\\Banking-Management-System-Project\\BankingManagmentApp\\Views\\Profile\\Index.cshtml",
+              "RelativeToolTip": "BankingManagmentApp\\Views\\Profile\\Index.cshtml",
+              "ViewState": "AgIAABcBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-09-09T16:27:54.648Z"
+              "WhenOpened": "2025-09-11T11:13:52.559Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "Create.cshtml",
+              "DocumentMoniker": "C:\\Users\\viole\\Downloads\\Banking-Management-System-Project\\BankingManagmentApp\\Views\\Transactions\\Create.cshtml",
+              "RelativeDocumentMoniker": "BankingManagmentApp\\Views\\Transactions\\Create.cshtml",
+              "ToolTip": "C:\\Users\\viole\\Downloads\\Banking-Management-System-Project\\BankingManagmentApp\\Views\\Transactions\\Create.cshtml",
+              "RelativeToolTip": "BankingManagmentApp\\Views\\Transactions\\Create.cshtml",
+              "ViewState": "AgIAAAMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-09-11T11:13:39.809Z"
             },
             {
               "$type": "Document",
               "DocumentIndex": 2,
-              "Title": "Delete.cshtml",
-              "DocumentMoniker": "C:\\Users\\viole\\OneDrive\\\u0420\u0430\u0431\u043E\u0442\u0435\u043D \u043F\u043B\u043E\u0442\\Banking-Management-System-Project\\BankingManagmentApp\\Views\\Loans\\Delete.cshtml",
-              "RelativeDocumentMoniker": "BankingManagmentApp\\Views\\Loans\\Delete.cshtml",
-              "ToolTip": "C:\\Users\\viole\\OneDrive\\\u0420\u0430\u0431\u043E\u0442\u0435\u043D \u043F\u043B\u043E\u0442\\Banking-Management-System-Project\\BankingManagmentApp\\Views\\Loans\\Delete.cshtml",
-              "RelativeToolTip": "BankingManagmentApp\\Views\\Loans\\Delete.cshtml",
-              "ViewState": "AgIAABsAAAAAAAAAAAAAAB8AAABIAAAAAAAAAA==",
+              "Title": "_Layout.cshtml",
+              "DocumentMoniker": "C:\\Users\\viole\\Downloads\\Banking-Management-System-Project\\BankingManagmentApp\\Views\\Shared\\_Layout.cshtml",
+              "RelativeDocumentMoniker": "BankingManagmentApp\\Views\\Shared\\_Layout.cshtml",
+              "ToolTip": "C:\\Users\\viole\\Downloads\\Banking-Management-System-Project\\BankingManagmentApp\\Views\\Shared\\_Layout.cshtml",
+              "RelativeToolTip": "BankingManagmentApp\\Views\\Shared\\_Layout.cshtml",
+              "ViewState": "AgIAAEsAAAAAAAAAAAAIwFYAAAAxAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-09-09T16:27:07.56Z"
+              "WhenOpened": "2025-09-11T10:57:48.399Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "Create.cshtml",
-              "DocumentMoniker": "C:\\Users\\viole\\OneDrive\\\u0420\u0430\u0431\u043E\u0442\u0435\u043D \u043F\u043B\u043E\u0442\\Banking-Management-System-Project\\BankingManagmentApp\\Views\\Loans\\Create.cshtml",
-              "RelativeDocumentMoniker": "BankingManagmentApp\\Views\\Loans\\Create.cshtml",
-              "ToolTip": "C:\\Users\\viole\\OneDrive\\\u0420\u0430\u0431\u043E\u0442\u0435\u043D \u043F\u043B\u043E\u0442\\Banking-Management-System-Project\\BankingManagmentApp\\Views\\Loans\\Create.cshtml",
-              "RelativeToolTip": "BankingManagmentApp\\Views\\Loans\\Create.cshtml",
-              "ViewState": "AgIAABIAAAAAAAAAAAAAAB4AAAAhAAAAAAAAAA==",
+              "DocumentIndex": 6,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Users\\viole\\Downloads\\Banking-Management-System-Project\\BankingManagmentApp\\Program.cs",
+              "RelativeDocumentMoniker": "BankingManagmentApp\\Program.cs",
+              "ToolTip": "C:\\Users\\viole\\Downloads\\Banking-Management-System-Project\\BankingManagmentApp\\Program.cs",
+              "RelativeToolTip": "BankingManagmentApp\\Program.cs",
+              "ViewState": "AgIAAF0AAAAAAAAAAAAAwHAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-11T10:49:46.035Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "Chatbot.cshtml",
+              "DocumentMoniker": "C:\\Users\\viole\\Downloads\\Banking-Management-System-Project\\BankingManagmentApp\\Views\\Shared\\Chatbot.cshtml",
+              "RelativeDocumentMoniker": "BankingManagmentApp\\Views\\Shared\\Chatbot.cshtml",
+              "ToolTip": "C:\\Users\\viole\\Downloads\\Banking-Management-System-Project\\BankingManagmentApp\\Views\\Shared\\Chatbot.cshtml",
+              "RelativeToolTip": "BankingManagmentApp\\Views\\Shared\\Chatbot.cshtml",
+              "ViewState": "AgIAABgAAAAAAAAAAAAAACEAAAAKAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-09-09T16:25:47.451Z"
+              "WhenOpened": "2025-09-11T10:49:32.264Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "Index.cshtml",
+              "DocumentMoniker": "C:\\Users\\viole\\Downloads\\Banking-Management-System-Project\\BankingManagmentApp\\Views\\Chat\\Index.cshtml",
+              "RelativeDocumentMoniker": "BankingManagmentApp\\Views\\Chat\\Index.cshtml",
+              "ToolTip": "C:\\Users\\viole\\Downloads\\Banking-Management-System-Project\\BankingManagmentApp\\Views\\Chat\\Index.cshtml",
+              "RelativeToolTip": "BankingManagmentApp\\Views\\Chat\\Index.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAAmAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-09-11T10:49:10.905Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "AiChatService.cs",
+              "DocumentMoniker": "C:\\Users\\viole\\Downloads\\Banking-Management-System-Project\\BankingManagmentApp\\Services\\AiChatService.cs",
+              "RelativeDocumentMoniker": "BankingManagmentApp\\Services\\AiChatService.cs",
+              "ToolTip": "C:\\Users\\viole\\Downloads\\Banking-Management-System-Project\\BankingManagmentApp\\Services\\AiChatService.cs",
+              "RelativeToolTip": "BankingManagmentApp\\Services\\AiChatService.cs",
+              "ViewState": "AgIAABcAAAAAAAAAAAAAwCoAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-11T10:48:35.357Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "ChatController.cs",
+              "DocumentMoniker": "C:\\Users\\viole\\Downloads\\Banking-Management-System-Project\\BankingManagmentApp\\Controllers\\ChatController.cs",
+              "RelativeDocumentMoniker": "BankingManagmentApp\\Controllers\\ChatController.cs",
+              "ToolTip": "C:\\Users\\viole\\Downloads\\Banking-Management-System-Project\\BankingManagmentApp\\Controllers\\ChatController.cs",
+              "RelativeToolTip": "BankingManagmentApp\\Controllers\\ChatController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAwwAgAAAAdAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-11T10:46:13.057Z"
             }
           ]
         }

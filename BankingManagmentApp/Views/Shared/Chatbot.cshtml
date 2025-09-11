@@ -1,0 +1,98 @@
+﻿<div id="chatbot-container" class="card shadow-lg border-0"
+     style="position: fixed; bottom: 90px; right: 20px; width: 350px; height: 500px; display: none; flex-direction: column; z-index: 1050;">
+
+    <!-- Header -->
+    <div class="card-header d-flex justify-content-between align-items-center bg-primary text-white">
+        <span>AI Banking Assistant</span>
+        <button type="button" class="btn-close btn-close-white" aria-label="Close" onclick="toggleChatbot()"></button>
+    </div>
+
+    <!-- Chat messages -->
+    <div id="chatWindowBot" class="card-body overflow-auto d-flex flex-column" style="background-color: var(--bs-body-bg);">
+        <!-- Messages will appear here -->
+    </div>
+
+    <!-- Suggested quick questions -->
+    <div class="d-flex flex-wrap p-2 border-top">
+        <button class="btn btn-sm btn-outline-primary m-1" onclick="sendQuick('Create Account')">Create Account</button>
+        <button class="btn btn-sm btn-outline-primary m-1" onclick="sendQuick('Forgot Password')">Forgot Password</button>
+        <button class="btn btn-sm btn-outline-primary m-1" onclick="sendQuick('Account Security')">Account Security</button>
+        <button class="btn btn-sm btn-outline-primary m-1" onclick="sendQuick('Update Profile')">Update Profile</button>
+        <button class="btn btn-sm btn-outline-primary m-1" onclick="sendQuick('Manage Security')">Manage Security</button>
+        <button class="btn btn-sm btn-outline-primary m-1" onclick="sendQuick('No Transactions')">No Transactions</button>
+        <button class="btn btn-sm btn-outline-primary m-1" onclick="sendQuick('Apply Loan')">Apply Loan</button>
+        <button class="btn btn-sm btn-outline-primary m-1" onclick="sendQuick('Improve Credit')">Improve Credit</button>
+        <button class="btn btn-sm btn-outline-primary m-1" onclick="sendQuick('Loan Documents')">Loan Documents</button>
+        <button class="btn btn-sm btn-outline-primary m-1" onclick="sendQuick('Early Repayment')">Early Repayment</button>
+    </div>
+
+    <!-- Input -->
+    <div class="card-footer d-flex">
+        <input id="prompt" type="text" class="form-control me-2" placeholder="Type a message..."
+               onkeypress="if(event.key==='Enter'){sendMessage();}" />
+        <button class="btn btn-primary" onclick="sendMessage()">Send</button>
+    </div>
+</div>
+
+<!-- Floating Chat Button -->
+<button id="chatbot-toggle"
+        class="btn btn-primary rounded-circle shadow d-flex align-items-center justify-content-center"
+        style="position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px; z-index: 1050;"
+        onclick="toggleChatbot()">
+    💬
+</button>
+
+
+<script>
+    function toggleChatbot() {
+        const chat = document.getElementById("chatbot-container");
+        const toggleBtn = document.getElementById("chatbot-toggle");
+        if (chat.style.display === "none") {
+            chat.style.display = "flex";
+            toggleBtn.style.display = "none";
+        } else {
+            chat.style.display = "none";
+            toggleBtn.style.display = "inline-flex";
+        }
+    }
+
+    function addMessage(text, sender) {
+      const chatWindow = document.getElementById('chatWindowBot');
+      const msgDiv = document.createElement('div');
+      msgDiv.classList.add("p-2", "mb-2", "rounded", "text-break");
+
+      if (sender === "user") {
+        msgDiv.classList.add("bg-primary", "text-white", "align-self-end");
+        msgDiv.innerText = text;
+      } else {
+        msgDiv.classList.add("bg-light", "text-dark", "align-self-start", "border");
+        msgDiv.innerText = text;
+      }
+
+      chatWindow.appendChild(msgDiv);
+      chatWindow.scrollTop = chatWindow.scrollHeight;
+    }
+
+    function sendQuick(question) {
+        const input = document.getElementById('prompt');
+        input.value = question;    // Set the input box to the quick question
+        sendMessage();             // Call your existing sendMessage function
+    }
+
+    async function sendMessage() {
+      const input = document.getElementById('prompt');
+      const prompt = input.value.trim();
+      if (!prompt) return;
+
+      addMessage(prompt, "user");
+      input.value = "";
+
+      const res = await fetch('/chat/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: prompt })
+      });
+      const data = await res.json();
+      addMessage(data.reply, "ai");
+    }
+</script>
