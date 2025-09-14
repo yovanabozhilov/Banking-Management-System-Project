@@ -1,0 +1,101 @@
+@model IEnumerable<BankingManagmentApp.ViewModels.CategoryComparisonVm>
+@{
+    ViewData["Title"] = "Category Comparison";
+}
+
+<div class="container mt-4">
+
+    <!-- HEADER -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header d-flex align-items-center justify-content-between">
+            <h3 class="mb-0">Comparison of Expenses/Income by Category</h3>
+            <a asp-controller="Transactions" asp-action="Create" class="btn btn-sm btn-outline-primary">
+                + New Transaction
+            </a>
+        </div>
+
+        <!-- TABLE -->
+        <div class="card-body p-0">
+            @if (!Model.Any())
+            {
+                <div class="p-4 text-muted text-center">No data available for comparison.</div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Category</th>
+                                <th class="text-end">Income</th>
+                                <th class="text-end">Expenses</th>
+                                <th class="text-end">Balance</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                var balance = item.Income - item.Expense;
+                                <tr>
+                                    <td>@item.Category</td>
+                                    <td class="text-end text-success fw-semibold">
+                                        @item.Income.ToString("N2")
+                                    </td>
+                                    <td class="text-end text-danger fw-semibold">
+                                        @item.Expense.ToString("N2")
+                                    </td>
+                                    <td class="text-end @(balance >= 0 ? "text-success" : "text-danger") fw-bold">
+                                        @balance.ToString("N2")
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+
+        <!-- CHART -->
+        <div class="card-footer bg-white border-top-0">
+            <h6 class="text-center mb-3">Visualization</h6>
+            <canvas id="categoryChart" height="140"></canvas>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const ctx = document.getElementById('categoryChart');
+        const chart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.Select(m => m.Category))),
+                datasets: [
+                    {
+                        label: 'Income',
+                        data: @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.Select(m => m.Income))),
+                        backgroundColor: 'rgba(25, 135, 84, 0.7)' // bootstrap green
+                    },
+                    {
+                        label: 'Expenses',
+                        data: @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.Select(m => m.Expense))),
+                        backgroundColor: 'rgba(220, 53, 69, 0.7)' // bootstrap red
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: { font: { size: 13 } }
+                    }
+                },
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            }
+        });
+    </script>
+}

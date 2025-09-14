@@ -1,6 +1,11 @@
 ﻿using BankingManagmentApp.Data;
 using Microsoft.AspNetCore.Mvc;
 
+using BankingManagmentApp.ViewModels;
+using Microsoft.EntityFrameworkCore;
+
+
+
 namespace BankingManagmentApp.Controllers
 {
     public class AdminDashboardController : Controller
@@ -10,6 +15,21 @@ namespace BankingManagmentApp.Controllers
         public AdminDashboardController(ApplicationDbContext context)
         {
             _context = context;
+        }
+
+        public async Task<IActionResult> CategoryComparison()
+        {
+            var data = await _context.Transactions
+                .GroupBy(t => t.TransactionType)
+                .Select(g => new CategoryComparisonVm
+                {
+                    Category = g.Key,
+                    Income = g.Key == "Credit" ? g.Sum(x => x.Amount) : 0,
+                    Expense = g.Key == "Debit" ? g.Sum(x => x.Amount) : 0
+                })
+                .ToListAsync();
+
+            return View(data);
         }
 
         public async Task<IActionResult> Index()
@@ -36,7 +56,7 @@ namespace BankingManagmentApp.Controllers
                     Year = g.Key.Year,
                     Deposits = g.Where(x => x.TransactionType == "Credit").Sum(x => x.Amount),
                     Withdrawals = g.Where(x => x.TransactionType == "Debit").Sum(x => x.Amount),
-                    
+
                 })
                 .OrderBy(g => g.Year).ThenBy(g => g.Month)
                 .ToList();
@@ -57,7 +77,7 @@ namespace BankingManagmentApp.Controllers
                 ViewBag.CreditsChange = 0;
                 ViewBag.DepositsChange = 0;
                 ViewBag.WithdrawalsChange = 0;
-               
+
             }
 
             ViewBag.TotalClients = totalClients;
