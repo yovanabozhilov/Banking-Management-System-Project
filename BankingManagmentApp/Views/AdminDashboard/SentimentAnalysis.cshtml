@@ -1,0 +1,94 @@
+@model IEnumerable<BankingManagmentApp.ViewModels.FeedbackSentimentVm>
+
+@{
+    ViewData["Title"] = "Sentiment Analysis";
+}
+
+<div class="container mt-4">
+    <div class="card shadow-sm mb-4">
+        <div class="card-header">
+            <h3 class="mb-0">Customer Feedback Sentiment</h3>
+        </div>
+
+        <div class="card-body">
+            <p>
+                <span class="badge bg-success">Positive: @ViewBag.PositiveCount</span>
+                <span class="badge bg-danger">Negative: @ViewBag.NegativeCount</span>
+                <span class="badge bg-secondary">Neutral: @ViewBag.NeutralCount</span>
+            </p>
+
+            @if (!Model.Any())
+            {
+                <p class="text-muted">No feedback available.</p>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-striped align-middle">
+                        <thead>
+                            <tr>
+                                <th>Id</th>
+                                <th>Comment</th>
+                                <th>Sentiment</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>@item.Id</td>
+                                    <td>@item.Comment</td>
+                                    <td>
+                                        @if (item.Sentiment == "Positive")
+                                        {
+                                            <span class="badge bg-success">Positive</span>
+                                        }
+                                        else if (item.Sentiment == "Negative")
+                                        {
+                                            <span class="badge bg-danger">Negative</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary">Neutral</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+
+        @if (Model.Any())
+        {
+            <div class="card-footer bg-white border-top-0">
+                <canvas id="sentimentChart" height="140"></canvas>
+            </div>
+        }
+
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const ctx = document.getElementById('sentimentChart');
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Positive', 'Negative', 'Neutral'],
+                datasets: [{
+                    data: [@ViewBag.PositiveCount, @ViewBag.NegativeCount, @ViewBag.NeutralCount],
+                    backgroundColor: ['#198754', '#dc3545', '#6c757d']
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { position: 'bottom' }
+                }
+            }
+        });
+    </script>
+}
