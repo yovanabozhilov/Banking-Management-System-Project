@@ -1,0 +1,100 @@
+@model IEnumerable<BankingManagmentApp.ViewModels.CategoryBenchmarkVm>
+@using System.Globalization
+@{
+    ViewData["Title"] = "Benchmarking";
+    var bg = CultureInfo.GetCultureInfo("bg-BG");
+    var modeNote = ViewBag.BenchmarkMode as string ?? "";
+}
+
+<div class="container mt-4">
+    <div class="card shadow-sm mb-4">
+        <div class="card-header d-flex align-items-center justify-content-between">
+            <h3 class="mb-0">Benchmarking — comparison vs industry</h3>
+            <small class="text-muted">@modeNote</small>
+        </div>
+
+        <div class="card-body p-0">
+            @if (!Model.Any())
+            {
+                <div class="p-4 text-muted text-center">No transactions available to benchmark.</div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Category</th>
+                                <th class="text-end">Income</th>
+                                <th class="text-end">Industry Avg Income</th>
+                                <th class="text-end">Income Δ%</th>
+                                <th class="text-end">Expense</th>
+                                <th class="text-end">Industry Avg Expense</th>
+                                <th class="text-end">Expense Δ%</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>@item.Category</td>
+                                    <td class="text-end">@item.Income.ToString("N2", bg)</td>
+                                    <td class="text-end">@item.IndustryAvgIncome.ToString("N2", bg)</td>
+                                    <td class="text-end @(item.IncomeVariancePercent >= 0 ? "text-success" : "text-danger")">
+                                        @item.IncomeVariancePercent.ToString("N2")% 
+                                    </td>
+                                    <td class="text-end">@item.Expense.ToString("N2", bg)</td>
+                                    <td class="text-end">@item.IndustryAvgExpense.ToString("N2", bg)</td>
+                                    <td class="text-end @(item.ExpenseVariancePercent >= 0 ? "text-success" : "text-danger")">
+                                        @item.ExpenseVariancePercent.ToString("N2")% 
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+
+        <div class="card-footer bg-white border-top-0">
+            <h6 class="text-center mb-3">Bank vs Industry (Income & Expenses)</h6>
+            <canvas id="benchmarkChart" height="160"></canvas>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // prepare data arrays from model
+        const labels = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.Select(m => m.Category)));
+        const bankIncome = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.Select(m => m.Income)));
+        const bankExpense = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.Select(m => m.Expense)));
+        const industryIncome = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.Select(m => m.IndustryAvgIncome)));
+        const industryExpense = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.Select(m => m.IndustryAvgExpense)));
+
+        const ctx = document.getElementById('benchmarkChart');
+        const chart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [
+                    { label: 'Bank Income', data: bankIncome, stack: 'income', backgroundColor: 'rgba(25,135,84,0.8)' },
+                    { label: 'Industry Income', data: industryIncome, stack: 'income', backgroundColor: 'rgba(25,135,84,0.35)' },
+
+                    { label: 'Bank Expense', data: bankExpense, stack: 'expense', backgroundColor: 'rgba(220,53,69,0.85)' },
+                    { label: 'Industry Expense', data: industryExpense, stack: 'expense', backgroundColor: 'rgba(220,53,69,0.35)' },
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { position: 'top' }
+                },
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            }
+        });
+    </script>
+}
