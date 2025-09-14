@@ -21,6 +21,8 @@ namespace BankingManagmentApp.Data
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options) { }
         
+        public DbSet<Feedback> Feedbacks { get; set; } = default!;
+        
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -34,12 +36,12 @@ namespace BankingManagmentApp.Data
             });
 
             // 2) DECIMAL precision за SQL Server (премахва warning-ите и пази парите „цели“)
-            modelBuilder.Entity<Accounts>().Property(p => p.Balance)        .HasColumnType("decimal(18,2)");
-            modelBuilder.Entity<Loans>().Property(p => p.Amount)            .HasColumnType("decimal(18,2)");
-            modelBuilder.Entity<Loans>().Property(p => p.ApprovedAmount)    .HasColumnType("decimal(18,2)");
+            modelBuilder.Entity<Accounts>().Property(p => p.Balance).HasColumnType("decimal(18,2)");
+            modelBuilder.Entity<Loans>().Property(p => p.Amount).HasColumnType("decimal(18,2)");
+            modelBuilder.Entity<Loans>().Property(p => p.ApprovedAmount).HasColumnType("decimal(18,2)");
             modelBuilder.Entity<LoanRepayments>().Property(p => p.AmountDue).HasColumnType("decimal(18,2)");
             modelBuilder.Entity<LoanRepayments>().Property(p => p.AmountPaid).HasColumnType("decimal(18,2)");
-            modelBuilder.Entity<Transactions>().Property(p => p.Amount)     .HasColumnType("decimal(18,2)");
+            modelBuilder.Entity<Transactions>().Property(p => p.Amount).HasColumnType("decimal(18,2)");
         }
     }
 }

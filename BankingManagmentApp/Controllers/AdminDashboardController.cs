@@ -17,6 +17,47 @@ namespace BankingManagmentApp.Controllers
             _context = context;
         }
 
+        public async Task<IActionResult> SentimentAnalysis()
+        {
+            // 1) Load feedback comments from DB
+            // If you don’t already have a Feedback table, adapt to your structure.
+            // Example assumes a DbSet<Feedback> with Id + Comment fields.
+            var feedbacks = await _context.Feedbacks
+                .Select(f => new { f.Id, f.Comment })
+                .ToListAsync();
+        
+            // 2) Define a very simple keyword-based rule set
+            string[] positiveWords = { "good", "great", "excellent", "happy", "love", "wonderful", "perfect", "amazing" };
+            string[] negativeWords = { "bad", "poor", "terrible", "sad", "angry", "hate", "awful", "worst" };
+        
+            // 3) Build ViewModel list with sentiment classification
+            var vmList = feedbacks.Select(f =>
+            {
+                var text = (f.Comment ?? string.Empty).ToLower();
+        
+                string sentiment = "Neutral";
+                if (positiveWords.Any(w => text.Contains(w)))
+                    sentiment = "Positive";
+                else if (negativeWords.Any(w => text.Contains(w)))
+                    sentiment = "Negative";
+        
+                return new FeedbackSentimentVm
+                {
+                    Id = f.Id,
+                    Comment = f.Comment ?? "",
+                    Sentiment = sentiment
+                };
+            }).ToList();
+        
+            // Summary stats
+            ViewBag.PositiveCount = vmList.Count(x => x.Sentiment == "Positive");
+            ViewBag.NegativeCount = vmList.Count(x => x.Sentiment == "Negative");
+            ViewBag.NeutralCount = vmList.Count(x => x.Sentiment == "Neutral");
+        
+            return View(vmList);
+        }
+
+
         public async Task<IActionResult> Benchmarking()
         {
             // 1) load distinct TransactionType values
@@ -25,14 +66,14 @@ namespace BankingManagmentApp.Controllers
                 .Where(t => t != null)
                 .Distinct()
                 .ToListAsync();
-        
+
             // detect common pattern: are TransactionType values just "Credit"/"Debit"?
             var lowerTypes = distinctTypes.Select(s => s?.Trim().ToLower()).Where(s => s != null).ToList();
             bool hasCreditDebit = lowerTypes.Contains("credit") || lowerTypes.Contains("debit");
-        
+
             // detect whether amounts can be negative in your DB (used for fallback inference)
             bool hasNegativeAmounts = await _context.Transactions.AnyAsync(t => t.Amount < 0);
-        
+
             // 2) aggregate by categoryKey (we use TransactionType as the categoryKey for now)
             //    and compute Income / Expense depending on detected pattern.
             var grouped = await _context.Transactions
@@ -50,7 +91,7 @@ namespace BankingManagmentApp.Controllers
                     Total = g.Sum(x => (decimal?)x.Amount) ?? 0m
                 })
                 .ToListAsync();
-        
+
             // 3) fake industry benchmarks (you can tune values here)
             var industryBenchmarks = new Dictionary<string, (decimal Income, decimal Expense)>(StringComparer.OrdinalIgnoreCase)
             {
@@ -63,16 +104,16 @@ namespace BankingManagmentApp.Controllers
                 { "Utilities", (Income: 0m, Expense: 2500m) },
                 { "Unknown", (Income: 10000m, Expense: 10000m) } // default fallback
             };
-        
+
             // compute fallback averages for unknown categories (so we have something reasonable)
             var avgIndustryIncome = industryBenchmarks.Values.Average(v => v.Income);
             var avgIndustryExpense = industryBenchmarks.Values.Average(v => v.Expense);
-        
+
             // 4) map to VM, selecting the right Income/Expense based on detection
             var vmList = grouped.Select(g =>
             {
                 decimal income = 0m, expense = 0m;
-        
+
                 if (hasCreditDebit)
                 {
                     // when app uses Credit/Debit, Income for "Credit" rows comes from IncomeWhenCredit, Expense for "Debit" from ExpenseWhenDebit
@@ -91,7 +132,7 @@ namespace BankingManagmentApp.Controllers
                     income = g.Total;
                     expense = 0m;
                 }
-        
+
                 // find industry benchmark or use averages
                 var catKey = string.IsNullOrWhiteSpace(g.Category) ? "Unknown" : g.Category;
                 (decimal IndustryIncome, decimal IndustryExpense) bench;
@@ -103,7 +144,7 @@ namespace BankingManagmentApp.Controllers
                 {
                     bench = (b.Income, b.Expense);
                 }
-        
+
                 return new CategoryBenchmarkVm
                 {
                     Category = catKey,
@@ -115,12 +156,12 @@ namespace BankingManagmentApp.Controllers
             })
             .OrderByDescending(x => x.Expense + x.Income)
             .ToList();
-        
+
             // Pass an informational flag to view via ViewBag so the UI can explain the chosen mode
             ViewBag.BenchmarkMode = hasCreditDebit ? "Detected Credit/Debit as direction (comparing Credit vs Debit)" :
                                  hasNegativeAmounts ? "Detected signed amounts (positive = income, negative = expense)" :
                                  "Fallback mode: no direction field detected (treating totals as Income)";
-        
+
             return View(vmList);
         }
 
