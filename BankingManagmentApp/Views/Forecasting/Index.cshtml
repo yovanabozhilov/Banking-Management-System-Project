@@ -1,7 +1,7 @@
 ﻿@using BankingManagmentApp.Models
 @using BankingManagmentApp.Services.Forecasting
 @{
-    ViewData["Title"] = "Forecast Dashboard";
+    ViewData["Title"] = "Forecasting";
 
     var volume = (Dictionary<string, int>)ViewData["TransactionVolume"];
     var avgValue = (decimal)ViewData["AvgTransactionValue"];
@@ -18,105 +18,205 @@
 
     var newCustomers = (int)ViewData["NewCustomers"];
     var churnRate = (double)ViewData["ChurnRate"];
-    //var highRiskCustomers = (List<string>)ViewData["HighRiskCustomers"];
 }
 
-<div class="container-fluid py-4">
-    <h2 class="text-center mb-5">@ViewData["Title"]</h2>
+<style>
 
-    <!-- Transactions Section -->
-    <h4 class="mb-3 text-primary">💵 Transactions</h4>
-    <div class="row g-3 mb-4">
+    body {
+        background-color: #f0f2f5;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    h1{
+    font-size: 2.55rem;
+    font-weight: 700;
+    color: steelblue;
+
+    text-align: center;
+    }
+
+    .card-header {
+        border-bottom: 2px solid #ddd;
+    }
+
+    .chart-container {
+        position: relative;
+        height: 250px; 
+    }
+
+    .info-card {
+        text-align: center;
+        padding: 20px;
+    }
+
+        .info-card h4 {
+            font-size: 2.5rem;
+            font-weight: bold;
+        }
+</style>
+
+<div class="container py-5">
+    <header class="text-center mb-5">
+        <h1>@ViewData["Title"]</h1>
+    </header>
+
+    <h2 class="mb-4 text-primary"><i class="fas fa-chart-line me-2"></i>Transactions</h2>
+    <hr class="mb-4">
+    <div class="row g-4 mb-5">
         <div class="col-md-6">
-            <div class="card shadow-sm">
-                <div class="card-header bg-primary text-white">Transactions Volume</div>
-                <div class="card-body">
-                    <canvas id="volumeChart" style="max-height:180px"></canvas>
+            <div class="card shadow-lg border-0 h-100">
+                <div class="card-header text-black">
+                    <h5 class="my-1">Transaction Volume Forecast</h5>
+                </div>
+                <div class="card-body d-flex flex-column">
+                    <div class="chart-container flex-grow-1">
+                        <canvas id="volumeChart"></canvas>
+                    </div>
+                    <div class="info-card mt-3">
+                        <p class="mb-0 text-muted">Average Transaction Value:</p>
+                        <h4 class="text-primary">@avgValue.ToString("C2", System.Globalization.CultureInfo.GetCultureInfo("bg-BG"))</h4>
+                    </div>
                 </div>
             </div>
         </div>
         <div class="col-md-6">
-            <div class="card shadow-sm">
-                <div class="card-header bg-success text-white">Cash Flows</div>
+            <div class="card shadow-lg border-0 h-100">
+                <div class="card-header text-black">
+                    <h5 class="my-1">Cash Flow Diagram</h5>
+                </div>
                 <div class="card-body">
-                    <canvas id="cashFlowChart" style="max-height:180px"></canvas>
+                    <div class="chart-container">
+                        <canvas id="cashFlowChart"></canvas>
+                    </div>
+                    <div class="mt-3 text-center">
+                        <span class="badge bg-success me-2">Positive 📈</span>
+                        <span class="badge bg-danger">Negative 📉</span>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Cards Section -->
-    <h4 class="mb-3 text-warning">💳 Cards</h4>
-    <div class="row g-3 mb-4">
+    <h2 class="mb-4 text-warning"><i class="fas fa-credit-card me-2"></i>Cards</h2>
+    <hr class="mb-4">
+    <div class="row g-4 mb-5">
         <div class="col-md-6">
-            <div class="card shadow-sm">
-                <div class="card-header bg-warning text-dark">Card Spending & Activity</div>
+            <div class="card shadow-lg border-0 h-100">
+                <div class="card-header text-black">
+                    <h5 class="my-1">Card Spending & Activity</h5>
+                </div>
                 <div class="card-body">
-                    <canvas id="cardsChart" style="max-height:180px"></canvas>
+                    <div class="chart-container">
+                        <canvas id="cardsChart"></canvas>
+                    </div>
+                    <div class="info-card mt-3">
+                        <p class="mb-0 text-muted">Total Active Cards:</p>
+                        <h4 class="text-warning">@activeCards</h4>
+                    </div>
                 </div>
             </div>
         </div>
         <div class="col-md-6">
-            <div class="card shadow-sm">
-                <div class="card-header bg-danger text-white">Card Risk</div>
-                <div class="card-body d-flex flex-column align-items-center">
-                    <canvas id="cardRiskGauge" style="max-height:150px"></canvas>
-                    <div class="fw-bold">@Math.Round(cardRisk * 100)%</div>
+            <div class="card shadow-lg border-0 h-100">
+                <div class="card-header text-black">
+                    <h5 class="my-1">Card Default Risk</h5>
+                </div>
+                <div class="card-body d-flex flex-column align-items-center justify-content-center">
+                    <div class="chart-container" style="height: 200px;">
+                        <canvas id="cardRiskGauge"></canvas>
+                    </div>
+                    <div class="mt-3">
+                        <h4 class="fw-bold text-danger">@Math.Round(cardRisk * 100)%</h4>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Loans Section -->
-    <h4 class="mb-3 text-info">🏦 Loans</h4>
-    <div class="row g-3 mb-4">
+    <h2 class="mb-4 text-info"><i class="fas fa-hand-holding-usd me-2"></i>Loans</h2>
+    <hr class="mb-4">
+    <div class="row g-4 mb-5">
         <div class="col-md-6">
-            <div class="card shadow-sm">
-                <div class="card-header bg-info text-white">Loan Activity</div>
+            <div class="card shadow-lg border-0 h-100">
+                <div class="card-header text-black">
+                    <h5 class="my-1">Loan Activity</h5>
+                </div>
                 <div class="card-body">
-                    <canvas id="loansChart" style="max-height:180px"></canvas>
+                    <div class="chart-container">
+                        <canvas id="loansChart"></canvas>
+                    </div>
+                    <div class="info-card mt-3">
+                        <p class="mb-0 text-muted">New Loans Issued:</p>
+                        <h4 class="text-info">@newLoans</h4>
+                    </div>
                 </div>
             </div>
         </div>
         <div class="col-md-6">
-            <div class="card shadow-sm">
-                <div class="card-header bg-secondary text-white">Loan Risk</div>
-                <div class="card-body d-flex flex-column align-items-center">
-                    <canvas id="loanRiskGauge" style="max-height:150px"></canvas>
-                    <div class="fw-bold">@Math.Round(overdueRate * 100)%</div>
+            <div class="card shadow-lg border-0 h-100">
+                <div class="card-header text-black">
+                    <h5 class="my-1">Overdue Loans Risk</h5>
+                </div>
+                <div class="card-body d-flex flex-column align-items-center justify-content-center">
+                    <div class="chart-container" style="height: 200px;">
+                        <canvas id="loanRiskGauge"></canvas>
+                    </div>
+                    <div class="mt-3">
+                        <h4 class="fw-bold text-secondary">@Math.Round(overdueRate * 100)%</h4>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Customers Section -->
-    <h4 class="mb-3 text-dark">👥 Customers</h4>
-    <div class="row g-3 mb-4">
+    <h2 class="mb-4 text-dark"><i class="fas fa-users me-2"></i>Customers</h2>
+    <hr class="mb-4">
+    <div class="row g-4 mb-5">
         <div class="col-md-12">
-            <div class="card shadow-sm">
-                <div class="card-header bg-dark text-white">Customer Trends</div>
+            <div class="card shadow-lg border-0">
+                <div class="card-header text-black">
+                    <h5 class="my-1">Customer Trends</h5>
+                </div>
                 <div class="card-body">
-                    <canvas id="customersChart" style="max-height:200px"></canvas>
+                    <div class="chart-container">
+                        <canvas id="customersChart"></canvas>
+                    </div>
+                    <div class="info-card mt-3">
+                        <p class="mb-0 text-muted">Customer Churn Rate:</p>
+                        <h4 class="text-danger">@Math.Round(churnRate * 100)%</h4>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Anomalies Section -->
-    <h4 class="mb-3 text-danger">🚨 Anomalies</h4>
-    <div class="row g-3 mb-4">
+    <h2 class="mb-4 text-danger"><i class="fas fa-exclamation-triangle me-2"></i>Anomalies</h2>
+    <hr class="mb-4">
+    <div class="row g-4 mb-5">
         <div class="col-md-12">
-            <div class="card shadow-sm">
-                <div class="card-header bg-danger text-white">Transaction Anomalies</div>
+            <div class="card shadow-lg border-0">
+                <div class="card-header text-black">
+                    <h5 class="my-1">Transaction Anomalies</h5>
+                </div>
                 <div class="card-body">
-                    <ul class="list-unstyled mb-0">
-                        @foreach (var t in anomalies)
-                        {
-                            <li class="bg-light p-2 rounded mb-1">
-                                <strong>@t.Date.ToString("yyyy-MM-dd"):</strong> @t.Amount lv.
-                            </li>
-                        }
-                    </ul>
+                    @if (anomalies != null && anomalies.Any())
+                    {
+                        <ul class="list-group list-group-flush">
+                            @foreach (var t in anomalies)
+                            {
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span class="text-danger fw-bold"><i class="fas fa-bell me-2"></i> Anomaly on @t.Date.ToString("yyyy-MM-dd")</span>
+                                    <span class="badge bg-danger rounded-pill">@t.Amount.ToString("C2", System.Globalization.CultureInfo.GetCultureInfo("bg-BG"))</span>
+                                </li>
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <div class="alert alert-success text-center" role="alert">
+                            <i class="fas fa-check-circle me-2"></i> No anomalies detected for this period.
+                        </div>
+                    }
                 </div>
             </div>
         </div>
@@ -124,56 +224,248 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0/dist/chartjs-plugin-datalabels.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
 <script>
     document.addEventListener("DOMContentLoaded", function () {
+        Chart.register(ChartDataLabels);
+
         // --- Transactions ---
         const volumeLabels = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(volume.Keys));
         const volumeData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(volume.Values));
         new Chart(document.getElementById("volumeChart"), {
             type: 'line',
-            data: { labels: volumeLabels, datasets: [{ data: volumeData, borderColor: "#007bff", backgroundColor: "rgba(0,123,255,0.1)", fill: true, tension: 0.3 }] },
-            options: { plugins: { legend: { display: false } } }
+            data: {
+                labels: volumeLabels,
+                datasets: [{
+                    label: 'Volume',
+                    data: volumeData,
+                    borderColor: "#0d6efd",
+                    backgroundColor: "rgba(13,110,253,0.1)",
+                    fill: true,
+                    tension: 0.4,
+                    pointBackgroundColor: '#0d6efd',
+                    pointRadius: 5
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false
+                    },
+                    datalabels: {
+                        align: 'top',
+                        anchor: 'end',
+                        color: '#6c757d',
+                        formatter: (value) => value
+                    }
+                },
+                scales: {
+                    x: { grid: { display: false } },
+                    y: { beginAtZero: true }
+                }
+            }
         });
 
         const cashLabels = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(cashFlows.Keys));
         const cashData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(cashFlows.Values));
         new Chart(document.getElementById("cashFlowChart"), {
             type: 'bar',
-            data: { labels: cashLabels, datasets: [{ data: cashData, backgroundColor: cashData.map(v => v >= 0 ? "green" : "red") }] },
-            options: { plugins: { legend: { display: false } } }
+            data: {
+                labels: cashLabels,
+                datasets: [{
+                    label: 'Cash Flow',
+                    data: cashData,
+                    backgroundColor: cashData.map(v => v >= 0 ? "#198754" : "#dc3545"),
+                    borderRadius: 5
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false
+                    },
+                    datalabels: {
+                        color: '#fff',
+                        formatter: (value) => value
+                    }
+                },
+                scales: {
+                    x: { grid: { display: false } },
+                    y: { beginAtZero: true }
+                }
+            }
         });
 
         // --- Cards ---
         new Chart(document.getElementById("cardsChart"), {
             type: 'doughnut',
-            data: { labels: ["Monthly Expenses", "Active Cards"], datasets: [{ data: [@cardExpenses, @activeCards], backgroundColor: ["#ffc107", "#28a745"] }] },
-            options: { plugins: { legend: { position: "bottom" } } }
+            data: {
+                labels: ["Monthly Expenses", "Active Cards"],
+                datasets: [{
+                    data: [@cardExpenses, @activeCards],
+                    backgroundColor: ["#ffc107", "#28a745"],
+                    hoverOffset: 10
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: "bottom" },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed > 1) {
+                                    label += context.parsed.toLocaleString('bg-BG');
+                                } else {
+                                    label += context.parsed;
+                                }
+                                return label;
+                            }
+                        }
+                    },
+                    datalabels: {
+                        color: '#fff',
+                        formatter: (value, context) => {
+                            return context.chart.data.labels[context.dataIndex] === 'Monthly Expenses' ? value.toLocaleString('bg-BG') : value;
+                        }
+                    }
+                }
+            }
         });
-
-        new Chart(document.getElementById("cardRiskGauge"), {
-            type: 'doughnut',
-            data: { datasets: [{ data: [@Math.Round(cardRisk * 100), 100 - @Math.Round(cardRisk * 100)], backgroundColor: ["#dc3545", "lightgray"], borderWidth: 0 }] },
-            options: { rotation: -90, circumference: 180, cutout: "80%", plugins: { legend: { display: false }, tooltip: { enabled: false } } }
-        });
+        function createGaugeChart(elementId, value, labelColor) {
+            new Chart(document.getElementById(elementId), {
+                type: 'doughnut',
+                data: {
+                    datasets: [{
+                        data: [value, 100 - value],
+                        backgroundColor: [labelColor, "rgba(220, 220, 220, 0.5)"],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    rotation: -90,
+                    circumference: 180,
+                    cutout: "80%",
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { enabled: false },
+                        datalabels: {
+                            formatter: (value) => {
+                                return value + '%';
+                            },
+                            color: labelColor,
+                            font: {
+                                size: 24,
+                                weight: 'bold'
+                            },
+                            display: true,
+                            anchor: 'center',
+                            align: 'center',
+                            offset: -10
+                        },
+                        scales: 
+                        {
+                        x: {
+                            display: false 
+                        },
+                        y: {
+                            display: false 
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        createGaugeChart("cardRiskGauge", @Math.Round(cardRisk * 100), "#dc3545");
+        createGaugeChart("loanRiskGauge", @Math.Round(overdueRate * 100), "#17a2b8");
 
         // --- Loans ---
         new Chart(document.getElementById("loansChart"), {
             type: 'bar',
-            data: { labels: ["Overdue %", "New Loans"], datasets: [{ data: [@overdueRate * 100, @newLoans], backgroundColor: ["#dc3545", "#17a2b8"] }] },
-            options: { plugins: { legend: { display: false } } }
-        });
-
-        new Chart(document.getElementById("loanRiskGauge"), {
-            type: 'doughnut',
-            data: { datasets: [{ data: [@Math.Round(overdueRate * 100), 100 - @Math.Round(overdueRate * 100)], backgroundColor: ["#ffc107", "lightgray"], borderWidth: 0 }] },
-            options: { rotation: -90, circumference: 180, cutout: "80%", plugins: { legend: { display: false }, tooltip: { enabled: false } } }
+            data: {
+                labels: ["Overdue %", "New Loans"],
+                datasets: [{
+                    label: '',
+                    data: [@overdueRate * 100, @newLoans],
+                    backgroundColor: ["#dc3545", "red"],
+                    borderRadius: 5
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false
+                    },
+                    datalabels: {
+                        color: '#fff',
+                        formatter: (value) => {
+                            return value + (value <= 1 ? '' : ''); // Optional: add % sign for overdue rate
+                        }
+                    }
+                },
+                scales: {
+                    x: { grid: { display: false } },
+                    y: { beginAtZero: true }
+                }
+            }
         });
 
         // --- Customers ---
         new Chart(document.getElementById("customersChart"), {
             type: 'pie',
-            data: { labels: ["New Customers", "Churn %"], datasets: [{ data: [@newCustomers, @Math.Round(churnRate * 100)], backgroundColor: ["#6c757d", "#ffc107"] }] },
-            options: { plugins: { legend: { position: "bottom" } } }
+            data: {
+                labels: ["New Customers", "Churn Rate %"],
+                datasets: [{
+                    data: [@newCustomers, @Math.Round(churnRate * 100)],
+                    backgroundColor: ["#6c757d", "#ffc107"],
+                    hoverOffset: 10
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: "bottom" },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                label += context.parsed.toLocaleString('bg-BG');
+                                return label;
+                            }
+                        }
+                    },
+                    datalabels: {
+                        color: '#fff',
+                        formatter: (value, context) => {
+                            return context.chart.data.labels[context.dataIndex].includes('Churn') ? value + '%' : value;
+                        }
+                    }
+                }
+            }
         });
     });
 </script>

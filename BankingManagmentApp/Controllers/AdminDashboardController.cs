@@ -210,30 +210,40 @@ namespace BankingManagmentApp.Controllers
                 .OrderBy(g => g.Year).ThenBy(g => g.Month)
                 .ToList();
 
+            ViewBag.MonthlyData = monthlyData;
+            ViewBag.ClientsChange = 0;
+            ViewBag.CreditsChange = 0;
+            ViewBag.DepositsChange = 0;
+            ViewBag.WithdrawalsChange = 0;
+
             var ordered = monthlyData.OrderByDescending(m => new DateTime(m.Year, m.Month, 1)).ToList();
             if (ordered.Count >= 2)
             {
-                var current = ordered[0];   // текущ месец
-                var previous = ordered[1];  // предходен месец
+                var current = ordered[0];
+                var previous = ordered[1];
+                if (previous.Deposits != 0)
+                {
+                    ViewBag.DepositsChange = ((float)(current.Deposits - previous.Deposits) / (double)previous.Deposits) * 100;
+                }
+                else
+                {
+                    ViewBag.DepositsChange = 0; 
+                }
 
-                ViewBag.DepositsChange = ((float)(current.Deposits - previous.Deposits) / (float)previous.Deposits) * 100;
-                ViewBag.WithdrawalsChange = ((float)(current.Withdrawals - previous.Withdrawals) / (double)previous.Withdrawals) * 100;
+                if (previous.Withdrawals != 0)
+                {
+                    ViewBag.WithdrawalsChange = ((float)(current.Withdrawals - previous.Withdrawals) / (double)previous.Withdrawals) * 100;
+                }
+                else
+                {
+                    ViewBag.WithdrawalsChange = 0; 
+                }
             }
-            else
-            {
-                // ако няма два месеца данни, задаваме 0%
-                ViewBag.ClientsChange = 0;
-                ViewBag.CreditsChange = 0;
-                ViewBag.DepositsChange = 0;
-                ViewBag.WithdrawalsChange = 0;
-
-            }
-
             ViewBag.TotalClients = totalClients;
             ViewBag.TotalCredits = totalCredits;
             ViewBag.TotalDeposits = totalDeposits;
             ViewBag.TotalWithdrawals = totalWithdrawals;
-            ViewBag.MonthlyData = monthlyData;
+            ViewBag.TotalCards = totalCards;
             ViewBag.TotalCards = totalCards;
 
             var currentMonth = DateTime.Now.Month;

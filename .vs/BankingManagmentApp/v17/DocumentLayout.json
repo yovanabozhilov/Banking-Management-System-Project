@@ -1,12 +1,69 @@
 {
   "Version": 1,
   "WorkspaceRootPath": "C:\\Users\\viole\\Downloads\\Banking-Management-System-Project\\",
-  "Documents": [],
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{584A87E8-1FC0-42DD-B80C-7D8D27808F9C}|BankingManagmentApp\\BankingManagmentApp.csproj|c:\\users\\viole\\downloads\\banking-management-system-project\\bankingmanagmentapp\\services\\forecasting\\forecastservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{584A87E8-1FC0-42DD-B80C-7D8D27808F9C}|BankingManagmentApp\\BankingManagmentApp.csproj|solutionrelative:bankingmanagmentapp\\services\\forecasting\\forecastservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{584A87E8-1FC0-42DD-B80C-7D8D27808F9C}|BankingManagmentApp\\BankingManagmentApp.csproj|c:\\users\\viole\\downloads\\banking-management-system-project\\bankingmanagmentapp\\views\\forecasting\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{584A87E8-1FC0-42DD-B80C-7D8D27808F9C}|BankingManagmentApp\\BankingManagmentApp.csproj|solutionrelative:bankingmanagmentapp\\views\\forecasting\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{584A87E8-1FC0-42DD-B80C-7D8D27808F9C}|BankingManagmentApp\\BankingManagmentApp.csproj|c:\\users\\viole\\downloads\\banking-management-system-project\\bankingmanagmentapp\\views\\admindashboard\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{584A87E8-1FC0-42DD-B80C-7D8D27808F9C}|BankingManagmentApp\\BankingManagmentApp.csproj|solutionrelative:bankingmanagmentapp\\views\\admindashboard\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    }
+  ],
   "DocumentGroupContainers": [
     {
       "Orientation": 0,
       "VerticalTabListWidth": 256,
-      "DocumentGroups": []
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 1,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Index.cshtml",
+              "DocumentMoniker": "C:\\Users\\viole\\Downloads\\Banking-Management-System-Project\\BankingManagmentApp\\Views\\AdminDashboard\\Index.cshtml",
+              "RelativeDocumentMoniker": "BankingManagmentApp\\Views\\AdminDashboard\\Index.cshtml",
+              "ToolTip": "C:\\Users\\viole\\Downloads\\Banking-Management-System-Project\\BankingManagmentApp\\Views\\AdminDashboard\\Index.cshtml",
+              "RelativeToolTip": "BankingManagmentApp\\Views\\AdminDashboard\\Index.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABIAAAAPAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-09-15T15:23:54.553Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "ForecastService.cs",
+              "DocumentMoniker": "C:\\Users\\viole\\Downloads\\Banking-Management-System-Project\\BankingManagmentApp\\Services\\Forecasting\\ForecastService.cs",
+              "RelativeDocumentMoniker": "BankingManagmentApp\\Services\\Forecasting\\ForecastService.cs",
+              "ToolTip": "C:\\Users\\viole\\Downloads\\Banking-Management-System-Project\\BankingManagmentApp\\Services\\Forecasting\\ForecastService.cs",
+              "RelativeToolTip": "BankingManagmentApp\\Services\\Forecasting\\ForecastService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-15T15:19:44.487Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Index.cshtml",
+              "DocumentMoniker": "C:\\Users\\viole\\Downloads\\Banking-Management-System-Project\\BankingManagmentApp\\Views\\Forecasting\\Index.cshtml",
+              "RelativeDocumentMoniker": "BankingManagmentApp\\Views\\Forecasting\\Index.cshtml",
+              "ToolTip": "C:\\Users\\viole\\Downloads\\Banking-Management-System-Project\\BankingManagmentApp\\Views\\Forecasting\\Index.cshtml",
+              "RelativeToolTip": "BankingManagmentApp\\Views\\Forecasting\\Index.cshtml",
+              "ViewState": "AgIAABgAAAAAAAAAAAAAAB4AAAASAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-09-15T15:18:45.482Z"
+            }
+          ]
+        }
+      ]
     }
   ]
 }

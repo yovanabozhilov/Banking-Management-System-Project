@@ -1,69 +1,4 @@
-﻿//using BankingManagmentApp.Data;
-//using BankingManagmentApp.Models;
-//using SQLitePCL;
-
-//namespace BankingManagmentApp.Services.Forecasting
-//{
-//    public class ForecastService
-//    { 
-//        private readonly ApplicationDbContext _context;
-//        public ForecastService(ApplicationDbContext context)
-//        {
-//            _context = context;
-//        }
-
-//        public List<Transactions> GetHistoricalData()
-//        {
-//            return _context.Transactions
-//                .OrderBy(t => t.Date)
-//                .ToList();
-//        }
-
-//        public decimal GetForecast(List<Transactions> history, int window = 3)
-//        {
-//            return history
-//                .OrderByDescending(x => x.Date)
-//                .Take(window)
-//                .Average(x => x.Amount);
-//        }
-//        public decimal GetSumForecast(List<Transactions> history)
-//        {
-//            if (history.Count < 2) return history.Sum(t => t.Amount);
-
-//            // Проста линейна тенденция (разлика между последните два месеца)
-//            var lastMonth = history[history.Count - 1];
-//            var prevMonth = history[history.Count - 2];
-
-//            var delta = lastMonth.Amount - prevMonth.Amount;
-//            return lastMonth.Amount + delta; // прогноза за следващия месец
-//        }
-
-//        // 3. Прогноза на брой транзакции
-//        public int GetCountForecast(List<Transactions> history)
-//        {
-//            if (history.Count < 2) return history.Count;
-
-//            var lastMonthCount = history.Count(t => t.Date.Month == history[^1].Date.Month);
-//            var prevMonthCount = history.Count(t => t.Date.Month == history[^2].Date.Month);
-
-//            var delta = lastMonthCount - prevMonthCount;
-//            return lastMonthCount + delta;
-//        }
-
-//        // 4. Откриване на аномалии (amount > 2 * средна стойност)
-//        public List<Transactions> DetectAnomalies(List<Transactions> history)
-//        {
-//            if (!history.Any()) return new List<Transactions>();
-
-//            var avg = history.Average(t => t.Amount);
-//            return history.Where(t => t.Amount > avg * 2).ToList();
-//        }
-//    }
-//}
-
-//using BankingManagmentApp.Data;
-//using BankingManagmentApp.Models;
-using BankingManagmentApp.Data;
+﻿using BankingManagmentApp.Data;
 using BankingManagmentApp.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -82,7 +17,7 @@ namespace BankingManagmentApp.Services.Forecasting
         public Dictionary<string, int> ForecastTransactionVolumeMonthly()
         {
             return _context.Transactions
-                .AsEnumerable() // DateOnly can't translate directly to SQL
+                .AsEnumerable()
                 .GroupBy(t => t.Date.ToString("yyyy-MM"))
                 .ToDictionary(g => g.Key, g => g.Count());
         }
@@ -106,7 +41,7 @@ namespace BankingManagmentApp.Services.Forecasting
         {
             decimal avg = ForecastAvgTransactionValue();
             return _context.Transactions
-                .Where(t => t.Amount > avg * 3) // example anomaly: 3x average
+                .Where(t => t.Amount > avg * 3)
                 .ToList();
         }
 
@@ -116,7 +51,7 @@ namespace BankingManagmentApp.Services.Forecasting
             return _context.Accounts
                 .Include(a => a.Transactions)
                 .SelectMany(a => a.Transactions)
-                .Where(t => t.TransactionType.ToLower().Contains("card"))
+                .Where(t => t.TransactionType.ToLower().Contains("Debit"))
                 .Sum(t => t.Amount);
         }
 
@@ -130,10 +65,10 @@ namespace BankingManagmentApp.Services.Forecasting
             var cardTx = _context.Accounts
                 .Include(a => a.Transactions)
                 .SelectMany(a => a.Transactions)
-                .Where(t => t.TransactionType.ToLower().Contains("card"));
+                .Where(t => t.TransactionType.ToLower().Contains("Debit"));
 
             if (!cardTx.Any()) return 0;
-            int overdue = cardTx.Count(t => t.Amount < 0); // example: negative as risk
+            int overdue = cardTx.Count(t => t.Amount < 0); 
             return (double)overdue / cardTx.Count();
         }
 
@@ -172,8 +107,7 @@ namespace BankingManagmentApp.Services.Forecasting
         }
 
         public double ForecastChurnRate()
-        {
-            // simple churn example: inactive customers / total
+        { 
             int total = _context.Users.Count();
             if (total == 0) return 0;
             int inactive = _context.Users.Count(c => !c.IsActive);
