@@ -1,0 +1,209 @@
+@model BankingManagmentApp.ViewModels.Reports.ReportResultVm
+@using BankingManagmentApp.ViewModels.Reports
+
+@{
+    ViewData["Title"] = "Reports";
+    bool show = (ViewBag.ShowResults as bool?) ?? false;
+}
+
+<style>
+    .page-header {
+        border-bottom: 1px solid rgba(0,0,0,.06);
+        margin-bottom: 1rem;
+        padding-bottom: .75rem;
+    }
+    .card-elevated {
+        border: 1px solid rgba(0,0,0,.08);
+        box-shadow: 0 2px 8px rgba(0,0,0,.04);
+        border-radius: .75rem;
+    }
+    .table-responsive {
+        max-height: 60vh; 
+    }
+    .table thead th {
+        position: sticky;
+        top: 0;
+        background: #fff;
+        z-index: 1;
+        border-bottom: 1px solid rgba(0,0,0,.08);
+    }
+    .filters-row .form-label {
+        font-size: .85rem;
+        color: #6c757d;
+        margin-bottom: .35rem;
+    }
+    .btn-bar .btn {
+        min-width: 120px;
+    }
+</style>
+
+<div class="container-xl py-3">
+    <div class="page-header d-flex align-items-center justify-content-between flex-wrap gap-2">
+        <div>
+            <h1 class="h3 mb-1">Reports</h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0 small">
+                    <li class="breadcrumb-item"><a asp-controller="AdminDashboard" asp-action="Index">Dashboard</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Reports</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <form asp-action="Index" method="post" class="mb-4" autocomplete="off" novalidate>
+        @Html.AntiForgeryToken()
+
+        <div class="card card-elevated">
+            <div class="card-body">
+                <div asp-validation-summary="ModelOnly" class="text-danger small mb-2"></div>
+
+                <div class="row g-3 filters-row align-items-end">
+                    <div class="col-12 col-md-3">
+                        <label class="form-label">From</label>
+                        <input asp-for="Filters.From" type="date" class="form-control" />
+                        <span asp-validation-for="Filters.From" class="text-danger small"></span>
+                    </div>
+
+                    <div class="col-12 col-md-3">
+                        <label class="form-label">To</label>
+                        <input asp-for="Filters.To" type="date" class="form-control" />
+                        <span asp-validation-for="Filters.To" class="text-danger small"></span>
+                    </div>
+
+                    <div class="col-12 col-md-4">
+                        <label class="form-label">Account</label>
+                        <select asp-for="Filters.AccountId"
+                                asp-items="Model.Filters.AccountsSelect"
+                                class="form-select">
+                        </select>
+                        <span asp-validation-for="Filters.AccountId" class="text-danger small"></span>
+                    </div>
+
+                    <div class="col-6 col-md-2">
+                        <label class="form-label">Group by</label>
+                        <select asp-for="Filters.GroupBy" class="form-select">
+                            <option value="Monthly">Monthly</option>
+                            <option value="Yearly">Yearly</option>
+                        </select>
+                        <span asp-validation-for="Filters.GroupBy" class="text-danger small"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-footer d-flex justify-content-end gap-2">
+                <button type="submit" class="btn btn-primary">Run report</button>
+            </div>
+        </div>
+    </form>
+
+    @if (show)
+    {
+        if (Model?.Rows == null || !Model.Rows.Any())
+        {
+            <div class="alert alert-info card-elevated" role="alert">
+                No data for the selected period.
+            </div>
+        }
+        else
+        {
+            <div class="card card-elevated">
+                <div class="card-header d-flex flex-wrap align-items-center justify-content-between gap-2">
+                    <div class="fw-semibold">
+                        Results — @Model.Filters.GroupBy
+                        <span class="text-muted">
+                            (@Model.Filters.From?.ToString("yyyy-MM-dd") → @Model.Filters.To?.ToString("yyyy-MM-dd"),
+                            @Model.Filters.SelectedAccountLabel)
+                        </span>
+                    </div>
+
+                    <div class="btn-bar d-flex align-items-center gap-2">
+                        <form asp-action="ExportExcel" method="post" class="m-0 p-0">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="Filters.From" value="@(Model.Filters.From?.ToString("yyyy-MM-dd"))" />
+                            <input type="hidden" name="Filters.To" value="@(Model.Filters.To?.ToString("yyyy-MM-dd"))" />
+                            <input type="hidden" name="Filters.AccountId" value="@(Model.Filters.AccountId?.ToString())" />
+                            <input type="hidden" name="Filters.GroupBy" value="@Model.Filters.GroupBy" />
+                            <button type="submit" class="btn btn-outline-success">
+                                Export Excel
+                            </button>
+                        </form>
+
+                        <form asp-action="ExportPdf" method="post" class="m-0 p-0">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="Filters.From" value="@(Model.Filters.From?.ToString("yyyy-MM-dd"))" />
+                            <input type="hidden" name="Filters.To" value="@(Model.Filters.To?.ToString("yyyy-MM-dd"))" />
+                            <input type="hidden" name="Filters.AccountId" value="@(Model.Filters.AccountId?.ToString())" />
+                            <input type="hidden" name="Filters.GroupBy" value="@Model.Filters.GroupBy" />
+                            <button type="submit" class="btn btn-outline-danger">
+                                Export PDF
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover table-sm align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th style="min-width: 110px;">Year</th>
+                                    @if (Model.Filters.GroupBy == ReportGroupBy.Monthly)
+                                    {
+                                        <th style="min-width: 110px;">Month</th>
+                                    }
+                                    <th class="text-end" style="min-width: 150px;">Total transactions</th>
+                                    <th class="text-end" style="min-width: 150px;">Total amount</th>
+                                    <th>By type</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var r in Model.Rows)
+                                {
+                                    <tr>
+                                        <td>@r.Year</td>
+                                        @if (Model.Filters.GroupBy == ReportGroupBy.Monthly)
+                                        {
+                                            <td>@(r.Month?.ToString() ?? "-")</td>
+                                        }
+                                        <td class="text-end">@r.TotalTransactions</td>
+                                        <td class="text-end">@r.TotalAmount.ToString("N2")</td>
+                                        <td>
+                                            @if (r.AmountByType != null && r.AmountByType.Any())
+                                            {
+                                                <div class="d-flex flex-wrap gap-2">
+                                                    @foreach (var kv in r.AmountByType.OrderBy(k => k.Key))
+                                                    {
+                                                        <span class="badge bg-light text-dark border">
+                                                            <strong>@(kv.Key ?? "Unknown"):</strong> @kv.Value.ToString("N2")
+                                                        </span>
+                                                    }
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">–</span>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+
+                            <tfoot>
+                                <tr class="table-light">
+                                    <th>Total</th>
+                                    @if (Model.Filters.GroupBy == ReportGroupBy.Monthly)
+                                    {
+                                        <th></th>
+                                    }
+                                    <th class="text-end">@Model.GrandTotalTransactions</th>
+                                    <th class="text-end">@Model.GrandTotalAmount.ToString("N2")</th>
+                                    <th></th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+</div>
