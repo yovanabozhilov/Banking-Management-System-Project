@@ -84,6 +84,14 @@
 <div class="container mx-auto px-4 py-8">
     <h1><span class="text-indigo-600">Admin</span> Dashboard</h1>
 
+    <p class="text-right mb-4">
+        <a asp-controller="Reports" asp-action="Index"
+           class="text-indigo-600 hover:text-indigo-800 underline underline-offset-4 text-sm"
+           aria-label="Open Reports page">
+            Reports →
+        </a>
+    </p>
+
     <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
         <h2 class="section-title">📊 Clients</h2>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
