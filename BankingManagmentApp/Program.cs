@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.AI;
 using OpenAI;
 using Microsoft.Extensions.Configuration;
+using BankingManagmentApp.Services.Forecasting;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -69,6 +70,7 @@ builder.Services.AddChatClient(sp =>
 
 // register your wrapper service so controllers can inject it
 builder.Services.AddScoped<AiChatService>();
+builder.Services.AddScoped<ForecastService>();
 
 
 // Background авто-претрениране (стартира на boot и по график)

@@ -45,15 +45,16 @@ namespace BankingManagmentApp.Controllers
                 return Challenge();
 
             if (!ModelState.IsValid)
-                return View(loan);
+            {
+                // return View(loan);
+                loan.CustomerId = user.Id;
+                loan.Status = "Pending ";
+                loan.Date = DateTime.UtcNow;
+                
 
-            loan.CustomerId = user.Id;
-            loan.Status     = "Pending";
-            loan.Date       = DateTime.UtcNow;
-
-            if (loan.Term == default)
-                loan.Term = DateOnly.FromDateTime(DateTime.Today.AddMonths(12));
-
+                if (loan.Term == default)
+                    loan.Term = DateOnly.FromDateTime(DateTime.Today.AddMonths(12));
+            }
             _context.Loans.Add(loan);
             await _context.SaveChangesAsync(); 
 

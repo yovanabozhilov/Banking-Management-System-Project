@@ -56,7 +56,10 @@
         </div>
 
         <div class="card-footer d-flex justify-content-between">
-            <a asp-action="Edit" asp-route-id="@Model?.Id" class="btn btn-primary btn-sm">Edit</a>
+            @if (User.IsInRole("Admin"))
+            {
+                <a asp-action="Edit" asp-route-id="@Model?.Id" class="btn btn-primary btn-sm">Edit</a>
+            }
             <a asp-action="Index" class="btn btn-outline-secondary btn-sm">Back to List</a>
         </div>
     </div>

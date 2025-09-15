@@ -65,20 +65,6 @@
 
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
-
-                            <li class="nav-item">
-                                <a class="nav-link" style="color: steelblue; font-weight:800;font-size:18px;" asp-controller="AdminDashboard" asp-action="CategoryComparison">Category Comparison</a>
-                            </li>
-
-                            <li class="nav-item">
-                                <a class="nav-link" style="color: steelblue; font-weight:800;font-size:18px;" asp-controller="AdminDashboard" asp-action="Benchmarking">Benchmarking</a>
-                            </li>
-
-                            <li class="nav-item">
-                                <a class="nav-link" style="color: steelblue; font-weight:800;font-size:18px;" asp-controller="AdminDashboard" asp-action="SentimentAnalysis">Sentiment Analysis</a>
-                            </li>
-
-
                         @if (User.IsInRole("Admin") || User.IsInRole("User"))
                         {
                             <li class="nav-item">
@@ -86,10 +72,15 @@
                             </li>
 
                             <li class="nav-item">
-                                <a class="nav-link" style="color: steelblue; font-weight:800;font-size:18px;" asp-area="" asp-controller="Loans" asp-action="Create">Apply for credit</a>
+                                <a class="nav-link" style="color: steelblue; font-weight:800;font-size:18px;" asp-area="" asp-controller="Loans" asp-action="Apply">Apply for credit</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" style="color: steelblue; font-weight:800;font-size:18px;" asp-area="" asp-controller="Accounts" asp-action="Create">New Card</a>
+
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link" style="color: steelblue; font-weight:800;font-size:18px;" asp-controller="AdminDashboard" asp-action="CategoryComparison">Category Comparison</a>
                             </li>
                             @* <li class="nav-item">
                                 <a class="nav-link text-dark" asp-controller="AdminDashboard" asp-action="CategoryComparison">Category Comparison</a>
@@ -101,12 +92,25 @@
                             <li class="nav-item">
                                 <a class="nav-link" style="color: steelblue; font-weight:800;font-size:18px;" asp-area="" asp-controller="Loans" asp-action="Index">Pending Credits</a>
                             </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link" style="color: steelblue; font-weight:800;font-size:18px;" asp-controller="AdminDashboard" asp-action="Benchmarking">Benchmarking</a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link" style="color: steelblue; font-weight:800;font-size:18px;" asp-controller="AdminDashboard" asp-action="SentimentAnalysis">Sentiment Analysis</a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link" style="color: steelblue; font-weight:800;font-size:18px;" asp-controller="Forecasting" asp-action="Index">Forecasting</a>
+                            </li>
+
                             <li class="nav-item">
                                 <a class="nav-link" style="color: steelblue; font-weight:800;font-size:18px;" asp-area="" asp-controller="AdminDashboard" asp-action="Index">Dashboard</a>
                             </li>
 
                         }
-                        else
+                        @if (User.IsInRole("User"))
                         {
                             <li class="nav-item">
                                 <a class="nav-link" style="color: steelblue; font-weight:800;font-size:18px;" asp-area="" asp-controller="Loans" asp-action="Index">Your Credits</a>
@@ -139,7 +143,7 @@
 
 
 
-    <partial name="Chatbot"/>
+    <partial name="Chatbot" />
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>

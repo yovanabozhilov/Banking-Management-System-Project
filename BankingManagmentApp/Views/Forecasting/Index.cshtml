@@ -1,0 +1,179 @@
+﻿@using BankingManagmentApp.Models
+@using BankingManagmentApp.Services.Forecasting
+@{
+    ViewData["Title"] = "Forecast Dashboard";
+
+    var volume = (Dictionary<string, int>)ViewData["TransactionVolume"];
+    var avgValue = (decimal)ViewData["AvgTransactionValue"];
+    var cashFlows = (Dictionary<string, decimal>)ViewData["CashFlows"];
+    var anomalies = (List<Transactions>)ViewData["TransactionAnomalies"];
+
+    var cardExpenses = (decimal)ViewData["CardExpenses"];
+    var activeCards = (int)ViewData["ActiveCards"];
+    var cardRisk = (double)ViewData["CardDefaultRisk"];
+
+    var overdueRate = (double)ViewData["OverdueLoansRate"];
+    var newLoans = (int)ViewData["NewLoans"];
+    var repaymentTrend = (string)ViewData["RepaymentTrend"];
+
+    var newCustomers = (int)ViewData["NewCustomers"];
+    var churnRate = (double)ViewData["ChurnRate"];
+    //var highRiskCustomers = (List<string>)ViewData["HighRiskCustomers"];
+}
+
+<div class="container-fluid py-4">
+    <h2 class="text-center mb-5">@ViewData["Title"]</h2>
+
+    <!-- Transactions Section -->
+    <h4 class="mb-3 text-primary">💵 Transactions</h4>
+    <div class="row g-3 mb-4">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">Transactions Volume</div>
+                <div class="card-body">
+                    <canvas id="volumeChart" style="max-height:180px"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-success text-white">Cash Flows</div>
+                <div class="card-body">
+                    <canvas id="cashFlowChart" style="max-height:180px"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cards Section -->
+    <h4 class="mb-3 text-warning">💳 Cards</h4>
+    <div class="row g-3 mb-4">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-warning text-dark">Card Spending & Activity</div>
+                <div class="card-body">
+                    <canvas id="cardsChart" style="max-height:180px"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-danger text-white">Card Risk</div>
+                <div class="card-body d-flex flex-column align-items-center">
+                    <canvas id="cardRiskGauge" style="max-height:150px"></canvas>
+                    <div class="fw-bold">@Math.Round(cardRisk * 100)%</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loans Section -->
+    <h4 class="mb-3 text-info">🏦 Loans</h4>
+    <div class="row g-3 mb-4">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-info text-white">Loan Activity</div>
+                <div class="card-body">
+                    <canvas id="loansChart" style="max-height:180px"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-secondary text-white">Loan Risk</div>
+                <div class="card-body d-flex flex-column align-items-center">
+                    <canvas id="loanRiskGauge" style="max-height:150px"></canvas>
+                    <div class="fw-bold">@Math.Round(overdueRate * 100)%</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Customers Section -->
+    <h4 class="mb-3 text-dark">👥 Customers</h4>
+    <div class="row g-3 mb-4">
+        <div class="col-md-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-dark text-white">Customer Trends</div>
+                <div class="card-body">
+                    <canvas id="customersChart" style="max-height:200px"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Anomalies Section -->
+    <h4 class="mb-3 text-danger">🚨 Anomalies</h4>
+    <div class="row g-3 mb-4">
+        <div class="col-md-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-danger text-white">Transaction Anomalies</div>
+                <div class="card-body">
+                    <ul class="list-unstyled mb-0">
+                        @foreach (var t in anomalies)
+                        {
+                            <li class="bg-light p-2 rounded mb-1">
+                                <strong>@t.Date.ToString("yyyy-MM-dd"):</strong> @t.Amount lv.
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // --- Transactions ---
+        const volumeLabels = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(volume.Keys));
+        const volumeData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(volume.Values));
+        new Chart(document.getElementById("volumeChart"), {
+            type: 'line',
+            data: { labels: volumeLabels, datasets: [{ data: volumeData, borderColor: "#007bff", backgroundColor: "rgba(0,123,255,0.1)", fill: true, tension: 0.3 }] },
+            options: { plugins: { legend: { display: false } } }
+        });
+
+        const cashLabels = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(cashFlows.Keys));
+        const cashData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(cashFlows.Values));
+        new Chart(document.getElementById("cashFlowChart"), {
+            type: 'bar',
+            data: { labels: cashLabels, datasets: [{ data: cashData, backgroundColor: cashData.map(v => v >= 0 ? "green" : "red") }] },
+            options: { plugins: { legend: { display: false } } }
+        });
+
+        // --- Cards ---
+        new Chart(document.getElementById("cardsChart"), {
+            type: 'doughnut',
+            data: { labels: ["Monthly Expenses", "Active Cards"], datasets: [{ data: [@cardExpenses, @activeCards], backgroundColor: ["#ffc107", "#28a745"] }] },
+            options: { plugins: { legend: { position: "bottom" } } }
+        });
+
+        new Chart(document.getElementById("cardRiskGauge"), {
+            type: 'doughnut',
+            data: { datasets: [{ data: [@Math.Round(cardRisk * 100), 100 - @Math.Round(cardRisk * 100)], backgroundColor: ["#dc3545", "lightgray"], borderWidth: 0 }] },
+            options: { rotation: -90, circumference: 180, cutout: "80%", plugins: { legend: { display: false }, tooltip: { enabled: false } } }
+        });
+
+        // --- Loans ---
+        new Chart(document.getElementById("loansChart"), {
+            type: 'bar',
+            data: { labels: ["Overdue %", "New Loans"], datasets: [{ data: [@overdueRate * 100, @newLoans], backgroundColor: ["#dc3545", "#17a2b8"] }] },
+            options: { plugins: { legend: { display: false } } }
+        });
+
+        new Chart(document.getElementById("loanRiskGauge"), {
+            type: 'doughnut',
+            data: { datasets: [{ data: [@Math.Round(overdueRate * 100), 100 - @Math.Round(overdueRate * 100)], backgroundColor: ["#ffc107", "lightgray"], borderWidth: 0 }] },
+            options: { rotation: -90, circumference: 180, cutout: "80%", plugins: { legend: { display: false }, tooltip: { enabled: false } } }
+        });
+
+        // --- Customers ---
+        new Chart(document.getElementById("customersChart"), {
+            type: 'pie',
+            data: { labels: ["New Customers", "Churn %"], datasets: [{ data: [@newCustomers, @Math.Round(churnRate * 100)], backgroundColor: ["#6c757d", "#ffc107"] }] },
+            options: { plugins: { legend: { position: "bottom" } } }
+        });
+    });
+</script>
