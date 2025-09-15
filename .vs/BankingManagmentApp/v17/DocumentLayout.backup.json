@@ -3,6 +3,10 @@
   "WorkspaceRootPath": "C:\\Users\\viole\\Downloads\\Banking-Management-System-Project\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{584A87E8-1FC0-42DD-B80C-7D8D27808F9C}|BankingManagmentApp\\BankingManagmentApp.csproj|c:\\users\\viole\\downloads\\banking-management-system-project\\bankingmanagmentapp\\views\\shared\\_layout.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{584A87E8-1FC0-42DD-B80C-7D8D27808F9C}|BankingManagmentApp\\BankingManagmentApp.csproj|solutionrelative:bankingmanagmentapp\\views\\shared\\_layout.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{584A87E8-1FC0-42DD-B80C-7D8D27808F9C}|BankingManagmentApp\\BankingManagmentApp.csproj|c:\\users\\viole\\downloads\\banking-management-system-project\\bankingmanagmentapp\\services\\forecasting\\forecastservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{584A87E8-1FC0-42DD-B80C-7D8D27808F9C}|BankingManagmentApp\\BankingManagmentApp.csproj|solutionrelative:bankingmanagmentapp\\services\\forecasting\\forecastservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
@@ -22,11 +26,24 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 1,
+          "SelectedChildIndex": 0,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 0,
+              "Title": "_Layout.cshtml",
+              "DocumentMoniker": "C:\\Users\\viole\\Downloads\\Banking-Management-System-Project\\BankingManagmentApp\\Views\\Shared\\_Layout.cshtml",
+              "RelativeDocumentMoniker": "BankingManagmentApp\\Views\\Shared\\_Layout.cshtml",
+              "ToolTip": "C:\\Users\\viole\\Downloads\\Banking-Management-System-Project\\BankingManagmentApp\\Views\\Shared\\_Layout.cshtml",
+              "RelativeToolTip": "BankingManagmentApp\\Views\\Shared\\_Layout.cshtml",
+              "ViewState": "AgIAACcAAAAAAAAAAAAAADMAAAAZAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-09-15T15:31:59.085Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
               "Title": "Index.cshtml",
               "DocumentMoniker": "C:\\Users\\viole\\Downloads\\Banking-Management-System-Project\\BankingManagmentApp\\Views\\AdminDashboard\\Index.cshtml",
               "RelativeDocumentMoniker": "BankingManagmentApp\\Views\\AdminDashboard\\Index.cshtml",
@@ -38,7 +55,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 1,
               "Title": "ForecastService.cs",
               "DocumentMoniker": "C:\\Users\\viole\\Downloads\\Banking-Management-System-Project\\BankingManagmentApp\\Services\\Forecasting\\ForecastService.cs",
               "RelativeDocumentMoniker": "BankingManagmentApp\\Services\\Forecasting\\ForecastService.cs",
@@ -51,7 +68,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 2,
               "Title": "Index.cshtml",
               "DocumentMoniker": "C:\\Users\\viole\\Downloads\\Banking-Management-System-Project\\BankingManagmentApp\\Views\\Forecasting\\Index.cshtml",
               "RelativeDocumentMoniker": "BankingManagmentApp\\Views\\Forecasting\\Index.cshtml",

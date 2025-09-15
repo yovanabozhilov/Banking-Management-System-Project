@@ -3,135 +3,163 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-
     <title>@ViewData["Title"] - BankingManagmentApp</title>
 
-    <!-- Hint към браузъра за двете цветови схеми -->
-    <meta name="color-scheme" content="light dark" />
-
-    <!-- Apply theme site-wide from cookie BEFORE CSS to avoid flash -->
-    <script>
-        (function () {
-          try {
-            function readCookie(name) {
-              var m = document.cookie.match(new RegExp('(?:^|;\\s*)' + name + '=([^;]+)'));
-              return m ? decodeURIComponent(m[1]) : null;
-            }
-            function effective(mode) {
-              if (mode === 'system') {
-                return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-              }
-              return mode === 'dark' ? 'dark' : 'light';
-            }
-            function apply(mode) {
-              var theme = effective(mode || 'system');
-              var html = document.documentElement;
-              html.setAttribute('data-bs-theme', theme);
-              // optional fallback class for any custom CSS
-              html.classList.toggle('dark', theme === 'dark');
-            }
-
-            var saved = readCookie('theme') || 'system';
-            apply(saved);
-
-            // Auto-update when OS scheme changes (only in 'system' mode)
-            if (saved === 'system' && window.matchMedia) {
-              var mq = window.matchMedia('(prefers-color-scheme: dark)');
-              var cb = function () { apply('system'); };
-              if (mq.addEventListener) mq.addEventListener('change', cb);
-              else if (mq.addListener) mq.addListener(cb); // Safari/old
-            }
-          } catch (e) { /* no-op */ }
-        })();
-    </script>
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/BankingManagmentApp.styles.css" asp-append-version="true" />
 
     @await RenderSectionAsync("Head", required: false)
+
+    <style>
+        /* Custom CSS for the sidebar */
+        body {
+            display: flex;
+            min-height: 100vh;
+            flex-direction: column;
+        }
+
+        #wrapper {
+            display: flex;
+            flex: 1;
+        }
+
+        #sidebar-wrapper {
+            min-width: 250px;
+            max-width: 250px;
+            transition: margin-left .25s ease-out;
+            background-color: #f8f9fa;
+            border-right: 1px solid #dee2e6;
+            padding: 1.5rem;
+            margin-left: -250px;
+        }
+
+        #wrapper.toggled #sidebar-wrapper {
+            margin-left: 0;
+        }
+            #sidebar-wrapper .sidebar-heading {
+                padding: 0.875rem 1.25rem;
+                font-size: 1.2rem;
+            }
+
+        #page-content-wrapper {
+            width: 100%;
+            padding: 20px;
+        }
+
+        #wrapper.toggled #sidebar-wrapper {
+            margin-left: 0px;
+        }
+
+        .sidebar-brand {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: steelblue;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-nav-item .nav-link {
+            font-weight: 800;
+            font-size: 18px;
+            color: steelblue;
+            transition: background-color 0.2s ease-in-out;
+            border-radius: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+            .sidebar-nav-item .nav-link:hover {
+                background-color: rgba(70, 130, 180, 0.1);
+            }
+
+        .navbar-toggle-btn {
+            cursor: pointer;
+            margin-right: 1rem;
+        }
+
+    </style>
 </head>
+
 <body>
-    <header>
-        <!-- bg-body-tertiary се „прелива“ с темата; избягваме .navbar-light/.navbar-dark -->
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm bg-body-tertiary border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" style="color: steelblue;" asp-area="" asp-controller="Home" asp-action="Index"><i>GlowPay</i></a>
-
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse"
-                        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        @if (User.IsInRole("Admin") || User.IsInRole("User"))
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link" style="color: steelblue; font-weight:800;font-size:18px; " asp-area="" asp-controller="Profile" asp-action="Index">Your Profile</a>
-                            </li>
-
-                            <li class="nav-item">
-                                <a class="nav-link" style="color: steelblue; font-weight:800;font-size:18px;" asp-area="" asp-controller="Loans" asp-action="Apply">Apply for credit</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" style="color: steelblue; font-weight:800;font-size:18px;" asp-area="" asp-controller="Accounts" asp-action="Create">New Card</a>
-
-                            </li>
-
-                            <li class="nav-item">
-                                <a class="nav-link" style="color: steelblue; font-weight:800;font-size:18px;" asp-controller="AdminDashboard" asp-action="CategoryComparison">Category Comparison</a>
-                            </li>
-                            @* <li class="nav-item">
-                                <a class="nav-link text-dark" asp-controller="AdminDashboard" asp-action="CategoryComparison">Category Comparison</a>
-                            </li> *@
-
-                        }
-                        @if (User.IsInRole("Admin"))
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link" style="color: steelblue; font-weight:800;font-size:18px;" asp-area="" asp-controller="Loans" asp-action="Index">Pending Credits</a>
-                            </li>
-
-                            <li class="nav-item">
-                                <a class="nav-link" style="color: steelblue; font-weight:800;font-size:18px;" asp-controller="AdminDashboard" asp-action="Benchmarking">Benchmarking</a>
-                            </li>
-
-                            <li class="nav-item">
-                                <a class="nav-link" style="color: steelblue; font-weight:800;font-size:18px;" asp-controller="AdminDashboard" asp-action="SentimentAnalysis">Sentiment Analysis</a>
-                            </li>
-
-                            <li class="nav-item">
-                                <a class="nav-link" style="color: steelblue; font-weight:800;font-size:18px;" asp-controller="Forecasting" asp-action="Index">Forecasting</a>
-                            </li>
-
-                            <li class="nav-item">
-                                <a class="nav-link" style="color: steelblue; font-weight:800;font-size:18px;" asp-area="" asp-controller="AdminDashboard" asp-action="Index">Dashboard</a>
-                            </li>
-
-                        }
-                        @if (User.IsInRole("User"))
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link" style="color: steelblue; font-weight:800;font-size:18px;" asp-area="" asp-controller="Loans" asp-action="Index">Your Credits</a>
-                            </li>
-                        }
-
-
-
-                    </ul>
-
-                    <partial name="_LoginPartial" />
-                </div>
+    <header class="navbar navbar-expand-lg navbar-light bg-light border-bottom box-shadow mb-3">
+        <div class="container-fluid">
+            <button class="btn btn-outline-secondary navbar-toggle-btn" id="sidebarToggle">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+            <a class="navbar-brand" style="color: steelblue;" asp-area="" asp-controller="Home" asp-action="Index"><i>GlowPay</i></a>
+            <div class="collapse navbar-collapse justify-content-end">
+                <partial name="_LoginPartial" />
             </div>
-        </nav>
+        </div>
     </header>
 
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
+    <div id="wrapper">
+        <nav id="sidebar-wrapper">
+            <div class="sidebar-brand">
+                Menu
+            </div>
+            <ul class="list-unstyled components">
+                @if (User.IsInRole("Admin") || User.IsInRole("User"))
+                {
+                    <li class="sidebar-nav-item">
+                        <a class="nav-link" asp-area="" asp-controller="Profile" asp-action="Index">Your Profile</a>
+                    </li>
+                    <li class="sidebar-nav-item">
+                        <a class="nav-link" asp-area="" asp-controller="Loans" asp-action="Apply">Apply for credit</a>
+                    </li>
+                    <li class="sidebar-nav-item">
+                        <a class="nav-link" asp-area="" asp-controller="Accounts" asp-action="Create">New Card</a>
+                    </li>
+                    <li class="sidebar-nav-item">
+                        <a class="nav-link" asp-controller="AdminDashboard" asp-action="CategoryComparison">Category Comparison</a>
+                    </li>
+                }
+                @if (User.IsInRole("Admin"))
+                {
+                    <li class="sidebar-nav-item">
+                        <a class="nav-link" asp-area="" asp-controller="Loans" asp-action="Index">Pending Credits</a>
+                    </li>
+                    <li class="sidebar-nav-item">
+                        <a class="nav-link" asp-controller="AdminDashboard" asp-action="Benchmarking">Benchmarking</a>
+                    </li>
+                    <li class="sidebar-nav-item">
+                        <a class="nav-link" asp-controller="AdminDashboard" asp-action="SentimentAnalysis">Sentiment Analysis</a>
+                    </li>
+                    <li class="sidebar-nav-item">
+                        <a class="nav-link" asp-controller="Forecasting" asp-action="Index">Forecasting</a>
+                    </li>
+                    <li class="sidebar-nav-item">
+                        <a class="nav-link" asp-area="" asp-controller="AdminDashboard" asp-action="Index">Dashboard</a>
+                    </li>
+                }
+                @if (User.IsInRole("User"))
+                {
+                    <li class="sidebar-nav-item">
+                        <a class="nav-link" asp-area="" asp-controller="Loans" asp-action="Index">Your Credits</a>
+                    </li>
+                }
+            </ul>
+        </nav>
+
+        <div id="page-content-wrapper">
+            <main role="main" class="container pb-3">
+                @RenderBody()
+            </main>
+        </div>
     </div>
+
+    <partial name="Chatbot" />
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    <script>
+        document.getElementById("sidebarToggle").addEventListener("click", function(e) {
+            e.preventDefault();
+            document.getElementById("wrapper").classList.toggle("toggled");
+        });
+    </script>
 
     <footer class="border-top footer text-body-secondary">
         <div class="container">
@@ -140,14 +168,7 @@
         </div>
     </footer>
 
-
-
-
-    <partial name="Chatbot" />
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
-
     @await RenderSectionAsync("Scripts", required: false)
+
 </body>
 </html>
