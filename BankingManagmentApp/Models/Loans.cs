@@ -1,4 +1,6 @@
-﻿namespace BankingManagmentApp.Models
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace BankingManagmentApp.Models
 {
     public class Loans
     {
@@ -13,6 +15,9 @@
         public DateTime ApprovalDate { get; set; } = DateTime.Now;
         public Customers Customer { get; set; }
         public ICollection<LoanRepayments> LoanRepayments { get; set; } = new List<LoanRepayments>();
-        public ICollection<CreditAssessments> CreditAssessments { get; set; } = new List<CreditAssessments>(); 
+        public ICollection<CreditAssessments> CreditAssessments { get; set; } = new List<CreditAssessments>();
+        
+        [NotMapped]
+        public bool IsRisky { get; set; }
     }
 }

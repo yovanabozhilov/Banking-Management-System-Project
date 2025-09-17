@@ -55,6 +55,9 @@ builder.Services.AddScoped<LoansService>();
 builder.Services.AddSingleton<LoanApprovalPolicy>();
 builder.Services.AddScoped<ILoanApprovalEngine, LoanApprovalEngine>();
 builder.Services.AddScoped<ILoanWorkflow, LoanWorkflow>();
+builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<LoanContractGenerator>();
+
 
 builder.Services.AddChatClient(sp =>
 {
@@ -71,7 +74,6 @@ builder.Services.AddChatClient(sp =>
 // register your wrapper service so controllers can inject it
 builder.Services.AddScoped<AiChatService>();
 builder.Services.AddScoped<ForecastService>();
-
 
 // Background авто-претрениране (стартира на boot и по график)
 builder.Services.AddHostedService<MlRetrainHostedService>();

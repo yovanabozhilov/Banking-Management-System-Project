@@ -1,5 +1,6 @@
 ﻿using BankingManagmentApp.Data;
 using BankingManagmentApp.Models;
+using BankingManagmentApp.Services;
 using BankingManagmentApp.Services.Approval;
 using DocumentFormat.OpenXml.Drawing.Charts;
 using Microsoft.AspNetCore.Authorization;
@@ -18,11 +19,14 @@ namespace BankingManagmentApp.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly UserManager<Customers> _userManager;
-
-        public LoansController(ApplicationDbContext context, UserManager<Customers> userManager)
+        private readonly IEmailService _emailService;
+        private readonly LoanContractGenerator _loanContractGenerator;
+        public LoansController(ApplicationDbContext context, UserManager<Customers> userManager, IEmailService emailService, LoanContractGenerator loanContractGenerator)
         {
             _context = context;
             _userManager = userManager;
+            _emailService = emailService;
+            _loanContractGenerator = loanContractGenerator;
         }
 
         
@@ -91,40 +95,61 @@ namespace BankingManagmentApp.Controllers
             }
         }
 
-        
-        // АДМИН/ОБЩИ (преглед)
-        
 
-        // GET: Loans (общ преглед)
+        // АДМИН/ОБЩИ (преглед)
+
+
         public async Task<IActionResult> Index()
         {
             var user = await _userManager.GetUserAsync(User);
             if (user == null) return Challenge();
 
+            List<Loans> list;
             if (User.IsInRole("Admin"))
             {
-                var list = await _context.Loans
+                list = await _context.Loans
                     .Include(l => l.Customer)
-                    .Where(t => t.Status == "Pending"
-                             || t.Status == "PendingReview"
-                             || t.Status == "AutoApproved"
-                             || t.Status == "AutoDeclined")
+                    .Where(t => t.Status == "Pending" || t.Status == "PendingReview" ||
+                                t.Status == "AutoApproved" || t.Status == "AutoDeclined")
                     .OrderByDescending(x => x.Date)
                     .ToListAsync();
-
-                return View(list);
             }
             else
             {
-                var my = await _context.Loans
+                list = await _context.Loans
                     .Include(o => o.Customer)
                     .Where(x => x.CustomerId == _userManager.GetUserId(User))
                     .OrderByDescending(x => x.Date)
                     .ToListAsync();
-
-                return View(my);
             }
+
+            // Изчисляване на риска за визуализация
+            foreach (var loan in list)
+            {
+                var accounts = await _context.Accounts
+                    .Where(a => a.CustomerId == loan.CustomerId)
+                    .ToListAsync();
+
+                decimal totalBalance = accounts.Sum(a => a.Balance);
+
+                var activeLoans = await _context.Loans
+                    .Where(l => l.CustomerId == loan.CustomerId &&
+                                (l.Status == "AutoApproved" || l.Status == "Approved"))
+                    .ToListAsync();
+
+                bool hasActiveLoan = activeLoans.Any();
+                if (activeLoans.Count() > 5)
+                {
+                    hasActiveLoan = true;
+                }
+                bool isLargeLoan = loan.Amount >= 1000000;
+
+                loan.IsRisky = (totalBalance < loan.Amount / 2 && loan.Amount < 1000000) || hasActiveLoan || isLargeLoan;
+            }
+
+            return View(list);
         }
+
 
         // GET: Loans/Details/5
         public async Task<IActionResult> Details(int? id)
@@ -205,53 +230,82 @@ namespace BankingManagmentApp.Controllers
             {
                 try
                 {
-                    loans.CustomerId = _userManager.GetUserId(User);
+                    var existingLoan = await _context.Loans.AsNoTracking().FirstOrDefaultAsync(l => l.Id == id);
+                    loans.CustomerId = existingLoan.CustomerId;
+                    //loans.CustomerId = _userManager.GetUserId(User);
 
-                    int termMonths = 0;
-                    if (loans.Amount <= 1000)
+                    if (existingLoan != null && existingLoan.Status != loans.Status)
                     {
-                        termMonths = 12;
-                    }
-                    else if (loans.Amount <= 5000)
-                    {
-                        termMonths = 36;
-                    }
-                    else
-                    {
-                        termMonths = 60; 
-                    }
-
-                    DateTime calculatedEndDate = DateTime.Today.AddMonths(termMonths);
-                    loans.Term = DateOnly.FromDateTime(calculatedEndDate);
-
-                    LoanRepayments repayment = new LoanRepayments();
-                    if (loans.Status == "Approved")
-                    {
-                        var hasExistingRepayments = await _context.LoanRepayments.AnyAsync(r => r.LoanId == loans.Id);
-
-                        if (!hasExistingRepayments)
+                        var customer = await _userManager.FindByIdAsync(loans.CustomerId);
+                        if (customer != null && !string.IsNullOrWhiteSpace(customer.Email))
                         {
-                            decimal monthlyPayment = loans.ApprovedAmount / termMonths;
-                            var repayments = new List<LoanRepayments>();
-                            DateOnly today = DateOnly.FromDateTime(DateTime.Today);
-                            for (int i = 1; i <= termMonths; i++)
+                            // NEW LOGIC
+                            // Generate the PDF contract only when the status becomes "Approved"
+                            if (loans.Status == "Approved")
                             {
-                                repayments.Add(new LoanRepayments
-                                {
-                                    LoanId = loans.Id,
-                                    DueDate = today.AddMonths(i),
-                                    AmountDue = monthlyPayment,
-                                    AmountPaid = 0,
-                                    PaymentDate =today,
-                                    Status = "Pending" 
-                                });
+                                // Ensure the ApprovedAmount and ApprovalDate are set before generating
+                                loans.ApprovedAmount = loans.ApprovedAmount > 0 ? loans.ApprovedAmount : loans.Amount;
+                                loans.ApprovalDate = DateTime.UtcNow;
+
+                                var pdfBytes = await _loanContractGenerator.GeneratePdfAsync(loans);
+
+                                // Pass the PDF bytes to the email service
+                                await _emailService.SendLoanStatusUpdateAsync(customer.Email, loans.Id, loans.Status, pdfBytes);
                             }
-                            _context.LoanRepayments.AddRange(repayments);
-                            await _context.SaveChangesAsync();
+                            else
+                            {
+                                // For other status changes, send an email without an attachment
+                                await _emailService.SendLoanStatusUpdateAsync(customer.Email, loans.Id, loans.Status, null);
+                            }
                         }
-                    } 
-                    _context.Loans.Update(loans);
-                    await _context.SaveChangesAsync();
+
+
+                        int termMonths = 0;
+                        if (loans.Amount <= 1000)
+                        {
+                            termMonths = 12;
+                        }
+                        else if (loans.Amount <= 5000)
+                        {
+                            termMonths = 36;
+                        }
+                        else
+                        {
+                            termMonths = 60;
+                        }
+
+                        DateTime calculatedEndDate = DateTime.Today.AddMonths(termMonths);
+                        loans.Term = DateOnly.FromDateTime(calculatedEndDate);
+
+                        LoanRepayments repayment = new LoanRepayments();
+                        if (loans.Status == "Approved")
+                        {
+                            var hasExistingRepayments = await _context.LoanRepayments.AnyAsync(r => r.LoanId == loans.Id);
+
+                            if (!hasExistingRepayments)
+                            {
+                                decimal monthlyPayment = loans.ApprovedAmount / termMonths;
+                                var repayments = new List<LoanRepayments>();
+                                DateOnly today = DateOnly.FromDateTime(DateTime.Today);
+                                for (int i = 1; i <= termMonths; i++)
+                                {
+                                    repayments.Add(new LoanRepayments
+                                    {
+                                        LoanId = loans.Id,
+                                        DueDate = today.AddMonths(i),
+                                        AmountDue = monthlyPayment,
+                                        AmountPaid = 0,
+                                        PaymentDate = today,
+                                        Status = "Pending"
+                                    });
+                                }
+                                _context.LoanRepayments.AddRange(repayments);
+                                await _context.SaveChangesAsync();
+                            }
+                        }
+                        _context.Loans.Update(loans);
+                        await _context.SaveChangesAsync();
+                    }
                 }
                 catch (DbUpdateConcurrencyException)
                 {

@@ -55,36 +55,23 @@
                                 var st = item.Status?.ToLower();
                                 var isApproved = st == "approved" || st == "autoapproved";
 
-                                <tr>
+                                <tr class="@(item.IsRisky ? "table-warning" : "")">
                                     <td>@item.Type</td>
                                     <td class="text-end">@item.Amount.ToString("N2", bg)</td>
-
-                                    <td>
-                                        @item.Term.ToString("dd.MM.yyyy")
-                                    </td>
-
-                                    <td>
-                                        @item.Date.ToString("dd.MM.yyyy")
-                                    </td>
-
+                                    <td>@item.Term.ToString("dd.MM.yyyy")</td>
+                                    <td>@item.Date.ToString("dd.MM.yyyy")</td>
                                     <td>
                                         <span class="badge @LoanStatusBadgeClass(item.Status)">
                                             @item.Status
                                         </span>
+                                        @if (item.IsRisky)
+                                        {
+                                            <span class="text-danger ms-2">⚠ Рисков клиент</span>
+                                        }
                                     </td>
-
-                                    <td class="text-end">
-                                        @(isApproved ? item.ApprovedAmount.ToString("N2", bg) : "-")
-                                    </td>
-
-                                    <td>
-                                        @(isApproved ? item.ApprovalDate.ToString("dd.MM.yyyy") : "-")
-                                    </td>
-
-                                    <td>
-                                        @item.Customer?.Id
-                                    </td>
-
+                                    <td class="text-end">@(item.Status.ToLower().Contains("approved") ? item.ApprovedAmount.ToString("N2", bg) : "-")</td>
+                                    <td>@(item.Status.ToLower().Contains("approved") ? item.ApprovalDate.ToString("dd.MM.yyyy") : "-")</td>
+                                    <td>@item.Customer?.FirstName @item.Customer?.LastName</td>
                                     <td class="text-center">
                                         <div class="btn-group btn-group-sm" role="group">
                                             @if (User.IsInRole("Admin"))
@@ -92,10 +79,7 @@
                                                 <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-outline-primary">Edit</a>
                                                 <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-outline-danger">Delete</a>
                                             }
-                                            @if(User.IsInRole("Admin")||User.IsInRole("User"))
-                                            {
                                             <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-outline-secondary">Details</a>
-                                            }
                                         </div>
                                     </td>
                                 </tr>

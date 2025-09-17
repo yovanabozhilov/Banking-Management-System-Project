@@ -74,7 +74,7 @@ namespace BankingManagmentApp.Services.Approval
                     loan.Status = "PendingReview";
                     break;
             }
-
+            await EvaluateRiskAsync(loan);
             _db.Loans.Update(loan);
             await _db.SaveChangesAsync();
             await tx.CommitAsync();
@@ -137,5 +137,41 @@ namespace BankingManagmentApp.Services.Approval
                 _            => ProductType.Personal
             };
         }
+
+        private async Task EvaluateRiskAsync(Loans loan)
+        {
+            var accounts = await _db.Accounts
+                .Where(a => a.CustomerId == loan.CustomerId)
+                .ToListAsync();
+
+            decimal totalBalance = accounts.Sum(a => a.Balance);
+
+            var activeLoans = await _db.Loans
+                .Where(l => l.CustomerId == loan.CustomerId &&
+                            (l.Status == "AutoApproved" || l.Status == "Approved"))
+                .ToListAsync();
+
+            bool hasActiveLoan = false;
+
+            bool isLargeLoan = loan.Amount >= 1000000;
+
+            // Рисков само ако имаш малко пари и имаш активен заем или е голям заем
+            if ((totalBalance < loan.Amount && loan.Amount < 1000000) || hasActiveLoan || isLargeLoan)
+            {
+                loan.IsRisky = true;
+
+                if (loan.Status == "AutoApproved")
+                    loan.Status = "PendingReview";
+            }
+            else
+            {
+                loan.IsRisky = false;
+            }
+        }
+
+
+
+
+
     }
 }
