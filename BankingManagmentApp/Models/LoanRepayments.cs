@@ -1,4 +1,6 @@
-﻿namespace BankingManagmentApp.Models
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace BankingManagmentApp.Models
 {
     public class LoanRepayments
     {
@@ -12,6 +14,10 @@
         public decimal AmountPaid { get; set; }
         public DateOnly? PaymentDate { get; set; } 
         public string Status { get; set; }
+
+
+        [NotMapped]
+        public bool IsOverdue => PaymentDate == null && DueDate < DateOnly.FromDateTime(DateTime.Today);
     }
 
 }

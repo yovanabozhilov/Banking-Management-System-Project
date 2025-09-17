@@ -1,22 +1,21 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "C:\\Users\\viole\\Downloads\\Banking-Management-System-Project\\",
+  "WorkspaceRootPath": "C:\\Users\\viole\\OneDrive\\\u0420\u0430\u0431\u043E\u0442\u0435\u043D \u043F\u043B\u043E\u0442\\Banking-Management-System-Project\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{584A87E8-1FC0-42DD-B80C-7D8D27808F9C}|BankingManagmentApp\\BankingManagmentApp.csproj|c:\\users\\viole\\downloads\\banking-management-system-project\\bankingmanagmentapp\\views\\shared\\_layout.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{584A87E8-1FC0-42DD-B80C-7D8D27808F9C}|BankingManagmentApp\\BankingManagmentApp.csproj|solutionrelative:bankingmanagmentapp\\views\\shared\\_layout.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+      "AbsoluteMoniker": "D:0:0:{584A87E8-1FC0-42DD-B80C-7D8D27808F9C}|BankingManagmentApp\\BankingManagmentApp.csproj|c:\\users\\viole\\onedrive\\\u0440\u0430\u0431\u043E\u0442\u0435\u043D \u043F\u043B\u043E\u0442\\banking-management-system-project\\bankingmanagmentapp\\views\\profile\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{584A87E8-1FC0-42DD-B80C-7D8D27808F9C}|BankingManagmentApp\\BankingManagmentApp.csproj|solutionrelative:bankingmanagmentapp\\views\\profile\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{584A87E8-1FC0-42DD-B80C-7D8D27808F9C}|BankingManagmentApp\\BankingManagmentApp.csproj|c:\\users\\viole\\downloads\\banking-management-system-project\\bankingmanagmentapp\\services\\forecasting\\forecastservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{584A87E8-1FC0-42DD-B80C-7D8D27808F9C}|BankingManagmentApp\\BankingManagmentApp.csproj|solutionrelative:bankingmanagmentapp\\services\\forecasting\\forecastservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{584A87E8-1FC0-42DD-B80C-7D8D27808F9C}|BankingManagmentApp\\BankingManagmentApp.csproj|c:\\users\\viole\\onedrive\\\u0440\u0430\u0431\u043E\u0442\u0435\u043D \u043F\u043B\u043E\u0442\\banking-management-system-project\\bankingmanagmentapp\\controllers\\loanrepaymentscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{584A87E8-1FC0-42DD-B80C-7D8D27808F9C}|BankingManagmentApp\\BankingManagmentApp.csproj|solutionrelative:bankingmanagmentapp\\controllers\\loanrepaymentscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{584A87E8-1FC0-42DD-B80C-7D8D27808F9C}|BankingManagmentApp\\BankingManagmentApp.csproj|c:\\users\\viole\\downloads\\banking-management-system-project\\bankingmanagmentapp\\views\\forecasting\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{584A87E8-1FC0-42DD-B80C-7D8D27808F9C}|BankingManagmentApp\\BankingManagmentApp.csproj|solutionrelative:bankingmanagmentapp\\views\\forecasting\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+      "AbsoluteMoniker": "D:0:0:{584A87E8-1FC0-42DD-B80C-7D8D27808F9C}|BankingManagmentApp\\BankingManagmentApp.csproj|c:\\users\\viole\\onedrive\\\u0440\u0430\u0431\u043E\u0442\u0435\u043D \u043F\u043B\u043E\u0442\\banking-management-system-project\\bankingmanagmentapp\\models\\loanrepayments.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{584A87E8-1FC0-42DD-B80C-7D8D27808F9C}|BankingManagmentApp\\BankingManagmentApp.csproj|solutionrelative:bankingmanagmentapp\\models\\loanrepayments.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{584A87E8-1FC0-42DD-B80C-7D8D27808F9C}|BankingManagmentApp\\BankingManagmentApp.csproj|c:\\users\\viole\\downloads\\banking-management-system-project\\bankingmanagmentapp\\views\\admindashboard\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{584A87E8-1FC0-42DD-B80C-7D8D27808F9C}|BankingManagmentApp\\BankingManagmentApp.csproj|solutionrelative:bankingmanagmentapp\\views\\admindashboard\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|ViewDataWindow_MSSQL__/_localdb__MSSQLLocalDB/Bank/True/SqlTable/dbo.LoanRepayments.sql||{0058A1F7-65F3-4DB9-B3D0-CA7E64DD73CD}"
     }
   ],
   "DocumentGroupContainers": [
@@ -31,52 +30,51 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "_Layout.cshtml",
-              "DocumentMoniker": "C:\\Users\\viole\\Downloads\\Banking-Management-System-Project\\BankingManagmentApp\\Views\\Shared\\_Layout.cshtml",
-              "RelativeDocumentMoniker": "BankingManagmentApp\\Views\\Shared\\_Layout.cshtml",
-              "ToolTip": "C:\\Users\\viole\\Downloads\\Banking-Management-System-Project\\BankingManagmentApp\\Views\\Shared\\_Layout.cshtml",
-              "RelativeToolTip": "BankingManagmentApp\\Views\\Shared\\_Layout.cshtml",
-              "ViewState": "AgIAACcAAAAAAAAAAAAAADMAAAAZAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-09-15T15:31:59.085Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
               "Title": "Index.cshtml",
-              "DocumentMoniker": "C:\\Users\\viole\\Downloads\\Banking-Management-System-Project\\BankingManagmentApp\\Views\\AdminDashboard\\Index.cshtml",
-              "RelativeDocumentMoniker": "BankingManagmentApp\\Views\\AdminDashboard\\Index.cshtml",
-              "ToolTip": "C:\\Users\\viole\\Downloads\\Banking-Management-System-Project\\BankingManagmentApp\\Views\\AdminDashboard\\Index.cshtml",
-              "RelativeToolTip": "BankingManagmentApp\\Views\\AdminDashboard\\Index.cshtml",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABIAAAAPAAAAAAAAAA==",
+              "DocumentMoniker": "C:\\Users\\viole\\OneDrive\\\u0420\u0430\u0431\u043E\u0442\u0435\u043D \u043F\u043B\u043E\u0442\\Banking-Management-System-Project\\BankingManagmentApp\\Views\\Profile\\Index.cshtml",
+              "RelativeDocumentMoniker": "BankingManagmentApp\\Views\\Profile\\Index.cshtml",
+              "ToolTip": "C:\\Users\\viole\\OneDrive\\\u0420\u0430\u0431\u043E\u0442\u0435\u043D \u043F\u043B\u043E\u0442\\Banking-Management-System-Project\\BankingManagmentApp\\Views\\Profile\\Index.cshtml",
+              "RelativeToolTip": "BankingManagmentApp\\Views\\Profile\\Index.cshtml",
+              "ViewState": "AgIAAMcBAAAAAAAAAAAAANgBAAAxAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-09-15T15:23:54.553Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "ForecastService.cs",
-              "DocumentMoniker": "C:\\Users\\viole\\Downloads\\Banking-Management-System-Project\\BankingManagmentApp\\Services\\Forecasting\\ForecastService.cs",
-              "RelativeDocumentMoniker": "BankingManagmentApp\\Services\\Forecasting\\ForecastService.cs",
-              "ToolTip": "C:\\Users\\viole\\Downloads\\Banking-Management-System-Project\\BankingManagmentApp\\Services\\Forecasting\\ForecastService.cs",
-              "RelativeToolTip": "BankingManagmentApp\\Services\\Forecasting\\ForecastService.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-09-15T15:19:44.487Z",
+              "WhenOpened": "2025-09-17T11:26:38.615Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 2,
-              "Title": "Index.cshtml",
-              "DocumentMoniker": "C:\\Users\\viole\\Downloads\\Banking-Management-System-Project\\BankingManagmentApp\\Views\\Forecasting\\Index.cshtml",
-              "RelativeDocumentMoniker": "BankingManagmentApp\\Views\\Forecasting\\Index.cshtml",
-              "ToolTip": "C:\\Users\\viole\\Downloads\\Banking-Management-System-Project\\BankingManagmentApp\\Views\\Forecasting\\Index.cshtml",
-              "RelativeToolTip": "BankingManagmentApp\\Views\\Forecasting\\Index.cshtml",
-              "ViewState": "AgIAABgAAAAAAAAAAAAAAB4AAAASAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-09-15T15:18:45.482Z"
+              "Title": "LoanRepayments.cs",
+              "DocumentMoniker": "C:\\Users\\viole\\OneDrive\\\u0420\u0430\u0431\u043E\u0442\u0435\u043D \u043F\u043B\u043E\u0442\\Banking-Management-System-Project\\BankingManagmentApp\\Models\\LoanRepayments.cs",
+              "RelativeDocumentMoniker": "BankingManagmentApp\\Models\\LoanRepayments.cs",
+              "ToolTip": "C:\\Users\\viole\\OneDrive\\\u0420\u0430\u0431\u043E\u0442\u0435\u043D \u043F\u043B\u043E\u0442\\Banking-Management-System-Project\\BankingManagmentApp\\Models\\LoanRepayments.cs",
+              "RelativeToolTip": "BankingManagmentApp\\Models\\LoanRepayments.cs",
+              "ViewState": "AgIAAAMAAAAAAAAAAAAAABMAAABoAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-17T11:26:14.335Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "dbo.LoanRepayments [Data]",
+              "DocumentMoniker": "ViewDataWindow_MSSQL__/_localdb__MSSQLLocalDB/Bank/True/SqlTable/dbo.LoanRepayments.sql",
+              "ToolTip": "dbo.LoanRepayments [Data]",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000826|",
+              "WhenOpened": "2025-09-17T10:55:42.66Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "LoanRepaymentsController.cs",
+              "DocumentMoniker": "C:\\Users\\viole\\OneDrive\\\u0420\u0430\u0431\u043E\u0442\u0435\u043D \u043F\u043B\u043E\u0442\\Banking-Management-System-Project\\BankingManagmentApp\\Controllers\\LoanRepaymentsController.cs",
+              "RelativeDocumentMoniker": "BankingManagmentApp\\Controllers\\LoanRepaymentsController.cs",
+              "ToolTip": "C:\\Users\\viole\\OneDrive\\\u0420\u0430\u0431\u043E\u0442\u0435\u043D \u043F\u043B\u043E\u0442\\Banking-Management-System-Project\\BankingManagmentApp\\Controllers\\LoanRepaymentsController.cs",
+              "RelativeToolTip": "BankingManagmentApp\\Controllers\\LoanRepaymentsController.cs",
+              "ViewState": "AgIAAAwAAAAAAAAAAAAAwB8AAAARAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-17T10:47:34.642Z",
+              "EditorCaption": ""
             }
           ]
         }

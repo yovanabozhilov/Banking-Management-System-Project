@@ -1,14 +1,15 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using BankingManagmentApp.Data;
+using BankingManagmentApp.Models;
+using BankingManagmentApp.Services.Approval;
+using DocumentFormat.OpenXml.Drawing.Charts;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Authorization;
-using BankingManagmentApp.Data;
-using BankingManagmentApp.Models;
-using BankingManagmentApp.Services.Approval;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace BankingManagmentApp.Controllers
 {
@@ -54,6 +55,8 @@ namespace BankingManagmentApp.Controllers
 
                 if (loan.Term == default)
                     loan.Term = DateOnly.FromDateTime(DateTime.Today.AddMonths(12));
+                
+                
             }
             _context.Loans.Add(loan);
             await _context.SaveChangesAsync(); 
@@ -190,28 +193,81 @@ namespace BankingManagmentApp.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,CustomerId,Type,Amount,Term,Date,Status,ApprovedAmount,ApprovalDate")] Loans loans)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,CustomerId,Type,Amount,Term,Date,Status,ApprovedAmount")] Loans loans)
         {
-            if (id != loans.Id) return NotFound();
+
+            if (id != loans.Id)
+            {
+                return NotFound();
+            }
 
             if (!ModelState.IsValid)
             {
-                ViewData["CustomerId"] = new SelectList(_context.Customers, "Id", "Email", loans.CustomerId);
-                return View(loans);
-            }
+                try
+                {
+                    loans.CustomerId = _userManager.GetUserId(User);
 
-            try
-            {
-                _context.Loans.Update(loans);
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!LoansExists(loans.Id)) return NotFound();
-                else throw;
-            }
+                    int termMonths = 0;
+                    if (loans.Amount <= 1000)
+                    {
+                        termMonths = 12;
+                    }
+                    else if (loans.Amount <= 5000)
+                    {
+                        termMonths = 36;
+                    }
+                    else
+                    {
+                        termMonths = 60; 
+                    }
 
-            return RedirectToAction(nameof(Index));
+                    DateTime calculatedEndDate = DateTime.Today.AddMonths(termMonths);
+                    loans.Term = DateOnly.FromDateTime(calculatedEndDate);
+
+                    LoanRepayments repayment = new LoanRepayments();
+                    if (loans.Status == "Approved")
+                    {
+                        var hasExistingRepayments = await _context.LoanRepayments.AnyAsync(r => r.LoanId == loans.Id);
+
+                        if (!hasExistingRepayments)
+                        {
+                            decimal monthlyPayment = loans.ApprovedAmount / termMonths;
+                            var repayments = new List<LoanRepayments>();
+                            DateOnly today = DateOnly.FromDateTime(DateTime.Today);
+                            for (int i = 1; i <= termMonths; i++)
+                            {
+                                repayments.Add(new LoanRepayments
+                                {
+                                    LoanId = loans.Id,
+                                    DueDate = today.AddMonths(i),
+                                    AmountDue = monthlyPayment,
+                                    AmountPaid = 0,
+                                    PaymentDate =today,
+                                    Status = "Pending" 
+                                });
+                            }
+                            _context.LoanRepayments.AddRange(repayments);
+                            await _context.SaveChangesAsync();
+                        }
+                    } 
+                    _context.Loans.Update(loans);
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!LoansExists(loans.Id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+                return RedirectToAction(nameof(Index));
+            }
+            ViewData["CustomerId"] = new SelectList(_context.Customers, "Id", "Email", loans.CustomerId);
+            return View(loans);
         }
 
         // GET: Loans/Delete/5
