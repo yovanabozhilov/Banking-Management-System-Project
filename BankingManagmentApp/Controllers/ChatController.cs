@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Text.Json;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.AI;
-using System.Text.Json;
+using Microsoft.AspNetCore.Identity;
+using BankingManagmentApp.Models;
 using BankingManagmentApp.Services;
 
 namespace BankingManagmentApp.Controllers
@@ -8,75 +10,121 @@ namespace BankingManagmentApp.Controllers
     [Route("chat")]
     public class ChatController : Controller
     {
+        private const string SessionKey = "chatHistory";
         private readonly AiChatService _ai;
+        private readonly UserManager<Customers> _userManager;
 
-        private static readonly Dictionary<string, string> FaqAnswers = new(StringComparer.OrdinalIgnoreCase)
+        public ChatController(AiChatService ai, UserManager<Customers> userManager)
         {
-            { "Create Account", "You can create a new account by clicking 'Register' and providing your details." },
-            { "Forgot Password", "Click 'Forgot Password', enter your email, and follow the reset instructions." },
-            { "Account Security", "Your account is protected with 2FA, encrypted transactions, and secure passwords." },
-            { "Update Profile", "Go to Profile → Edit Profile to update your phone number, city, or personal details." },
-            { "Manage Security", "Allows you to change password, enable 2FA, and review login activity." },
-            { "No Transactions", "You haven’t made any transactions yet; deposits, transfers, or payments will appear here." },
-            { "Apply Loan", "Go to Loans → Apply for Loan, select type, and submit required documents." },
-            { "Improve Credit", "Pay loans/bills on time, keep utilization low, avoid many new loans, maintain healthy transaction history." },
-            { "Loan Documents", "Typically need ID, proof of income, and address verification; varies by loan type." },
-            { "Early Repayment", "Yes, you can repay loans early; some may have a small early repayment fee." }
-        };
+            _ai = ai;
+            _userManager = userManager;
+        }
 
-        public ChatController(AiChatService ai) => _ai = ai;
+        [HttpGet("")]
+        public IActionResult Index() => View();
 
+        // ---------- Non-streaming JSON endpoint ----------
         // POST /chat/send
         [HttpPost("send")]
-        public IActionResult Send([FromBody] ChatRequestDto dto)
+        public async Task<IActionResult> Send([FromBody] ChatRequestDto dto, CancellationToken ct)
         {
-            if (string.IsNullOrWhiteSpace(dto.Message))
+            if (string.IsNullOrWhiteSpace(dto?.Message))
                 return BadRequest(new { reply = "Message cannot be empty." });
 
-            var key = dto.Message.Trim();
+            // Load history from session
+            var history = LoadHistory();
 
-            // Match ignoring case and whitespace
-            var match = FaqAnswers.Keys
-                .FirstOrDefault(k => string.Equals(k.Trim(), key, StringComparison.OrdinalIgnoreCase));
+            // Track the new user message in session history
+            history.Add(new ChatMessage(ChatRole.User, dto.Message.Trim()));
+            TrimHistory(history);
 
-            string reply = match != null ? FaqAnswers[match] : "Sorry, I don’t have an answer for that yet.";
+            // Current user (may be null -> no personalized tools)
+            var user = await _userManager.GetUserAsync(User);
+            var userId = user?.Id;
+            var firstName = user?.FirstName ?? user?.UserName;
+
+            // Ask the AI (RAG via TemplateAnswer + Tools later)
+            var reply = await _ai.SendAsync(dto.Message, userId, firstName, history, ct);
+
+            // Save assistant reply to history
+            history.Add(new ChatMessage(ChatRole.Assistant, reply));
+            SaveHistory(history);
 
             return Ok(new { reply });
         }
 
-        // GET /chat/stream?prompt=...  - server-sent-events streaming endpoint
+        // ---------- Streaming endpoint (Server-Sent Events) ----------
+        // GET /chat/stream?prompt=...
         [HttpGet("stream")]
         public async Task Stream([FromQuery] string prompt, CancellationToken ct)
         {
             Response.Headers["Content-Type"] = "text/event-stream";
 
-            // Load history from session
-            var json = HttpContext.Session.GetString("chatHistory");
-            var history = string.IsNullOrEmpty(json)
-                ? new List<ChatMessage>()
-                : JsonSerializer.Deserialize<List<ChatMessage>>(json) ?? new List<ChatMessage>();
-
-            if (!history.Any(m => m.Role == ChatRole.System))
+            if (string.IsNullOrWhiteSpace(prompt))
             {
-                history.Insert(0, new ChatMessage(ChatRole.System, "You are a helpful banking assistant. Keep answers concise."));
-            }
-
-            history.Add(new ChatMessage(ChatRole.User, prompt));
-
-            string assistantReply = "";
-
-            await foreach (var chunk in _ai.StreamMessageAsync(history, ct))
-            {
-                assistantReply += chunk;
-                // SSE format: data: <text>\n\n
-                await Response.WriteAsync($"data: {chunk.Replace("\n", "\\n")}\n\n", ct);
+                await Response.WriteAsync("data: Message cannot be empty.\n\n", ct);
                 await Response.Body.FlushAsync(ct);
+                return;
             }
 
+            // Load and update history with the new user message
+            var history = LoadHistory();
+            history.Add(new ChatMessage(ChatRole.User, prompt.Trim()));
+            TrimHistory(history);
+
+            // Current user context
+            var user = await _userManager.GetUserAsync(User);
+            var userId = user?.Id;
+            var firstName = user?.FirstName ?? user?.UserName;
+
+            // Stream AI reply (RAG via TemplateAnswer)
+            string assistantReply = "";
+            await foreach (var chunk in _ai.StreamAsync(prompt, userId, firstName, history, ct))
+            {
+                if (!string.IsNullOrEmpty(chunk))
+                {
+                    assistantReply += chunk;
+                    await Response.WriteAsync($"data: {chunk.Replace("\n", "\\n")}\n\n", ct);
+                    await Response.Body.FlushAsync(ct);
+                }
+            }
+
+            // Persist assistant reply in history
             history.Add(new ChatMessage(ChatRole.Assistant, assistantReply));
-            HttpContext.Session.SetString("chatHistory", JsonSerializer.Serialize(history));
+            SaveHistory(history);
+        }
+
+        // ---------- Helpers ----------
+        private List<ChatMessage> LoadHistory()
+        {
+            var json = HttpContext.Session.GetString(SessionKey);
+            if (string.IsNullOrEmpty(json)) return new List<ChatMessage>();
+            try
+            {
+                return JsonSerializer.Deserialize<List<ChatMessage>>(json) ?? new List<ChatMessage>();
+            }
+            catch
+            {
+                return new List<ChatMessage>();
+            }
+        }
+
+        private void SaveHistory(List<ChatMessage> history)
+        {
+            var json = JsonSerializer.Serialize(history);
+            HttpContext.Session.SetString(SessionKey, json);
+        }
+
+        // Keep the session payload bounded
+        private static void TrimHistory(List<ChatMessage> history, int maxMessages = 30)
+        {
+            if (history.Count > maxMessages)
+            {
+                var skip = history.Count - maxMessages;
+                history.RemoveRange(0, skip);
+            }
         }
     }
 
-    public record ChatRequestDto(string Message);
+    public record ChatRequestDto(string? Message);
 }

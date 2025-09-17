@@ -6,10 +6,10 @@ public class TemplateAnswer
     public int Id { get; set; }
 
     [Required]
-    public string Keyword { get; set; }
+    public string Keyword { get; set; } = default!;     
 
     [Required]
-    public string AnswerText { get; set; }
+    public string AnswerText { get; set; } = default!;  
 
-    public string FunctionName { get; set; } 
+    public string? FunctionName { get; set; }          
 }

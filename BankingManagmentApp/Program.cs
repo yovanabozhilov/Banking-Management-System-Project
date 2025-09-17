@@ -3,12 +3,12 @@ using BankingManagmentApp.Data;
 using BankingManagmentApp.Models;
 using BankingManagmentApp.Services;
 using BankingManagmentApp.Services.Approval;
+using BankingManagmentApp.Services.Forecasting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.AI;
-using OpenAI;
 using Microsoft.Extensions.Configuration;
-using BankingManagmentApp.Services.Forecasting;
+using OpenAI;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,7 +27,6 @@ builder.Services.AddDefaultIdentity<Customers>(options =>
 {
     options.SignIn.RequireConfirmedAccount = true;
     options.SignIn.RequireConfirmedEmail = true;
-    //options.SignIn.RequireConfirmedPhoneNumber = true;
     options.User.RequireUniqueEmail = true;
     options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
 })
@@ -38,7 +37,7 @@ builder.Services.AddDefaultIdentity<Customers>(options =>
 // MVC
 builder.Services.AddControllersWithViews();
 
-// Session (конфигурация)
+// Session
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {
@@ -47,7 +46,7 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
 });
 
-// DI: услуги за кредитен скоринг и кредити
+// DI: credit scoring & loans
 builder.Services.AddScoped<ICreditScoringService, MlCreditScoringService>();
 builder.Services.AddScoped<LoansService>();
 
@@ -55,32 +54,43 @@ builder.Services.AddScoped<LoansService>();
 builder.Services.AddSingleton<LoanApprovalPolicy>();
 builder.Services.AddScoped<ILoanApprovalEngine, LoanApprovalEngine>();
 builder.Services.AddScoped<ILoanWorkflow, LoanWorkflow>();
+
+// Ако тези класове съществуват в проекта – остави редовете.
+// Ако получиш build грешка за липсващи типове, просто ги изтрий.
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<LoanContractGenerator>();
 
-
+// OpenAI Chat Client – поддържа и двата начина за конфиг (OpenAIKey или OpenAI:ApiKey)
 builder.Services.AddChatClient(sp =>
 {
     var config = sp.GetRequiredService<IConfiguration>();
-    var key = config["OpenAIKey"] ?? throw new InvalidOperationException("OpenAIKey not set");
-    var model = config["ModelName"] ?? "gpt-4o-mini";
 
-    // create the provider client and adapt to IChatClient
-    var openAiClient = new OpenAI.OpenAIClient(key);
-    var chatClient = openAiClient.GetChatClient(model).AsIChatClient(); // adapt to ME.AI abstraction
+    var apiKey =
+        config["OpenAIKey"] ??
+        config["OpenAI:ApiKey"] ??
+        Environment.GetEnvironmentVariable("OpenAI__ApiKey")
+        ?? throw new InvalidOperationException("Missing OpenAI API key in OpenAIKey or OpenAI:ApiKey (or env OpenAI__ApiKey).");
+
+    var model =
+        config["ModelName"] ??
+        config["OpenAI:Model"] ??
+        "gpt-4o-mini";
+
+    var openAiClient = new OpenAIClient(apiKey);
+    var chatClient = openAiClient.GetChatClient(model).AsIChatClient();
     return chatClient;
 });
 
-// register your wrapper service so controllers can inject it
+// Chatbot services
 builder.Services.AddScoped<AiChatService>();
+builder.Services.AddScoped<KnowledgeBaseService>(); // TemplateAnswer-базиран retrieval
+builder.Services.AddScoped<ChatTools>();
+
+// Forecasting service
 builder.Services.AddScoped<ForecastService>();
 
-// Background авто-претрениране (стартира на boot и по график)
+// Background auto-retrain
 builder.Services.AddHostedService<MlRetrainHostedService>();
-
-// register your wrapper service so controllers can inject it
-builder.Services.AddScoped<AiChatService>();
-
 
 var app = builder.Build();
 
@@ -94,7 +104,7 @@ else
     app.UseHsts();
 }
 
-// seed/миграции
+// seed/migrations
 await app.PrepareDataBase();
 
 // middleware
@@ -114,3 +124,4 @@ app.MapControllerRoute(
 app.MapRazorPages();
 
 app.Run();
+
