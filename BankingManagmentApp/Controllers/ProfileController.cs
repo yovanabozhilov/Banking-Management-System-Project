@@ -5,17 +5,13 @@ using BankingManagmentApp.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Identity.Client;
-using Org.BouncyCastle.Utilities;
-using System;
-using QuestPDF.Fluent;
-using BankingManagmentApp.Services.Pdf;
 using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using BankingManagmentApp.Services.Pdf;
+using QuestPDF.Fluent;
 
 namespace BankingManagmentApp.Controllers
 {
@@ -33,15 +29,53 @@ namespace BankingManagmentApp.Controllers
             _scoring = scoring;
         }
 
+        // ------------------------------------------------------------------------------------
+        // Единна логика за филтриране на транзакции: ползва се от Search + Export (CSV/PDF)
+        // ------------------------------------------------------------------------------------
+        private IQueryable<Transactions> ApplyTxFilters(
+            string userId,
+            int? accountId, DateTime? from, DateTime? to, string? q, string? type)
+        {
+            var query = _db.Transactions
+                .Include(t => t.Accounts)
+                .Where(t => t.Accounts != null && t.Accounts.CustomerId == userId)
+                .AsQueryable();
+
+            if (accountId.HasValue)
+                query = query.Where(t => t.AccountsId == accountId.Value);
+
+            // DateOnly граници (включително до)
+            DateOnly? fromD = from.HasValue ? DateOnly.FromDateTime(from.Value.Date) : (DateOnly?)null;
+            DateOnly? toD   = to.HasValue   ? DateOnly.FromDateTime(to.Value.Date)   : (DateOnly?)null;
+
+            if (fromD.HasValue) query = query.Where(t => t.Date >= fromD.Value);
+            if (toD.HasValue)   query = query.Where(t => t.Date <= toD.Value);
+
+            if (!string.IsNullOrWhiteSpace(q))
+            {
+                var term = q.Trim();
+                query = query.Where(t => t.Description != null && EF.Functions.Like(t.Description, $"%{term}%"));
+            }
+
+            if (!string.IsNullOrWhiteSpace(type))
+            {
+                var wanted = type.Trim().ToLower();
+                query = query.Where(t => t.TransactionType != null &&
+                                         t.TransactionType.ToLower() == wanted);
+            }
+
+            return query;
+        }
+
         // PROFILE DASHBOARD
         public async Task<IActionResult> Index()
-        { 
+        {
             var user = await _userManager.GetUserAsync(User);
             if (user == null) return Challenge();
 
             // Accounts на текущия user
             var accounts = await _db.Accounts
-                .Where(a => a.CustomerId == user.Id)                // <-- FIX
+                .Where(a => a.CustomerId == user.Id)
                 .OrderByDescending(a => a.CreateAt)
                 .ToListAsync();
 
@@ -55,7 +89,7 @@ namespace BankingManagmentApp.Controllers
 
             // Loans на текущия user
             var loans = await _db.Loans
-                .Where(l => l.CustomerId == user.Id)                // <-- FIX
+                .Where(l => l.CustomerId == user.Id)
                 .OrderByDescending(l => l.Date)
                 .ToListAsync();
 
@@ -79,11 +113,14 @@ namespace BankingManagmentApp.Controllers
                     Notes = computed.Notes
                 };
             }
+
+            // Налични типове за падащото меню (спрямо потребителя)
             var availableTypes = await _db.Transactions
-       .Where(t => t.Accounts != null && t.Accounts.CustomerId == user.Id)
-       .Select(t => t.TransactionType)
-       .Distinct()
-       .ToListAsync();
+                .Where(t => t.Accounts != null && t.Accounts.CustomerId == user.Id)
+                .Select(t => t.TransactionType)
+                .Distinct()
+                .ToListAsync();
+
             var vm = new ProfileVm
             {
                 User = user,
@@ -107,12 +144,12 @@ namespace BankingManagmentApp.Controllers
             if (user == null) return Challenge();
 
             var query = _db.Accounts
-                .Where(a => a.CustomerId == user.Id);               // <-- FIX
+                .Where(a => a.CustomerId == user.Id);
 
             if (accountId.HasValue)
             {
                 var belongs = await _db.Accounts.AnyAsync(a => a.Id == accountId.Value &&
-                                                               a.CustomerId == user.Id); // <-- FIX
+                                                               a.CustomerId == user.Id);
                 if (!belongs) return Forbid();
                 query = query.Where(a => a.Id == accountId.Value);
             }
@@ -151,43 +188,26 @@ namespace BankingManagmentApp.Controllers
             return File(bytes, "text/csv", fname);
         }
 
+        // ---- TRANSACTIONS EXPORT CSV (уважава type, account, period, q) ----
         [HttpGet]
-        public async Task<IActionResult> ExportTransactions(int? accountId, DateTime? from, DateTime? to, string? q)
+        public async Task<IActionResult> ExportTransactions(int? accountId, DateTime? from, DateTime? to, string? q, string? type)
         {
             var user = await _userManager.GetUserAsync(User);
             if (user == null) return Challenge();
-
-            var query = _db.Transactions
-                .Include(t => t.Accounts)
-                .Where(t => t.Accounts != null && t.Accounts.CustomerId == user.Id)
-                .AsQueryable();
 
             if (accountId.HasValue)
             {
                 var belongs = await _db.Accounts.AnyAsync(a => a.Id == accountId.Value && a.CustomerId == user.Id);
                 if (!belongs) return Forbid();
-                query = query.Where(t => t.AccountsId == accountId.Value);
             }
 
-            DateOnly? fromD = from.HasValue ? DateOnly.FromDateTime(from.Value.Date) : null;
-            DateOnly? toD   = to.HasValue   ? DateOnly.FromDateTime(to.Value.Date)   : null;
-
-            if (fromD.HasValue) query = query.Where(t => t.Date >= fromD.Value);
-            if (toD.HasValue)   query = query.Where(t => t.Date <= toD.Value);
-
-            if (!string.IsNullOrWhiteSpace(q))
-            {
-                var term = q.Trim();
-                query = query.Where(t => t.Description != null && EF.Functions.Like(t.Description, $"%{term}%"));
-            }
-
-            var list = await query
+            var list = await ApplyTxFilters(user.Id, accountId, from, to, q, type)
                 .OrderBy(t => t.Date)
                 .ThenBy(t => t.Id)
                 .ToListAsync();
 
             var sb = new StringBuilder();
-            sb.Append('\uFEFF');
+            sb.Append('\uFEFF'); // BOM за Excel
             sb.AppendLine("Date,Type,Amount,Description,Reference,IBAN,Currency");
 
             var inv = CultureInfo.InvariantCulture;
@@ -200,12 +220,15 @@ namespace BankingManagmentApp.Controllers
 
             foreach (var t in list)
             {
+                // ReferenceNumber: безопасно към текст и за int, и за int?
+                var refText = (t.ReferenceNumber is int rn) ? rn.ToString(inv) : "";
+
                 sb.AppendLine(string.Join(",",
                     t.Date.ToString("yyyy-MM-dd", inv),
-                    Esc(t.TransactionType),
+                    Esc(t.TransactionType ?? ""),
                     t.Amount.ToString("0.00", inv),
                     Esc(t.Description ?? ""),
-                    t.ReferenceNumber.ToString(inv),
+                    refText,
                     Esc(t.Accounts?.IBAN ?? ""),
                     Esc(t.Accounts?.Currency ?? "")
                 ));
@@ -214,29 +237,25 @@ namespace BankingManagmentApp.Controllers
             var bytes = Encoding.UTF8.GetBytes(sb.ToString());
             var fname = "transactions";
             if (accountId.HasValue) fname += $"_acc{accountId.Value}";
-            if (fromD.HasValue || toD.HasValue)
+            if (!string.IsNullOrWhiteSpace(type)) fname += $"_{type}";
+            if (from.HasValue || to.HasValue)
             {
-                var f  = fromD?.ToString("yyyyMMdd") ?? "min";
-                var tt = toD?.ToString("yyyyMMdd") ?? "max";
+                var f = from?.ToString("yyyyMMdd") ?? "min";
+                var tt = to?.ToString("yyyyMMdd") ?? "max";
                 fname += $"_{f}-{tt}";
             }
-            if (!string.IsNullOrWhiteSpace(q)) fname += $"_desc"; // по желание добави белег
+            if (!string.IsNullOrWhiteSpace(q)) fname += "_desc";
             fname += $"_{DateTime.UtcNow:yyyyMMdd_HHmmss}.csv";
 
             return File(bytes, "text/csv", fname);
         }
 
-
-                [HttpGet]
-        public async Task<IActionResult> ExportTransactionsPdf(int? accountId, DateTime? from, DateTime? to, string? q)
+        // ---- TRANSACTIONS EXPORT PDF (уважава type, account, period, q) ----
+        [HttpGet]
+        public async Task<IActionResult> ExportTransactionsPdf(int? accountId, DateTime? from, DateTime? to, string? q, string? type)
         {
             var user = await _userManager.GetUserAsync(User);
             if (user == null) return Challenge();
-
-            var query = _db.Transactions
-                .Include(t => t.Accounts)
-                .Where(t => t.Accounts != null && t.Accounts.CustomerId == user.Id)
-                .AsQueryable();
 
             Accounts? account = null;
             if (accountId.HasValue)
@@ -244,90 +263,54 @@ namespace BankingManagmentApp.Controllers
                 account = await _db.Accounts
                     .FirstOrDefaultAsync(a => a.Id == accountId.Value && a.CustomerId == user.Id);
                 if (account is null) return Forbid();
-                query = query.Where(t => t.AccountsId == accountId.Value);
             }
 
-            DateOnly? fromD = from.HasValue ? DateOnly.FromDateTime(from.Value.Date) : null;
-            DateOnly? toD   = to.HasValue   ? DateOnly.FromDateTime(to.Value.Date)   : null;
-
-            if (fromD.HasValue) query = query.Where(t => t.Date >= fromD.Value);
-            if (toD.HasValue)   query = query.Where(t => t.Date <= toD.Value);
-
-            if (!string.IsNullOrWhiteSpace(q))
-            {
-                var term = q.Trim();
-                query = query.Where(t => t.Description != null && EF.Functions.Like(t.Description, $"%{term}%"));
-            }
-
-            var list = await query
+            var list = await ApplyTxFilters(user.Id, accountId, from, to, q, type)
                 .OrderBy(t => t.Date)
                 .ThenBy(t => t.Id)
                 .ToListAsync();
 
+            DateOnly? fromD = from.HasValue ? DateOnly.FromDateTime(from.Value.Date) : (DateOnly?)null;
+            DateOnly? toD   = to.HasValue   ? DateOnly.FromDateTime(to.Value.Date)   : (DateOnly?)null;
+
             var doc = new TransactionsStatementPdf(user, account, list, fromD, toD);
-            var bytes = doc.GeneratePdf();
+            var bytes = doc.GeneratePdf(); // extension метод от QuestPDF.Fluent
 
             var fname = "transactions";
             if (accountId.HasValue) fname += $"_acc{accountId.Value}";
-            if (fromD.HasValue || toD.HasValue)
+            if (!string.IsNullOrWhiteSpace(type)) fname += $"_{type}";
+            if (from.HasValue || to.HasValue)
             {
-                var f  = fromD?.ToString("yyyyMMdd") ?? "min";
-                var tt = toD?.ToString("yyyyMMdd") ?? "max";
+                var f = from?.ToString("yyyyMMdd") ?? "min";
+                var tt = to?.ToString("yyyyMMdd") ?? "max";
                 fname += $"_{f}-{tt}";
             }
-            if (!string.IsNullOrWhiteSpace(q)) fname += $"_desc";
+            if (!string.IsNullOrWhiteSpace(q)) fname += "_desc";
             fname += $"_{DateTime.UtcNow:yyyyMMdd_HHmmss}.pdf";
 
             return File(bytes, "application/pdf", fname);
         }
 
-
+        // ---- SEARCH (уважава type + всички останали филтри) ----
         [HttpGet]
-        public async Task<IActionResult> SearchTransactions(int? accountId, DateTime? from, DateTime? to, string? q)
+        public async Task<IActionResult> SearchTransactions(int? accountId, DateTime? from, DateTime? to, string? q, string? type)
         {
             var user = await _userManager.GetUserAsync(User);
             if (user == null) return Challenge();
 
-            // Списъци за страницата (като в Index)
+            // Accounts за филтрите
             var accounts = await _db.Accounts
                 .Where(a => a.CustomerId == user.Id)
                 .OrderByDescending(a => a.CreateAt)
                 .ToListAsync();
 
-            var accountIds = accounts.Select(a => a.Id).ToList();
-
-            var query = _db.Transactions
-                .Include(t => t.Accounts)
-                .Where(t => t.Accounts != null && t.Accounts.CustomerId == user.Id)
-                .AsQueryable();
-
-            if (accountId.HasValue)
-            {
-                var belongs = await _db.Accounts.AnyAsync(a => a.Id == accountId.Value && a.CustomerId == user.Id);
-                if (!belongs) return Forbid();
-                query = query.Where(t => t.AccountsId == accountId.Value);
-            }
-
-            DateOnly? fromD = from.HasValue ? DateOnly.FromDateTime(from.Value.Date) : null;
-            DateOnly? toD   = to.HasValue   ? DateOnly.FromDateTime(to.Value.Date)   : null;
-
-            if (fromD.HasValue) query = query.Where(t => t.Date >= fromD.Value);
-            if (toD.HasValue)   query = query.Where(t => t.Date <= toD.Value);
-
-            if (!string.IsNullOrWhiteSpace(q))
-            {
-                var term = q.Trim();
-                // SQL LIKE за частично съвпадение; пазим се от null описания
-                query = query.Where(t => t.Description != null && EF.Functions.Like(t.Description, $"%{term}%"));
-            }
-
-            // Показваме до 200 реда, за да не „залеем“ UI; коригирай по желание
-            var filteredTx = await query
+            // Филтрирани транзакции (единна логика)
+            var filteredTx = await ApplyTxFilters(user.Id, accountId, from, to, q, type)
                 .OrderByDescending(t => t.Id)
                 .Take(200)
                 .ToListAsync();
 
-            // Loans / Repayments / Credit / Типове – както в Index
+            // Loans / Repayments / Credit – както при Index
             var loans = await _db.Loans
                 .Where(l => l.CustomerId == user.Id)
                 .OrderByDescending(l => l.Date)
@@ -363,7 +346,17 @@ namespace BankingManagmentApp.Controllers
             {
                 User = user,
                 Accounts = accounts,
-                LastTransactions = filteredTx,              // <-- тук са резултатите от търсенето
+
+                // За обединената таблица – подаваме резултатите тук
+                TransactionType = filteredTx,
+
+                // fallback „скорошни“
+                LastTransactions = await _db.Transactions
+                    .Where(t => t.Accounts != null && t.Accounts.CustomerId == user.Id)
+                    .OrderByDescending(t => t.Id)
+                    .Take(10)
+                    .ToListAsync(),
+
                 Loans = loans,
                 UpcomingRepayments = upcomingRepayments,
                 Credit = credit,
@@ -373,54 +366,11 @@ namespace BankingManagmentApp.Controllers
             return View("Index", vm);
         }
 
-
-        public async Task<IActionResult> TransactionType(int? accountId, DateTime? from, DateTime? to, string type)
+        // ---- Back-compat: старият TransactionType екшън пренасочва към SearchTransactions ----
+        [HttpGet]
+        public IActionResult TransactionType(int? accountId, DateTime? from, DateTime? to, string type)
         {
-            var user = await _userManager.GetUserAsync(User);
-            if (user == null) return Challenge();
-
-            var query = _db.Transactions
-                .Include(t => t.Accounts)
-                .Where(t => t.Accounts != null && t.Accounts.CustomerId == user.Id)
-                .AsQueryable();
-
-            if (accountId.HasValue)
-            {
-                var belongs = await _db.Accounts.AnyAsync(a => a.Id == accountId.Value &&
-                                                               a.CustomerId == user.Id);
-                if (!belongs) return Forbid();
-                query = query.Where(t => t.AccountsId == accountId.Value);
-            }
-
-            DateOnly? fromD = from.HasValue ? DateOnly.FromDateTime(from.Value.Date) : null;
-            DateOnly? toD = to.HasValue ? DateOnly.FromDateTime(to.Value.Date) : null;
-
-            if (fromD.HasValue) query = query.Where(t => t.Date >= fromD.Value);
-            if (toD.HasValue) query = query.Where(t => t.Date <= toD.Value);
-
-            var list = await query
-                .OrderBy(t => t.Date)
-                .ThenBy(t => t.Id)
-                .Where(t => t.TransactionType == type)
-                .ToListAsync();
-
-            var availableTypes = await _db.Transactions
-                .Where(t => t.Accounts != null && t.Accounts.CustomerId == user.Id)
-                .Select(t => t.TransactionType)
-                .Distinct()
-                .ToListAsync();
-
-            var vm = new ProfileVm
-            {
-                Accounts = await _db.Accounts.Where(a => a.CustomerId == user.Id).ToListAsync(),
-                LastTransactions = await _db.Transactions.Where(t => t.Accounts.CustomerId == user.Id).OrderByDescending(t => t.Id).Take(10).ToListAsync(),
-                Loans = await _db.Loans.Where(l => l.CustomerId == user.Id).ToListAsync(),
-                UpcomingRepayments = await _db.LoanRepayments.Where(r => r.Loan.CustomerId == user.Id).OrderBy(r => r.DueDate).Take(5).ToListAsync(),
-                User = user,
-                TransactionType = list,
-                AvailableTransactionTypes = availableTypes
-            };
-            return View("Index", vm);
+            return RedirectToAction(nameof(SearchTransactions), new { accountId, from, to, type });
         }
     }
 }

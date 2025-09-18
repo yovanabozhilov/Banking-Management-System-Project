@@ -176,3 +176,152 @@ body {
   color: var(--chip-accent-fg) !important;
   border: 1px solid var(--chip-accent-border) !important;
 }
+
+
+/* --- Account "credit card" sizing & layout --- */
+.account-card{
+  /* по-дебела вертикално */
+  padding: 22px 20px;
+  border-radius: 16px;
+  min-height: 190px;            /* ↑ височина */
+
+  /* леко по-тясна хоризонтално и центрирана в колоната */
+  width: 100%;
+  max-width: 420px;             /* ← направи я по-тясна */
+  margin-left: 0 !important;
+  margin-right: auto !important;  /* лепи се вляво, без да се центрира */
+}
+
+@media (min-width: 992px){
+  .account-card{
+    /* на по-широки екрани още една щипка компактност */
+    max-width: 400px;
+  }
+}
+
+/* малко по-„картично“ усещане за числата/текстовете */
+.account-card .iban{ font-size: .95rem; }
+.account-card .balance .amount{ font-size: 1.75rem; line-height: 1.05; }
+.account-card .balance .currency{ font-size: .85rem; opacity: .9; }
+
+/* по-плътни контроли вътре, за да изглежда административно и стегнато */
+.account-card .btn.btn-sm{ padding: .3rem .5rem; }
+
+/* ===== Profile polish: hierarchy, density, tables ===== */
+
+/* по-лек фон за цялата секция, без да засяга други страници */
+.container-profile { padding-top: .5rem; }
+.container-profile .card { border-radius: .75rem; }
+
+/* card headers: по-ясна йерархия */
+.container-profile .card-header{
+  background: linear-gradient(180deg, rgba(0,0,0,.02), rgba(0,0,0,0));
+  border-bottom: 1px solid var(--bs-border-color);
+  padding: .6rem .9rem;
+}
+.container-profile .card-header strong{
+  font-size: .85rem;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: #495057;
+}
+
+/* „кредитната карта“ (account-card) – по-висока и по-тясна, лява подредба */
+.account-card{
+  padding: 22px 20px;
+  border-radius: 16px;
+  min-height: 190px;
+  width: 100%;
+  max-width: 420px;
+  margin-left: 0 !important;
+  margin-right: auto !important;
+}
+@media (min-width: 992px){
+  .account-card{ max-width: 400px; }
+}
+.account-card .iban{ font-size: .95rem; }
+.account-card .balance .amount{ font-size: 1.75rem; line-height: 1.05; }
+.account-card .balance .currency{ font-size: .85rem; opacity: .9; }
+.account-card .btn.btn-sm{ padding: .3rem .5rem; }
+
+/* компактни таблици навсякъде в профила */
+.container-profile .table thead th{
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  font-size: .72rem;
+  color: #6c757d;
+  border-bottom-color: var(--bs-border-color);
+}
+.container-profile .table tbody td{
+  vertical-align: middle;
+  padding-top: .45rem;
+  padding-bottom: .45rem;
+}
+
+/* по-плътни таблици (използва се вече .table-compact – тук я дефинираме) */
+.table-compact thead th{ padding: .45rem .6rem; }
+.table-compact tbody td{ padding: .4rem .6rem; }
+
+/* sticky thead да „виси“ красиво над редовете */
+.table .sticky-top{
+  box-shadow: 0 2px 0 rgba(0,0,0,.03);
+  z-index: 1;
+}
+
+/* по-елегантен hover, тон към primary */
+.table-hover tbody tr:hover > *{
+  background-color: rgba(13,110,253,.06);
+}
+
+/* моноширинни числа и no-wrap помощни класове */
+.text-mono{
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  letter-spacing: .3px;
+}
+.nowrap{ white-space: nowrap; }
+
+/* малко по-компактни badges */
+.badge-tight{ padding: .35em .5em; font-weight: 600; }
+
+/* amount цветове – по-четливи и в тъмно */
+:root{
+  --amount-pos: #18a957;
+  --amount-neg: #c0392b;
+}
+[data-bs-theme="dark"]{
+  --amount-pos: #4cd17a;
+  --amount-neg: #ff6b6b;
+}
+.amount-positive{ color: var(--amount-pos); font-weight: 600; }
+.amount-negative{ color: var(--amount-neg); font-weight: 600; }
+
+/* филтърната лента при Transactions — по-стегната */
+.container-profile .card-header form .form-label{
+  font-size: .7rem; text-transform: uppercase; letter-spacing: .06em; color:#6c757d;
+}
+.container-profile .card-header .form-select-sm,
+.container-profile .card-header .form-control-sm{
+  min-height: calc(1.5em + .5rem + 2px);
+}
+
+/* „Note“ под кредитния скор – по-умерено и четимо */
+.container-profile .alert-info{
+  background: rgba(13,110,253,.06);
+  border-color: rgba(13,110,253,.12);
+  color: inherit;
+}
+
+/* Еднакво вертикално разстояние между всички секции (таблици) в профила */
+.profile-section { margin-bottom: 1rem; }            /* мобилно */
+@media (min-width: 768px)  { .profile-section { margin-bottom: 1.25rem; } }
+@media (min-width: 1200px) { .profile-section { margin-bottom: 1.5rem; } }
+
+/* Помощни класове, използвани в таблиците */
+.text-mono{
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+}
+.table-compact > :not(caption) > * > *{
+  padding: .4rem .5rem;
+}
+.nowrap{ white-space: nowrap; }
+.badge-tight{ padding: .35em .55em; font-weight: 600; border-radius: .4rem; }

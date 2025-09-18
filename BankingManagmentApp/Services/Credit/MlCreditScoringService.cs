@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Hosting;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
@@ -19,7 +20,7 @@ namespace BankingManagmentApp.Services
     public class CreditScoreResult
     {
         public int    Score     { get; set; }
-        public int    RiskLevel { get; set; } 
+        public int    RiskLevel { get; set; }
         public string Notes     { get; set; } = string.Empty;
     }
 
@@ -62,7 +63,7 @@ namespace BankingManagmentApp.Services
         private readonly string _clusterMapPath;
 
         private ITransformer? _model;
-        private Dictionary<int, int>? _clusterToRisk; 
+        private Dictionary<int, int>? _clusterToRisk;
         private readonly SemaphoreSlim _lock = new(1, 1);
 
         private const int MaxRiskLevels = 4;
@@ -79,47 +80,79 @@ namespace BankingManagmentApp.Services
             _clusterMapPath = Path.Combine(_modelDir, "cluster_map.json");
         }
 
+        // ---------- Вътрешни модели за live snapshot ----------
+        private class LiveSnapshot
+        {
+            public decimal TotalBalance { get; set; }
+            public int     NumAccounts  { get; set; }
+            public int     NumLoans     { get; set; }
+            public double  LoanAgeDaysAvg { get; set; }
+            public double  OnTimeRatio    { get; set; }
+            public double  OverdueRatio   { get; set; }
+            public decimal AvgMonthlyInflow  { get; set; }
+            public decimal AvgMonthlyOutflow { get; set; }
+        }
+
         // ---------- Публични методи ----------
 
         public async Task<CreditScoreResult?> ComputeAsync(string userId)
         {
             await TrainIfNeededAsync();
 
-            var f = await _db.Set<CreditFeatures>()
-                .AsNoTracking()
-                .FirstOrDefaultAsync(x => x.UserId == userId);
+            // Жив snapshot от текущото състояние в БД
+            var snap = await GetLiveSnapshotAsync(userId);
 
-            if (f == null)
-                return null; 
-
-            var row = ToMlRow(f);
-            
+            // Изграждаме ML ред от живите данни (без да чакаме претрениране)
+            var row = new MlRow
+            {
+                UserId            = userId,
+                TotalBalance      = (float)snap.TotalBalance,
+                NumAccounts       = snap.NumAccounts,
+                NumLoans          = snap.NumLoans,
+                LoanAgeDaysAvg    = (float)snap.LoanAgeDaysAvg,
+                OnTimeRatio       = (float)snap.OnTimeRatio,
+                OverdueRatio      = (float)snap.OverdueRatio,
+                AvgMonthlyInflow  = (float)snap.AvgMonthlyInflow,
+                AvgMonthlyOutflow = (float)snap.AvgMonthlyOutflow
+            };
             Sanitize(row);
 
+            // Ако моделът още липсва – хевристичен fallback (пак с live данни)
             if (_model is null || _clusterToRisk is null || _clusterToRisk.Count == 0)
-                return HeuristicFallback(row, f);
+                return HeuristicFallback(row, snap);
 
-            var engine = _ml.Model.CreatePredictionEngine<MlRow, MlPrediction>(_model);
-            var pred   = engine.Predict(row);
+            var engine  = _ml.Model.CreatePredictionEngine<MlRow, MlPrediction>(_model);
+            var pred    = engine.Predict(row);
             var cluster = (int)pred.PredictedClusterId;
 
             var risk = _clusterToRisk.TryGetValue(cluster, out var r)
                 ? r
-                : MaxRiskLevels; 
+                : MaxRiskLevels;
 
             var score = ScoreFromRiskAndFeatures(risk, row);
 
+            string riskLabel = risk switch
+            {
+                1 => "Low",
+                2 => "Moderate",
+                3 => "Elevated",
+                _ => "High"
+            };
+
+            var inv = CultureInfo.InvariantCulture;
+            var net = snap.AvgMonthlyInflow - snap.AvgMonthlyOutflow;
+
             var notes =
-                $"Cluster: {cluster} → Risk {risk}; " +
-                $"Loans: {f.NumLoans}, Accounts: {f.NumAccounts}, " +
-                $"OnTime: {f.OnTimeRatio:0.00}, Overdue: {f.OverdueRatio:0.00}, " +
-                $"Balance: {f.TotalBalance:0.00}, NetFlow: {(f.AvgMonthlyInflow - f.AvgMonthlyOutflow):0.00}";
+                $"Risk: {riskLabel}. " +
+                $"You have {snap.NumLoans} loan{(snap.NumLoans == 1 ? "" : "s")} and {snap.NumAccounts} account{(snap.NumAccounts == 1 ? "" : "s")}. " +
+                $"On-time payments: {snap.OnTimeRatio.ToString("P0", inv)}, overdue: {snap.OverdueRatio.ToString("P0", inv)}. " +
+                $"Total balance: {snap.TotalBalance.ToString("0.00", inv)}; monthly net flow: {net.ToString("+0.00;-0.00;0.00", inv)}.";
 
             return new CreditScoreResult
             {
-                Score = score,
+                Score     = score,
                 RiskLevel = risk,
-                Notes = notes
+                Notes     = notes
             };
         }
 
@@ -128,11 +161,9 @@ namespace BankingManagmentApp.Services
             var baseRes = await ComputeAsync(userId);
             if (baseRes is null) return null;
 
-            var f = await _db.Set<CreditFeatures>()
-                .AsNoTracking()
-                .FirstOrDefaultAsync(x => x.UserId == userId);
-
-            decimal netFlow = ((f?.AvgMonthlyInflow ?? 0m) - (f?.AvgMonthlyOutflow ?? 0m));
+            // Използваме живия нетен поток, за да реагира веднага след плащане/постъпление
+            var snap = await GetLiveSnapshotAsync(userId);
+            decimal netFlow = snap.AvgMonthlyInflow - snap.AvgMonthlyOutflow;
             if (netFlow < 0) netFlow = 0;
 
             decimal req = app.RequestedAmount <= 0 ? 1m : app.RequestedAmount;
@@ -178,9 +209,8 @@ namespace BankingManagmentApp.Services
             try
             {
                 if (_model is not null && _clusterToRisk is not null && _clusterToRisk.Count > 0)
-                    return; 
+                    return;
 
-                
                 if (File.Exists(_modelPath))
                 {
                     using var fs = File.OpenRead(_modelPath);
@@ -193,7 +223,6 @@ namespace BankingManagmentApp.Services
                     _clusterToRisk = JsonSerializer.Deserialize<Dictionary<int, int>>(json);
                 }
 
-               
                 if (_model is null || _clusterToRisk is null || _clusterToRisk.Count == 0)
                 {
                     await TrainInternalAsync(ct);
@@ -222,7 +251,6 @@ namespace BankingManagmentApp.Services
 
         private async Task TrainInternalAsync(CancellationToken ct)
         {
-            
             var feats = await _db.Set<CreditFeatures>()
                 .AsNoTracking()
                 .ToListAsync(ct);
@@ -230,7 +258,6 @@ namespace BankingManagmentApp.Services
             var rows = feats.Select(ToMlRow).ToList();
             rows.ForEach(Sanitize);
 
-            
             var n = rows.Count;
             if (n == 0)
             {
@@ -272,7 +299,7 @@ namespace BankingManagmentApp.Services
 
             var joined = rows.Zip(preds, (r, p) => new
             {
-                Cluster = (int)p.PredictedClusterId, 
+                Cluster = (int)p.PredictedClusterId,
                 r.OnTimeRatio,
                 r.OverdueRatio,
                 r.TotalBalance
@@ -291,11 +318,11 @@ namespace BankingManagmentApp.Services
                 .ThenByDescending(s => s.OnTimeAvg)
                 .ToList();
 
-            var mapping = new Dictionary<int, int>(); 
+            var mapping = new Dictionary<int, int>();
             for (int i = 0; i < stats.Count; i++)
             {
                 var clusterId = stats[i].Cluster;
-                var riskLevel = Math.Min(MaxRiskLevels, i + 1); 
+                var riskLevel = Math.Min(MaxRiskLevels, i + 1);
                 mapping[clusterId] = riskLevel;
             }
 
@@ -309,6 +336,93 @@ namespace BankingManagmentApp.Services
 
             _model = model;
             _clusterToRisk = mapping;
+        }
+
+        // ---------- Live snapshot от БД ----------
+
+        private async Task<LiveSnapshot> GetLiveSnapshotAsync(string userId, int lookbackDays = 90)
+        {
+            // Accounts
+            var accountsQ = _db.Accounts.Where(a => a.CustomerId == userId);
+            var totalBalance = await accountsQ.SumAsync(a => (decimal?)a.Balance) ?? 0m;
+            var numAccounts  = await accountsQ.CountAsync();
+
+            // Loans
+            var loans = await _db.Loans.Where(l => l.CustomerId == userId).ToListAsync();
+            var numLoans = loans.Count;
+            double loanAgeDaysAvg = numLoans > 0
+                ? loans.Average(l => (DateTime.UtcNow - l.Date).TotalDays)
+                : 0.0;
+
+            // Repayments
+            double onTimeRatio = 0.0, overdueRatio = 0.0;
+            if (numLoans > 0)
+            {
+                var loanIds = loans.Select(l => l.Id).ToList();
+                var reps = await _db.LoanRepayments
+                    .Where(r => loanIds.Contains(r.LoanId))
+                    .ToListAsync();
+
+                var total = reps.Count;
+                if (total > 0)
+                {
+                    bool Is(string? s, string target) =>
+                        !string.IsNullOrEmpty(s) &&
+                        s.Equals(target, StringComparison.OrdinalIgnoreCase);
+
+                    var today = DateOnly.FromDateTime(DateTime.UtcNow.Date);
+                    var onTime   = reps.Count(r => Is(r.Status, "Paid"));
+                    var overdue1 = reps.Count(r => Is(r.Status, "Overdue"));
+                    var overdue2 = reps.Count(r => r.DueDate < today && !Is(r.Status, "Paid"));
+
+                    var overdue = Math.Max(overdue1, overdue2);
+
+                    onTimeRatio  = (double)onTime  / total;
+                    overdueRatio = (double)overdue / total;
+                }
+            }
+
+            // Transactions (последни lookbackDays дни) -> средни месечни вход/изход
+            var since = DateOnly.FromDateTime(DateTime.UtcNow.Date.AddDays(-lookbackDays));
+            var tx = await _db.Transactions
+                .Include(t => t.Accounts)
+                .Where(t => t.Accounts != null &&
+                            t.Accounts.CustomerId == userId &&
+                            t.Date >= since)
+                .ToListAsync();
+
+            bool Has(string? s, string token) =>
+                !string.IsNullOrEmpty(s) &&
+                s.IndexOf(token, StringComparison.OrdinalIgnoreCase) >= 0;
+
+            decimal inflowTotal = 0m, outflowTotal = 0m;
+            foreach (var t in tx)
+            {
+                var type = t.TransactionType ?? "";
+
+                // Приоритизираме дебит/плащания/погасяване като outflow;
+                // credit/disbursement -> inflow
+                if (Has(type, "debit") || Has(type, "repay") || Has(type, "payment"))
+                    outflowTotal += t.Amount;
+                else if (Has(type, "credit") || Has(type, "disbursement"))
+                    inflowTotal += t.Amount;
+            }
+
+            var months = Math.Max(1m, (decimal)lookbackDays / 30m);
+            var avgIn  = inflowTotal / months;
+            var avgOut = outflowTotal / months;
+
+            return new LiveSnapshot
+            {
+                TotalBalance      = totalBalance,
+                NumAccounts       = numAccounts,
+                NumLoans          = numLoans,
+                LoanAgeDaysAvg    = loanAgeDaysAvg,
+                OnTimeRatio       = onTimeRatio,
+                OverdueRatio      = overdueRatio,
+                AvgMonthlyInflow  = avgIn,
+                AvgMonthlyOutflow = avgOut
+            };
         }
 
         // ---------- Помощни ----------
@@ -328,9 +442,9 @@ namespace BankingManagmentApp.Services
 
         private static void Sanitize(MlRow r)
         {
-            if (float.IsNaN(r.OnTimeRatio)   || float.IsInfinity(r.OnTimeRatio))   r.OnTimeRatio   = 0f;
-            if (float.IsNaN(r.OverdueRatio)  || float.IsInfinity(r.OverdueRatio))  r.OverdueRatio  = 0f;
-            if (float.IsNaN(r.LoanAgeDaysAvg)|| float.IsInfinity(r.LoanAgeDaysAvg))r.LoanAgeDaysAvg= 0f;
+            if (float.IsNaN(r.OnTimeRatio)    || float.IsInfinity(r.OnTimeRatio))    r.OnTimeRatio    = 0f;
+            if (float.IsNaN(r.OverdueRatio)   || float.IsInfinity(r.OverdueRatio))   r.OverdueRatio   = 0f;
+            if (float.IsNaN(r.LoanAgeDaysAvg) || float.IsInfinity(r.LoanAgeDaysAvg)) r.LoanAgeDaysAvg = 0f;
         }
 
         private static int ClampScore(int x) => Math.Max(300, Math.Min(850, x));
@@ -349,18 +463,19 @@ namespace BankingManagmentApp.Services
 
             var delta =
                 (int)(
-                    60.0f * (r.OnTimeRatio - r.OverdueRatio) +   
-                    0.0035f * r.TotalBalance +                  
-                    0.02f * netFlow -                           
-                    8.0f * r.NumLoans +                        
-                    2.0f * r.NumAccounts -                      
-                    0.01f * r.LoanAgeDaysAvg                    
+                    60.0f * (r.OnTimeRatio - r.OverdueRatio) +
+                    0.0035f * r.TotalBalance +
+                    0.02f * netFlow -
+                    8.0f * r.NumLoans +
+                    2.0f * r.NumAccounts -
+                    0.01f * r.LoanAgeDaysAvg
                 );
 
             return ClampScore(@base + delta);
         }
 
-        private static CreditScoreResult HeuristicFallback(MlRow r, CreditFeatures f)
+        // Fallback, ако моделът още не е наличен
+        private static CreditScoreResult HeuristicFallback(MlRow r, LiveSnapshot s)
         {
             var baseScore = 650.0;
 
@@ -378,16 +493,28 @@ namespace BankingManagmentApp.Services
                 final >= 660 ? 2 :
                 final >= 600 ? 3 : 4;
 
+            string riskLabel = risk switch
+            {
+                1 => "Low",
+                2 => "Moderate",
+                3 => "Elevated",
+                _ => "High"
+            };
+
+            var inv = CultureInfo.InvariantCulture;
+            var net = s.AvgMonthlyInflow - s.AvgMonthlyOutflow;
+
             var notes =
-                $"Heuristic fallback; Loans: {f.NumLoans}, Accounts: {f.NumAccounts}, " +
-                $"OnTime: {f.OnTimeRatio:0.00}, Overdue: {f.OverdueRatio:0.00}, " +
-                $"Balance: {f.TotalBalance:0.00}";
+                $"Profile cluster heuristic; risk: {riskLabel}. " +
+                $"You have {s.NumLoans} loan{(s.NumLoans == 1 ? "" : "s")} and {s.NumAccounts} account{(s.NumAccounts == 1 ? "" : "s")}. " +
+                $"On-time payments: {s.OnTimeRatio.ToString("P0", inv)}, overdue: {s.OverdueRatio.ToString("P0", inv)}. " +
+                $"Total balance: {s.TotalBalance.ToString("0.00", inv)}; monthly net flow: {net.ToString("+0.00;-0.00;0.00", inv)}.";
 
             return new CreditScoreResult
             {
-                Score = final,
+                Score     = final,
                 RiskLevel = risk,
-                Notes = notes
+                Notes     = notes
             };
         }
     }
