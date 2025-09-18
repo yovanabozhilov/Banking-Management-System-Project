@@ -2,7 +2,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using BankingManagmentApp.Data;
-using BankingManagmentApp.Models.ML;
+using BankingManagmentApp.Models;
 using BankingManagmentApp.Services;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
