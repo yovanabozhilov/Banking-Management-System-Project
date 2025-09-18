@@ -33,7 +33,9 @@ namespace BankingManagmentApp.Data
                 eb.Property(p => p.UserId).HasColumnName("UserId");
             });
 
-            modelBuilder.Entity<Accounts>().Property(p => p.Balance).HasColumnType("decimal(18,2)");
+            modelBuilder.Entity<CreditFeatures>().HasKey(x=>x.UserId);
+
+                modelBuilder.Entity<Accounts>().Property(p => p.Balance).HasColumnType("decimal(18,2)");
             modelBuilder.Entity<Loans>().Property(p => p.Amount).HasColumnType("decimal(18,2)");
             modelBuilder.Entity<Loans>().Property(p => p.ApprovedAmount).HasColumnType("decimal(18,2)");
             modelBuilder.Entity<LoanRepayments>().Property(p => p.AmountDue).HasColumnType("decimal(18,2)");
