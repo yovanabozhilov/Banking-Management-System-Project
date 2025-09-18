@@ -47,7 +47,7 @@
 <div class="container-profile">
 
     <!-- HEADER: avatar + identity + totals -->
-    <div class="card shadow-sm mb-3 profile-header">
+    <div class="card shadow-sm profile-section">
         <div class="card-body d-flex align-items-center flex-wrap gap-3">
             <div class="avatar-circle">
                 <span>@Initials(Model.User.FirstName, Model.User.LastName)</span>
@@ -99,7 +99,7 @@
     </div>
 
     <!-- ACCOUNTS: responsive cards -->
-    <div class="card shadow-sm mb-3">
+    <div class="card shadow-sm profile-section">
         <div class="card-header d-flex align-items-center justify-content-between">
             <strong>Accounts</strong>
             <span class="text-muted small">@Model.Accounts.Count account(s)</span>
@@ -155,30 +155,35 @@
                         </div>
                     }
                     <div class="text-nowrap">
-                        <button class="btn btn-outline-primary btn-sm">
-                            <a class="nav-link" asp-area="" asp-controller="Accounts" asp-action="Create">New Card</a>
-                        </button>
+                        <a class="btn btn-outline-primary btn-sm" asp-area="" asp-controller="Accounts" asp-action="Create">
+                            New Card
+                        </a>
                     </div>
                 </div>
             }
         </div>
     </div>
 
-    <!-- TRANSACTIONS -->
-    <div class="card shadow-sm mb-4 mt-2 mt-lg-4">
+    <!-- TRANSACTIONS (Unified: Recent + Categorization) -->
+    <div class="card shadow-sm profile-section">
         <div class="card-header d-flex align-items-center justify-content-between flex-wrap gap-2">
-            <strong>Recent transactions</strong>
+            <strong>Transactions</strong>
 
             @if (Model.Accounts.Any())
             {
                 <form method="get" class="d-flex align-items-end flex-wrap gap-2">
+                    @{
+                        var qs = ViewContext?.HttpContext?.Request?.Query;
+                        var selectedAccountId = qs?["accountId"].ToString();
+                        var qsFrom = qs?["from"].ToString();
+                        var qsTo = qs?["to"].ToString();
+                        var qsQ = qs?["q"].ToString();
+                        var qsType = qs?["type"].ToString();
+                    }
+
                     <div>
                         <label class="form-label xsmall mb-1">Account</label>
                         <select name="accountId" class="form-select form-select-sm">
-                            @{
-                                var qs = ViewContext?.HttpContext?.Request?.Query;
-                                var selectedAccountId = qs?["accountId"].ToString();
-                            }
                             <option value="" selected="@(string.IsNullOrEmpty(selectedAccountId) ? "selected" : null)">All</option>
                             @foreach (var a in Model.Accounts)
                             {
@@ -192,20 +197,28 @@
 
                     <div>
                         <label class="form-label xsmall mb-1">From</label>
-                        <input type="date" name="from" class="form-control form-control-sm"
-                               value="@(ViewContext?.HttpContext?.Request?.Query["from"].ToString())" />
+                        <input type="date" name="from" class="form-control form-control-sm" value="@qsFrom" />
                     </div>
 
                     <div>
                         <label class="form-label xsmall mb-1">To</label>
-                        <input type="date" name="to" class="form-control form-control-sm"
-                               value="@(ViewContext?.HttpContext?.Request?.Query["to"].ToString())" />
+                        <input type="date" name="to" class="form-control form-control-sm" value="@qsTo" />
                     </div>
 
                     <div>
                         <label class="form-label xsmall mb-1">Description</label>
-                        <input type="text" name="q" class="form-control form-control-sm" placeholder="Contains..."
-                               value="@(ViewContext?.HttpContext?.Request?.Query["q"].ToString())" />
+                        <input type="text" name="q" class="form-control form-control-sm" placeholder="Contains..." value="@qsQ" />
+                    </div>
+
+                    <div>
+                        <label class="form-label xsmall mb-1">Transaction Type</label>
+                        <select name="type" class="form-select form-select-sm">
+                            <option value="" selected="@(string.IsNullOrEmpty(qsType) ? "selected" : null)">All types</option>
+                            @foreach (var type in Model.AvailableTransactionTypes)
+                            {
+                                <option value="@type" selected="@(qsType == type ? "selected" : null)">@type</option>
+                            }
+                        </select>
                     </div>
 
                     <button type="submit" class="btn btn-sm btn-outline-secondary"
@@ -225,106 +238,27 @@
                         Export PDF
                     </button>
                 </form>
-
             }
         </div>
 
         <div class="card-body p-0">
-            @if (!Model.LastTransactions.Any())
+            @{
+                // Единен източник за таблицата:
+                // - ако има резултати от категоризирано/филтрирано търсене (TransactionType), показваме тях
+                // - иначе показваме последните транзакции (LastTransactions)
+                var txItems = Model.TransactionType?.Any() == true
+                            ? Model.TransactionType
+                            : Model.LastTransactions;
+            }
+
+            @if (txItems == null || !txItems.Any())
             {
                 <div class="p-3 text-muted">You have no transactions.</div>
-                <div class="text-nowrap">
-                    <button class="btn btn-outline-primary btn-sm">
-                        <a class="nav-link" asp-area="" asp-controller="Transactions" asp-action="Create">New Transaction</a>
-                    </button>
+                <div class="text-nowrap px-3 pb-3">
+                    <a class="btn btn-outline-primary btn-sm" asp-area="" asp-controller="Transactions" asp-action="Create">
+                        New Transaction
+                    </a>
                 </div>
-            }
-            else
-            {
-                <div class="table-responsive">
-                    <table class="table table-sm table-striped table-hover align-middle mb-0">
-                        <thead class="table-light sticky-top">
-                            <tr>
-                                <th style="width: 110px;">Date</th>
-                                <th style="width: 110px;">Type</th>
-                                <th class="text-end" style="width: 160px;">Amount</th>
-                                <th>Description</th>
-                                <th style="width: 110px;">Ref.</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var t in Model.LastTransactions)
-                            {
-                                var isDebit = string.Equals(t.TransactionType, "Debit", StringComparison.OrdinalIgnoreCase);
-                                <tr>
-                                    <td>@t.Date.ToString("dd.MM.yyyy")</td>
-                                    <td>
-                                        <span class="badge @(isDebit ? "bg-danger" : "bg-success")">@t.TransactionType</span>
-                                    </td>
-                                    <td class="text-end @(isDebit ? "amount-negative" : "amount-positive")">
-                                        @(isDebit ? "-" : "+")@t.Amount.ToString("N2", bg)
-                                    </td>
-                                    <td class="text-truncate" style="max-width: 380px;">@t.Description</td>
-                                    <td>@t.ReferenceNumber</td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                    <div class="text-nowrap">
-                        <button class="btn btn-outline-primary btn-sm">
-                            <a class="nav-link" asp-area="" asp-controller="Transactions" asp-action="Create">New Transaction</a>
-                        </button>
-                    </div>
-                </div>
-            }
-        </div>
-    </div>
-
-    <div style="height: 15px;"></div>
-
-    <!-- TRANSACTIONS CATEGORIZATION -->
-    <div class="card shadow-sm mb-4">
-        <div class="card-header d-flex align-items-center justify-content-between flex-wrap gap-2">
-            <strong>Transactions categorization</strong>
-            @if (Model.Accounts.Any())
-            {
-                <form class="d-flex align-items-end gap-2" method="get" asp-controller="Profile" asp-action="TransactionType">
-                    <div>
-                        <label class="form-label xsmall mb-1">Account</label>
-                        <select name="accountId" class="form-select form-select-sm">
-                            @foreach (var a in Model.Accounts)
-                            {
-                                <option value="@a.Id">@a.IBAN.MaskIban() (@a.Currency)</option>
-                            }
-                        </select>
-                    </div>
-                    <div>
-                        <label class="form-label xsmall mb-1">From</label>
-                        <input type="date" name="from" class="form-control form-control-sm" />
-                    </div>
-                    <div>
-                        <label class="form-label xsmall mb-1">To</label>
-                        <input type="date" name="to" class="form-control form-control-sm" />
-                    </div>
-                    <div>
-                        <label class="form-label xsmall mb-1">Transaction Type</label>
-                        <select name="type" class="form-select form-select-sm">
-                            <option value="">Types</option>
-                            @foreach (var type in Model.AvailableTransactionTypes)
-                            {
-                                <option value="@type">@type</option>
-                            }
-                        </select>
-                    </div>
-                    <button type="submit" class="btn btn-sm btn-outline-secondary">Search</button>
-                </form>
-            }
-        </div>
-
-        <div class="card-body p-0">
-            @if (!Model.TransactionType.Any())
-            {
-                <div class="p-3 text-muted">No categorized transactions.</div>
             }
             else
             {
@@ -340,7 +274,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach (var t in Model.TransactionType)
+                            @foreach (var t in txItems)
                             {
                                 var isDebit = string.Equals(t.TransactionType, "Debit", StringComparison.OrdinalIgnoreCase);
                                 <tr>
@@ -348,7 +282,7 @@
                                     <td>
                                         <span class="badge @(isDebit ? "bg-danger" : "bg-success")">@t.TransactionType</span>
                                     </td>
-                                    <td class="text-end @(isDebit ? "amount-negative" : "amount-positive")">
+                                    <td class="text-end text-mono @(isDebit ? "amount-negative" : "amount-positive")">
                                         @(isDebit ? "-" : "+")@t.Amount.ToString("N2", bg)
                                     </td>
                                     <td class="text-truncate" style="max-width: 380px;">@t.Description</td>
@@ -357,139 +291,155 @@
                             }
                         </tbody>
                     </table>
+
+                    <div class="text-nowrap px-3 py-2">
+                        <a class="btn btn-outline-primary btn-sm" asp-area="" asp-controller="Transactions" asp-action="Create">
+                            New Transaction
+                        </a>
+                    </div>
                 </div>
             }
         </div>
     </div>
 
     <!-- LOANS + UPCOMING REPAYMENTS + CREDIT SCORE -->
-    <div class="row g-3 mt-2 align-items-stretch">
+    <div class="row g-3 profile-section align-items-stretch">
         <div class="col-12 col-lg-7 d-flex">
             <div class="card shadow-sm flex-fill d-flex flex-column">
                 <div class="card-header d-flex align-items-center justify-content-between">
-                    <strong>Loans</strong>
-                    <span class="text-muted small">@Model.Loans.Count loan(s)</span>
+                <strong>Loans</strong>
+                <span class="text-muted small">@Model.Loans.Count loan(s)</span>
                 </div>
 
                 <div class="card-body p-0">
-                    @if (!Model.Loans.Any())
-                    {
-                        <div class="p-3 text-muted">You have no active loans.</div>
-                    }
-                    else
-                    {
-                        <div class="table-responsive">
-                            <table class="table table-sm align-middle mb-0 w-100">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th>Type</th>
-                                        <th class="text-end">Approved</th>
-                                        <th>Status</th>
-                                        <th>Term</th>
-                                        <th>Approved on</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach (var l in Model.Loans)
-                                    {
-                                        var st = l.Status?.ToLower();
-                                        var isApproved = st == "approved" || st == "autoapproved";
-                                        <tr>
-                                            <td>@l.Type</td>
-                                            <td class="text-end">@(isApproved? l.ApprovedAmount.ToString("N2", bg) : "-")</td>
-                                            <td>
-                                                <span class="badge @LoanStatusBadgeClass(l.Status)">@l.Status</span>
-                                            </td>
-
-                                            <td>@l.Term.ToString("dd.MM.yyyy")</td>
-                                            <td>@(isApproved? l.ApprovalDate.ToString("dd.MM.yyyy") : "-")</td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
-                        </div>
-                    }
-                </div>
-
-                @* Credit score under Loans *@
-                @if (Model.Credit is not null)
+                @if (!Model.Loans.Any())
                 {
-                    <div class="card-footer py-2">
-                        <strong>Credit score:</strong> @Model.Credit.CreditScore
-                        &nbsp;•&nbsp;<strong>Risk:</strong>
-                        <span class="badge @RiskBadgeClass(Model.Credit.RiskLevel)">
-                            @RiskLabel(Model.Credit.RiskLevel)
-                        </span>
-                        <div class="alert alert-info small mt-3 mb-0">
-                            <strong>Note:</strong> @Model.Credit.Notes
-                        </div>
+                    <div class="p-3 text-muted">You have no active loans.</div>
+                }
+                else
+                {
+                    <div class="table-responsive">
+                    <table class="table table-compact table-striped table-hover align-middle mb-0 w-100">
+                        <thead class="table-light">
+                        <tr>
+                            <th>Type</th>
+                            <th class="text-end">Approved</th>
+                            <th>Status</th>
+                            <th class="nowrap">Term</th>
+                            <th class="nowrap">Approved on</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        @foreach (var l in Model.Loans)
+                        {
+                            var st = l.Status?.ToLower();
+                            var isApproved = st == "approved" || st == "autoapproved";
+                            <tr>
+                            <td class="nowrap">@l.Type</td>
+                            <td class="text-end text-mono">
+                                @(isApproved ? l.ApprovedAmount.ToString("N2", bg) : "-")
+                            </td>
+                            <td>
+                                <span class="badge badge-tight @LoanStatusBadgeClass(l.Status)">
+                                @l.Status
+                                </span>
+                            </td>
+                            <td class="nowrap">@l.Term.ToString("dd.MM.yyyy")</td>
+                            <td class="nowrap">
+                                @(isApproved ? l.ApprovalDate.ToString("dd.MM.yyyy") : "-")
+                            </td>
+                            </tr>
+                        }
+                        </tbody>
+                    </table>
                     </div>
                 }
+                </div>
+
+                @if (Model.Credit is not null)
+                {
+                <div class="card-footer py-2">
+                    <strong>Credit score:</strong> @Model.Credit.CreditScore
+                    &nbsp;•&nbsp;<strong>Risk:</strong>
+                    <span class="badge @RiskBadgeClass(Model.Credit.RiskLevel)">@RiskLabel(Model.Credit.RiskLevel)</span>
+                    <div class="alert alert-info small mt-2 mb-0">
+                    <strong>Note:</strong> @Model.Credit.Notes
+                    </div>
+                </div>
+                }
+
                 <div class="text-nowrap p-2">
-                    <button class="btn btn-outline-primary btn-sm">
-                        <a class="nav-link" asp-area="" asp-controller="Loans" asp-action="Create">Apply for credit</a>
-                    </button>
+                <a class="btn btn-outline-primary btn-sm" asp-area="" asp-controller="Loans" asp-action="Create">
+                    Apply for credit
+                </a>
                 </div>
             </div>
         </div>
 
+
         <!-- Upcoming repayments -->
         <div class="col-12 col-lg-5 d-flex">
             <div class="card shadow-sm flex-fill d-flex flex-column">
-                <div class="card-header">
-                    <strong>Upcoming repayments</strong>
+                <div class="card-header d-flex align-items-center justify-content-between">
+                <strong>Upcoming repayments</strong>
+                <span class="text-muted small">@Model.UpcomingRepayments.Count item(s)</span>
                 </div>
+
                 <div class="card-body p-0">
-                    @if (!Model.UpcomingRepayments.Any())
-                    {
-                        <div class="p-3 text-muted">No scheduled repayments.</div>
-                    }
-                    else
-                    {
-                        <div class="table-responsive">
-                            <table class="table table-sm align-middle mb-0 w-100">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th>Due</th>
-                                        <th class="text-end">Due amount</th>
-                                        <th class="text-end">Paid</th>
-                                        <th>Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach (var r in Model.UpcomingRepayments)
-                                    {
-                                        <tr>
-                                            <td>@r.DueDate.ToString("dd.MM.yyyy")</td>
-                                            <td class="text-end">@r.AmountDue.ToString("N2", bg)</td>
-                                            <td class="text-end">@r.AmountPaid.ToString("N2", bg)</td>
-                                            <td>
-                                                <span class="badge @(r.Status?.ToLower() == "paid" ? "bg-success" : r.Status?.ToLower() == "overdue" ? "bg-danger" : "bg-secondary")">
-                                                    @r.Status
-                                                </span>
-                                                @if (r.IsOverdue)
-                                                {
-                                                    <span class="text-danger">Overdue!</span>
-                                                }
-                                            </td>
-                                            <td>
-                                                <form asp-controller="Transactions" asp-action="Pay" method="post">
-                                                    <input type="hidden" name="repaymentId" value="@r.Id" />
-                                                    <button type="submit" class="btn btn-primary">Pay</button>
-                                                </form>
-                                            </td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
-                        </div>
-                    }
-                    @if (TempData["InsufficientFunds"] != null)
-                    {
-                        <script>
-                            alert('@TempData["InsufficientFunds"]');
-                        </script>
-                    }
+                @if (!Model.UpcomingRepayments.Any())
+                {
+                    <div class="p-3 text-muted">No scheduled repayments.</div>
+                }
+                else
+                {
+                    <div class="table-responsive">
+                    <table class="table table-compact table-striped table-hover align-middle mb-0 w-100">
+                        <thead class="table-light">
+                        <tr>
+                            <th class="nowrap">Due</th>
+                            <th class="text-end nowrap">Due amount</th>
+                            <th class="text-end nowrap">Paid</th>
+                            <th>Status</th>
+                            <th class="text-end"></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        @foreach (var r in Model.UpcomingRepayments)
+                        {
+                            var statusLower = r.Status?.ToLower();
+                            var statusClass = statusLower == "paid" ? "bg-success" 
+                                            : statusLower == "overdue" ? "bg-danger" 
+                                            : "bg-secondary";
+                            <tr>
+                            <td class="nowrap">@r.DueDate.ToString("dd.MM.yyyy")</td>
+                            <td class="text-end text-mono">@r.AmountDue.ToString("N2", bg)</td>
+                            <td class="text-end text-mono">@r.AmountPaid.ToString("N2", bg)</td>
+                            <td>
+                                <span class="badge badge-tight @statusClass">@r.Status</span>
+                                @if (r.IsOverdue)
+                                {
+                                <span class="text-danger ms-1 small">Overdue</span>
+                                }
+                            </td>
+                            <td class="text-end">
+                                <form asp-controller="Transactions" asp-action="Pay" method="post" class="m-0">
+                                <input type="hidden" name="repaymentId" value="@r.Id" />
+                                <button type="submit" class="btn btn-sm btn-primary">Pay</button>
+                                </form>
+                            </td>
+                            </tr>
+                        }
+                        </tbody>
+                    </table>
+                    </div>
+                }
+
+                @if (TempData["InsufficientFunds"] != null)
+                {
+                    <script>
+                    alert('@TempData["InsufficientFunds"]');
+                    </script>
+                }
                 </div>
             </div>
         </div>
