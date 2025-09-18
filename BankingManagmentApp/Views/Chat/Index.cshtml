@@ -1,10 +1,27 @@
 ﻿@{
+    var isAuth = (bool?)ViewBag.IsAuthenticated == true;
+    var name = ViewBag.DisplayName as string ?? "Customer";
+}
+
+@if (isAuth)
+{
+    <div class="alert alert-success" role="alert" style="margin-bottom:12px;">
+        🔒 Logged in as <strong>@name</strong>
+    </div>
+}
+else
+{
+    <div class="alert alert-warning" role="alert" style="margin-bottom:12px;">
+        🔓 You are not logged in
+    </div>
+}
+
+@{
     ViewData["Title"] = "AI Chat";
 }
 <h2>AI Chat</h2>
 
 <div id="chatWindowMain" style="border:1px solid #ccc; padding:10px; width:600px; height:400px; overflow-y:auto; background:#f9f9f9;">
-    <!-- Messages will appear here -->
 </div>
 
 <div style="margin-top:10px;">
@@ -24,11 +41,11 @@
       msgDiv.style.maxWidth = "80%";
 
       if (sender === "user") {
-        msgDiv.style.background = "#d1e7dd"; // greenish for user
+        msgDiv.style.background = "#d1e7dd"; 
         msgDiv.style.alignSelf = "flex-end";
         msgDiv.style.textAlign = "right";
       } else {
-        msgDiv.style.background = "#e2e3e5"; // gray for AI
+        msgDiv.style.background = "#e2e3e5"; 
         msgDiv.style.alignSelf = "flex-start";
       }
 
@@ -79,3 +96,5 @@
       };
     };
 </script>
+
+ 

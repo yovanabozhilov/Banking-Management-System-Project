@@ -21,7 +21,13 @@ namespace BankingManagmentApp.Controllers
         }
 
         [HttpGet("")]
-        public IActionResult Index() => View();
+        public async Task<IActionResult> Index()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            ViewBag.IsAuthenticated = user != null;
+            ViewBag.DisplayName = user?.FirstName ?? user?.UserName ?? "Customer";
+            return View();
+        }
 
         // ---------- Non-streaming JSON endpoint ----------
         // POST /chat/send
