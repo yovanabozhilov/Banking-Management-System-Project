@@ -1,5 +1,4 @@
 ﻿using BankingManagmentApp.Models;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using BankingManagmentApp.Models.ML;
@@ -17,32 +16,39 @@ namespace BankingManagmentApp.Data
         public DbSet<TemplateAnswer> TemplateAnswer { get; set; }
         public DbSet<ChatHistory> ChatHistory { get; set; }
         public DbSet<CreditFeatures> CreditFeaturesView => Set<CreditFeatures>();
-
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
-            : base(options) { }
-        
         public DbSet<Feedback> Feedbacks { get; set; } = default!;
+
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
-            // 1) Keyless entity за SQL изгледа vw_CreditFeatures
+            // vw_CreditFeatures -> keyless view mapping
             modelBuilder.Entity<CreditFeatures>(eb =>
             {
                 eb.HasNoKey();
-                eb.ToView("vw_CreditFeatures");
+                eb.ToView("vw_CreditFeatures"); // ensure the DB view exists
+                eb.Metadata.SetIsTableExcludedFromMigrations(true); // EF neće pokušati da kreira tabelu
                 eb.Property(p => p.UserId).HasColumnName("UserId");
             });
 
-            // 2) DECIMAL precision за SQL Server (премахва warning-ите и пази парите „цели“)
             modelBuilder.Entity<Accounts>().Property(p => p.Balance).HasColumnType("decimal(18,2)");
             modelBuilder.Entity<Loans>().Property(p => p.Amount).HasColumnType("decimal(18,2)");
             modelBuilder.Entity<Loans>().Property(p => p.ApprovedAmount).HasColumnType("decimal(18,2)");
             modelBuilder.Entity<LoanRepayments>().Property(p => p.AmountDue).HasColumnType("decimal(18,2)");
             modelBuilder.Entity<LoanRepayments>().Property(p => p.AmountPaid).HasColumnType("decimal(18,2)");
             modelBuilder.Entity<Transactions>().Property(p => p.Amount).HasColumnType("decimal(18,2)");
-            modelBuilder.Entity<CreditFeatures>().HasKey(x => x.UserId);
+
+            // TemplateAnswer
+            modelBuilder.Entity<TemplateAnswer>()
+                .Property(t => t.Keyword).IsRequired();
+
+            modelBuilder.Entity<TemplateAnswer>()
+                .Property(t => t.AnswerText).IsRequired();
+
+            modelBuilder.Entity<TemplateAnswer>()
+                .HasIndex(t => t.Keyword);
         }
     }
 }
