@@ -46,7 +46,7 @@
 
 <div class="container-profile">
 
-    <!-- HEADER: avatar + identity + totals -->
+    <!-- HEADER -->
     <div class="card shadow-sm profile-section">
         <div class="card-body d-flex align-items-center flex-wrap gap-3">
             <div class="avatar-circle">
@@ -76,10 +76,10 @@
                 <div class="mt-3 d-flex flex-wrap gap-2">
                     @{
                         var totals = Model.Accounts
-                        .GroupBy(a => a.Currency)
-                        .Select(g => new { Currency = g.Key, Sum = g.Sum(x => x.Balance) })
-                        .OrderBy(x => x.Currency)
-                        .ToList();
+                            .GroupBy(a => a.Currency)
+                            .Select(g => new { Currency = g.Key, Sum = g.Sum(x => x.Balance) })
+                            .OrderBy(x => x.Currency)
+                            .ToList();
 
                         if (totals.Any())
                         {
@@ -98,7 +98,7 @@
         </div>
     </div>
 
-    <!-- ACCOUNTS: responsive cards -->
+    <!-- ACCOUNTS -->
     <div class="card shadow-sm profile-section">
         <div class="card-header d-flex align-items-center justify-content-between">
             <strong>Accounts</strong>
@@ -136,26 +136,30 @@
                                 </div>
 
                                 <div class="balance mt-2">
-                                    <div class="amount">@a.Balance.ToString("N2", bg)</div>
+                                    <div class="amount text-mono">@a.Balance.ToString("N2", bg)</div>
                                     <div class="currency">@a.Currency</div>
                                 </div>
 
-                                <div class="d-flex justify-content-between align-items-center mt-3">
+                                <div class="d-flex justify-content-between align-items-center mt-3 gap-2">
                                     <span class="status-pill @(a.Status?.ToLower() == "active" ? "ok" : "warn")">
                                         @a.Status
                                     </span>
-                                    <a class="btn btn-sm btn-danger"
-                                       asp-controller="Accounts"
-                                       asp-action="Delete"
-                                       asp-route-id="@a.Id">
-                                        BLOCK
-                                    </a>
 
-                                    <a class="btn btn-sm btn-outline-secondary"
-                                       asp-controller="Profile" asp-action="ExportAccounts"
-                                       asp-route-accountId="@a.Id">
-                                        Export CSV
-                                    </a>
+                                    <div class="ms-auto d-flex gap-2">
+                                        <a class="btn btn-sm btn-outline-danger d-inline-flex align-items-center gap-1"
+                                           asp-controller="Accounts"
+                                           asp-action="Delete"
+                                           asp-route-id="@a.Id"
+                                           title="Block this card">
+                                            <i class="fas fa-shield-alt"></i><span>Block</span>
+                                        </a>
+
+                                        <a class="btn btn-sm btn-outline-secondary"
+                                           asp-controller="Profile" asp-action="ExportAccounts"
+                                           asp-route-accountId="@a.Id">
+                                            Export CSV
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -170,7 +174,7 @@
         </div>
     </div>
 
-    <!-- TRANSACTIONS (Unified: Recent + Categorization) -->
+    <!-- TRANSACTIONS -->
     <div class="card shadow-sm profile-section">
         <div class="card-header d-flex align-items-center justify-content-between flex-wrap gap-2">
             <strong>Transactions</strong>
@@ -249,9 +253,6 @@
 
         <div class="card-body p-0">
             @{
-                // Единен източник за таблицата:
-                // - ако има резултати от категоризирано/филтрирано търсене (TransactionType), показваме тях
-                // - иначе показваме последните транзакции (LastTransactions)
                 var txItems = Model.TransactionType?.Any() == true
                             ? Model.TransactionType
                             : Model.LastTransactions;
@@ -272,11 +273,11 @@
                     <table class="table table-sm table-striped table-hover align-middle mb-0">
                         <thead class="table-light sticky-top">
                             <tr>
-                                <th style="width: 110px;">Date</th>
-                                <th style="width: 140px;">Type</th>
-                                <th class="text-end" style="width: 160px;">Amount</th>
+                                <th style="width:110px;">Date</th>
+                                <th style="width:140px;">Type</th>
+                                <th class="text-end" style="width:160px;">Amount</th>
                                 <th>Description</th>
-                                <th style="width: 110px;">Ref.</th>
+                                <th style="width:110px;">Ref.</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -284,7 +285,7 @@
                             {
                                 var isDebit = string.Equals(t.TransactionType, "Debit", StringComparison.OrdinalIgnoreCase);
                                 <tr>
-                                    <td>@t.Date.ToString("dd.MM.yyyy")</td>
+                                    <td class="nowrap">@t.Date.ToString("dd.MM.yyyy")</td>
                                     <td>
                                         <span class="badge @(isDebit ? "bg-danger" : "bg-success")">@t.TransactionType</span>
                                     </td>
@@ -292,7 +293,7 @@
                                         @(isDebit ? "-" : "+")@t.Amount.ToString("N2", bg)
                                     </td>
                                     <td class="text-truncate" style="max-width: 380px;">@t.Description</td>
-                                    <td>@t.ReferenceNumber</td>
+                                    <td class="nowrap">@t.ReferenceNumber</td>
                                 </tr>
                             }
                         </tbody>
@@ -313,82 +314,95 @@
         <div class="col-12 col-lg-7 d-flex">
             <div class="card shadow-sm flex-fill d-flex flex-column">
                 <div class="card-header d-flex align-items-center justify-content-between">
-                <strong>Loans</strong>
-                <span class="text-muted small">@Model.Loans.Count loan(s)</span>
+                    <strong>Loans</strong>
+                    <span class="text-muted small">@Model.Loans.Count loan(s)</span>
                 </div>
 
                 <div class="card-body p-0">
-                @if (!Model.Loans.Any())
-                {
-                    <div class="p-3 text-muted">You have no active loans.</div>
-                }
-                else
-                {
-                    <div class="table-responsive">
-                    <table class="table table-compact table-striped table-hover align-middle mb-0 w-100">
-                        <thead class="table-light">
-                        <tr>
-                            <th>Type</th>
-                            <th class="text-end">Approved</th>
-                            <th>Status</th>
-                            <th class="nowrap">Term</th>
-                            <th class="nowrap">Approved on</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        @foreach (var l in Model.Loans)
-                        {
-                            var st = l.Status?.ToLower();
-                            var isApproved = st == "approved" || st == "autoapproved";
-                            <tr>
-                            <td class="nowrap">@l.Type</td>
-                            <td class="text-end text-mono">
-                                @(isApproved ? l.ApprovedAmount.ToString("N2", bg) : "-")
-                            </td>
-                            <td>
-                                <span class="badge badge-tight @LoanStatusBadgeClass(l.Status)">
-                                @l.Status
-                                </span>
-                            </td>
-                            <td class="nowrap">@l.Term.ToString("dd.MM.yyyy")</td>
-                            <td class="nowrap">
-                                @(isApproved ? l.ApprovalDate.ToString("dd.MM.yyyy") : "-")
-                            </td>
-                            </tr>
-                        }
-                        </tbody>
-                    </table>
-                    </div>
-                }
+                    @if (!Model.Loans.Any())
+                    {
+                        <div class="p-3 text-muted">You have no active loans.</div>
+                    }
+                    else
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-compact table-striped table-hover align-middle mb-0 w-100">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Type</th>
+                                        <th class="text-end">Approved</th>
+                                        <th>Status</th>
+                                        <th class="nowrap">Term</th>
+                                        <th class="nowrap">Approved on</th>
+                                        <th class="text-end nowrap">Contract</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var l in Model.Loans)
+                                    {
+                                        var st = l.Status?.ToLower();
+                                        var isApproved = st == "approved" || st == "autoapproved";
+                                        <tr>
+                                            <td class="nowrap">@l.Type</td>
+                                            <td class="text-end text-mono">
+                                                @(isApproved ? l.ApprovedAmount.ToString("N2", bg) : "-")
+                                            </td>
+                                            <td>
+                                                <span class="badge badge-tight @LoanStatusBadgeClass(l.Status)">
+                                                    @l.Status
+                                                </span>
+                                            </td>
+                                            <td class="nowrap">@l.Term.ToString("dd.MM.yyyy")</td>
+                                            <td class="nowrap">
+                                                @(isApproved ? l.ApprovalDate.ToString("dd.MM.yyyy") : "-")
+                                            </td>
+                                            <td class="text-end">
+                                                @if (isApproved)
+                                                {
+                                                    <a asp-controller="Loans" asp-action="DownloadContract" asp-route-id="@l.Id"
+                                                       class="btn btn-sm btn-outline-primary">
+                                                        <i class="fas fa-download"></i> Download
+                                                    </a>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted xsmall">N/A</span>
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
                 </div>
 
                 @if (Model.Credit is not null)
                 {
-                <div class="card-footer py-2">
-                    <strong>Credit score:</strong> @Model.Credit.CreditScore
-                    &nbsp;•&nbsp;<strong>Risk:</strong>
-                    <span class="badge @RiskBadgeClass(Model.Credit.RiskLevel)">@RiskLabel(Model.Credit.RiskLevel)</span>
-                    <div class="alert alert-info small mt-2 mb-0">
-                    <strong>Note:</strong> @Model.Credit.Notes
+                    <div class="card-footer py-2">
+                        <strong>Credit score:</strong> @Model.Credit.CreditScore
+                        &nbsp;•&nbsp;<strong>Risk:</strong>
+                        <span class="badge @RiskBadgeClass(Model.Credit.RiskLevel)">@RiskLabel(Model.Credit.RiskLevel)</span>
+                        <div class="alert alert-info small mt-2 mb-0">
+                            <strong>Note:</strong> @Model.Credit.Notes
+                        </div>
                     </div>
-                </div>
                 }
 
                 <div class="text-nowrap p-2">
-                    <button class="btn btn-outline-primary btn-sm">
-                        <a class="nav-link" asp-area="" asp-controller="Loans" asp-action="Apply">Apply for credit</a>
-                    </button>
+                    <a class="btn btn-outline-primary btn-sm" asp-area="" asp-controller="Loans" asp-action="Apply">
+                        Apply for credit
+                    </a>
                 </div>
             </div>
         </div>
-
 
         <!-- Upcoming repayments -->
         <div class="col-12 col-lg-5 d-flex">
             <div class="card shadow-sm flex-fill d-flex flex-column">
                 <div class="card-header d-flex align-items-center justify-content-between">
-                <strong>Upcoming repayments</strong>
-                <span class="text-muted small">@Model.UpcomingRepayments.Count item(s)</span>
+                    <strong>Upcoming repayments</strong>
+                    <span class="text-muted small">@Model.UpcomingRepayments.Count item(s)</span>
                 </div>
 
                 <div class="card-body p-0">
@@ -399,35 +413,34 @@
                     else
                     {
                         <div class="table-responsive">
-                            <table class="table table-sm align-middle mb-0 w-100">
+                            <table class="table table-compact table-striped table-hover align-middle mb-0 w-100">
                                 <thead class="table-light">
                                     <tr>
-                                        <th>Due</th>
-                                        <th class="text-end">Due amount</th>
-                                        <th class="text-end">Paid</th>
+                                        <th class="nowrap">Due</th>
+                                        <th class="text-end nowrap">Due amount</th>
+                                        <th class="text-end nowrap">Paid</th>
                                         <th>Status</th>
+                                        <th class="text-end nowrap">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach (var r in Model.UpcomingRepayments)
                                     {
+                                        var statusLower = r.Status?.ToLower();
+                                        var statusClass = statusLower == "paid" ? "bg-success"
+                                            : statusLower == "overdue" ? "bg-danger"
+                                            : "bg-secondary";
                                         <tr>
-                                            <td>@r.DueDate.ToString("dd.MM.yyyy")</td>
-                                            <td class="text-end">@r.AmountDue.ToString("N2", bg)</td>
-                                            <td class="text-end">@r.AmountPaid.ToString("N2", bg)</td>
+                                            <td class="nowrap">@r.DueDate.ToString("dd.MM.yyyy")</td>
+                                            <td class="text-end text-mono">@r.AmountDue.ToString("N2", bg)</td>
+                                            <td class="text-end text-mono">@r.AmountPaid.ToString("N2", bg)</td>
                                             <td>
-                                                <span class="badge @(r.Status?.ToLower() == "paid" ? "bg-success" : r.Status?.ToLower() == "overdue" ? "bg-danger" : "bg-secondary")">
-                                                    @r.Status
-                                                </span>
-                                                @if (r.IsOverdue)
-                                                {
-                                                    <span class="text-danger">Overdue!</span>
-                                                }
+                                                <span class="badge badge-tight @statusClass">@r.Status</span>
                                             </td>
-                                            <td>
-                                                <form asp-controller="Transactions" asp-action="Pay" method="post">
+                                            <td class="text-end">
+                                                <form asp-controller="Transactions" asp-action="Pay" method="post" class="m-0">
                                                     <input type="hidden" name="repaymentId" value="@r.Id" />
-                                                    <button type="submit" class="btn btn-primary">Pay</button>
+                                                    <button type="submit" class="btn btn-sm btn-primary">Pay</button>
                                                 </form>
                                             </td>
                                         </tr>
@@ -436,53 +449,6 @@
                             </table>
                         </div>
                     }
-                    </div>
-                <div>
-                    <div class="card shadow-sm flex-fill d-flex flex-column">
-                        <div class="card-header">
-                            <strong>Loan contracts</strong>
-                        </div>
-                        <div class="card-body p-0">
-                            @if (!Model.UpcomingRepayments.Any())
-                            {
-                                <div class="p-3 text-muted">No loan contracts.</div>
-                            }
-                            else
-                            {
-                                <table class="table table-striped mb-0">
-                                    <thead>
-                                        <tr>
-                                            <th>Loan ID</th>
-                                            <th>Customer</th>
-                                            <th>Status</th>
-                                            <th>Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        
-                                        @foreach (var loan in Model.Loans)
-                                        {
-                                            @if(loan.Status=="Approved"){
-                                            <tr>
-                                                <td>@loan.Id</td>
-                                                <td>@loan.Customer.FirstName</td>
-                                                <td>@loan.Status</td>
-                                                <td>
-                                                    @if (loan.Status == "Approved")
-                                                    {
-                                                        <a asp-controller="Loans" asp-action="DownloadContract" asp-route-id="@loan.Id" class="btn btn-sm btn-primary">
-                                                            <i class="fas fa-download"></i> Download Contract
-                                                        </a>
-                                                    }
-                                                </td>
-                                            </tr>
-                                            }
-                                        }
-                                    </tbody>
-                                </table>
-                            }
-                        </div>
-                    </div>
 
                     @if (TempData["InsufficientFunds"] != null)
                     {
