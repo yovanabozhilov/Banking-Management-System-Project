@@ -45,4 +45,30 @@ public class EmailService : IEmailService
             await client.DisconnectAsync(true);
         }
     }
+
+    public async Task SendEmailAsync(string toEmail, string subject, string message)
+    {
+        var smtpServer = _config["SmtpSettings:Server"];
+        var smtpPort = int.Parse(_config["SmtpSettings:Port"]);
+        var smtpUser = _config["SmtpSettings:Username"];
+        var smtpPass = _config["SmtpSettings:Password"];
+
+        var email = new MimeMessage();
+        email.From.Add(new MailboxAddress("Банка", "noreply@bank.com"));
+        email.To.Add(new MailboxAddress("Клиент", toEmail));
+        email.Subject = subject;
+
+        var bodyBuilder = new BodyBuilder();
+        bodyBuilder.HtmlBody = message;
+
+        email.Body = bodyBuilder.ToMessageBody();
+
+        using (var client = new SmtpClient())
+        {
+            await client.ConnectAsync(smtpServer, smtpPort, MailKit.Security.SecureSocketOptions.StartTls);
+            await client.AuthenticateAsync(smtpUser, smtpPass);
+            await client.SendAsync(email);
+            await client.DisconnectAsync(true);
+        }
+    }
 }

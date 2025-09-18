@@ -29,9 +29,9 @@ namespace BankingManagmentApp.Controllers
             _loanContractGenerator = loanContractGenerator;
         }
 
-        
+
         // КЛИЕНТСКИ ДЕЙСТВИЯ
-        
+
 
         // GET: Loans/Apply (форма за подаване на заявление)
         public IActionResult Apply()
@@ -55,15 +55,15 @@ namespace BankingManagmentApp.Controllers
                 loan.CustomerId = user.Id;
                 loan.Status = "Pending ";
                 loan.Date = DateTime.UtcNow;
-                
+
 
                 if (loan.Term == default)
                     loan.Term = DateOnly.FromDateTime(DateTime.Today.AddMonths(12));
-                
-                
+
+
             }
             _context.Loans.Add(loan);
-            await _context.SaveChangesAsync(); 
+            await _context.SaveChangesAsync();
 
             await workflow.ProcessNewApplicationAsync(loan);
 
@@ -172,9 +172,9 @@ namespace BankingManagmentApp.Controllers
             return View(loan);
         }
 
-        
+
         // АДМИН ДЕЙСТВИЯ
-        
+
 
         // GET: Loans/Create (админ създава ръчно)
         [Authorize(Roles = "Admin")]
@@ -322,6 +322,24 @@ namespace BankingManagmentApp.Controllers
             }
             ViewData["CustomerId"] = new SelectList(_context.Customers, "Id", "Email", loans.CustomerId);
             return View(loans);
+        }
+
+        [HttpGet]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> DownloadContract(int id)
+        {
+            var loan = await _context.Loans
+                                     .Include(l => l.Customer)
+                                     .FirstOrDefaultAsync(l => l.Id == id);
+
+            if (loan == null || loan.Status != "Approved")
+            {
+                return NotFound();
+            }
+
+            var pdfBytes = await _loanContractGenerator.GeneratePdfAsync(loan);
+
+            return File(pdfBytes, "application/pdf", $"Договор_Заем_{loan.Id}.pdf");
         }
 
         // GET: Loans/Delete/5

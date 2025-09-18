@@ -25,5 +25,6 @@ namespace BankingManagmentApp.Controllers
 
             return File(ms.ToArray(), "image/png");
         }
+
     }
 }

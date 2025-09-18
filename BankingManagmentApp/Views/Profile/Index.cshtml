@@ -144,6 +144,12 @@
                                     <span class="status-pill @(a.Status?.ToLower() == "active" ? "ok" : "warn")">
                                         @a.Status
                                     </span>
+                                    <a class="btn btn-sm btn-danger"
+                                       asp-controller="Accounts"
+                                       asp-action="Delete"
+                                       asp-route-id="@a.Id">
+                                        BLOCK
+                                    </a>
 
                                     <a class="btn btn-sm btn-outline-secondary"
                                        asp-controller="Profile" asp-action="ExportAccounts"
@@ -427,7 +433,7 @@
                 }
                 <div class="text-nowrap p-2">
                     <button class="btn btn-outline-primary btn-sm">
-                        <a class="nav-link" asp-area="" asp-controller="Loans" asp-action="Create">Apply for credit</a>
+                        <a class="nav-link" asp-area="" asp-controller="Loans" asp-action="Apply">Apply for credit</a>
                     </button>
                 </div>
             </div>
@@ -484,6 +490,54 @@
                             </table>
                         </div>
                     }
+                    </div>
+                <div>
+                    <div class="card shadow-sm flex-fill d-flex flex-column">
+                        <div class="card-header">
+                            <strong>Loan contracts</strong>
+                        </div>
+                        <div class="card-body p-0">
+                            @if (!Model.UpcomingRepayments.Any())
+                            {
+                                <div class="p-3 text-muted">No loan contracts.</div>
+                            }
+                            else
+                            {
+                                <table class="table table-striped mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>Loan ID</th>
+                                            <th>Customer</th>
+                                            <th>Status</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        
+                                        @foreach (var loan in Model.Loans)
+                                        {
+                                            @if(loan.Status=="Approved"){
+                                            <tr>
+                                                <td>@loan.Id</td>
+                                                <td>@loan.Customer.FirstName</td>
+                                                <td>@loan.Status</td>
+                                                <td>
+                                                    @if (loan.Status == "Approved")
+                                                    {
+                                                        <a asp-controller="Loans" asp-action="DownloadContract" asp-route-id="@loan.Id" class="btn btn-sm btn-primary">
+                                                            <i class="fas fa-download"></i> Download Contract
+                                                        </a>
+                                                    }
+                                                </td>
+                                            </tr>
+                                            }
+                                        }
+                                    </tbody>
+                                </table>
+                            }
+                        </div>
+                    </div>
+
                     @if (TempData["InsufficientFunds"] != null)
                     {
                         <script>
