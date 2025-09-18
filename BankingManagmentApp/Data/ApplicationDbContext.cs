@@ -29,7 +29,7 @@ namespace BankingManagmentApp.Data
             {
                 eb.HasNoKey();
                 eb.ToView("vw_CreditFeatures"); // ensure the DB view exists
-                eb.Metadata.SetIsTableExcludedFromMigrations(true); // EF neće pokušati da kreira tabelu
+                eb.Metadata.SetIsTableExcludedFromMigrations(true); 
                 eb.Property(p => p.UserId).HasColumnName("UserId");
             });
 
