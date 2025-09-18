@@ -22,14 +22,16 @@ namespace BankingManagmentApp.Services
             _tools = tools;
         }
 
-        private ChatMessage SystemMessage(string? userFirstName) => new(
+        private ChatMessage SystemMessage(string? userFirstName, bool isAuthenticated) => new(
             ChatRole.System,
-            $@"You are a banking virtual assistant for Experian Workshop 'Banking Management System'.
+$@"You are a banking virtual assistant for Experian Workshop 'Banking Management System'.
+AuthStatus: {(isAuthenticated ? "Authenticated" : "Unauthenticated")}
 
 Safety & Compliance:
 - Never disclose sensitive data or internal implementation.
 - For personalized info you MUST rely only on provided tool results; do not guess.
-- If the user is not authenticated, ask them to log in.
+- If AuthStatus=Unauthenticated, refuse personalized data and ask to log in.
+- If AuthStatus=Authenticated, NEVER tell the user to log in; answer using ToolResult or generic info.
 - Do not accept card numbers, PINs, OTPs, or full IBANs in chat. If provided, refuse and instruct secure channels.
 - Be concise, factual, and professional. If unsure, say so.
 
@@ -38,7 +40,7 @@ Capabilities:
 2) Use the provided tools to answer personal questions like balance, transactions, and loan status when the user is authenticated.
 3) If neither applies, give a helpful, bounded, generic answer.
 
-Tone: friendly, precise, and compliant. Address the user by name if provided: {userFirstName ?? "Customer"}.");
+Tone: friendly, precise, and compliant. Address the user by name if provided: {(userFirstName ?? "Customer")}.");
 
         // ========== PUBLIC ==========
         public async Task<string> SendAsync(
@@ -50,13 +52,14 @@ Tone: friendly, precise, and compliant. Address the user by name if provided: {u
         {
             try
             {
-                // 1) Personal queries -> answer via tools (no model call)
+                // 1) Personal queries -> отговаряме през tools (без модел)
                 var toolAnswer = await TryAnswerWithToolsAsync(userInput, userId, ct);
                 if (toolAnswer is not null)
                     return toolAnswer;
 
-                // 2) Otherwise ask the model with KB context
-                var messages = await BuildMessagesAsync(userInput, userFirstName, prior, ct);
+                // 2) Иначе питаме модела с KB, но с явен AuthStatus
+                var isAuthenticated = !string.IsNullOrWhiteSpace(userId);
+                var messages = await BuildMessagesAsync(userInput, userFirstName, isAuthenticated, prior, ct);
 
                 using var cts = CancellationTokenSource.CreateLinkedTokenSource(ct);
                 cts.CancelAfter(TimeSpan.FromSeconds(20));
@@ -84,7 +87,8 @@ Tone: friendly, precise, and compliant. Address the user by name if provided: {u
                 yield break;
             }
 
-            var messages = await BuildMessagesAsync(userInput, userFirstName, prior, ct);
+            var isAuthenticated = !string.IsNullOrWhiteSpace(userId);
+            var messages = await BuildMessagesAsync(userInput, userFirstName, isAuthenticated, prior, ct);
             await foreach (var update in _chatClient.GetStreamingResponseAsync(messages, cancellationToken: ct))
             {
                 if (!string.IsNullOrEmpty(update.Text))
@@ -115,21 +119,26 @@ Tone: friendly, precise, and compliant. Address the user by name if provided: {u
         private async Task<IList<ChatMessage>> BuildMessagesAsync(
             string userInput,
             string? userFirstName,
+            bool isAuthenticated,
             IList<ChatMessage>? prior,
             CancellationToken ct)
         {
             var history = prior ?? new List<ChatMessage>();
 
-            // RAG from TemplateAnswer (your KB replacement)
+            // RAG от TemplateAnswer
             var hits = await _kb.SearchAsync(userInput, top: 3, ct);
             var kbContext = string.Join(
                 "\n---\n",
                 hits.Select(h => $"Keyword(s): {h.Keyword}\nAnswer:\n{h.AnswerText}")
             );
 
+            // Ако е логнат, махаме от KB пасажи, които съветват "log in / sign in"
+            if (isAuthenticated)
+                kbContext = StripLoginLines(kbContext);
+
             var messages = new List<ChatMessage>
             {
-                SystemMessage(userFirstName),
+                SystemMessage(userFirstName, isAuthenticated),
                 new ChatMessage(ChatRole.User, $"FAQ/Policy context:\n{kbContext}"),
                 new ChatMessage(ChatRole.User, userInput)
             };
@@ -138,6 +147,15 @@ Tone: friendly, precise, and compliant. Address the user by name if provided: {u
                 messages.Insert(1, old);
 
             return messages;
+        }
+
+        private static string StripLoginLines(string text)
+        {
+            if (string.IsNullOrWhiteSpace(text)) return text;
+            // Премахваме редове от KB, които съдържат “log in / login / sign in”
+            var lines = text.Split('\n')
+                .Where(l => !Regex.IsMatch(l, @"\b(log\s*in|login|sign\s*in)\b", RegexOptions.IgnoreCase));
+            return string.Join('\n', lines);
         }
 
         // ========== TOOL INTENTS ==========
@@ -152,24 +170,20 @@ Tone: friendly, precise, and compliant. Address the user by name if provided: {u
             // Recent transactions
             if (s.Contains("transaction"))
             {
-                // explicit number: "last 3", "recent 2", "past 5"
                 var m = Regex.Match(s, @"\b(last|recent|past)\s+(\d+)\b");
                 if (m.Success && int.TryParse(m.Groups[2].Value, out var num) && num > 0)
                     n = num;
 
-                // singular: "last transaction"
                 if (n <= 0 && Regex.IsMatch(s, @"\blast\s*transaction\b"))
                     n = 1;
 
-                if (n <= 0) n = 5; // sensible default
+                if (n <= 0) n = 5; // default
                 return Intent.RecentTransactions;
             }
 
-            // Balance
             if (s.Contains("balance") || s.Contains("how much money") || s.Contains("my funds"))
                 return Intent.Balance;
 
-            // Loan status
             if ((s.Contains("loan") && s.Contains("status")) || s.Contains("application status"))
                 return Intent.LoanStatus;
 
@@ -224,7 +238,6 @@ Tone: friendly, precise, and compliant. Address the user by name if provided: {u
             }
             catch
             {
-                // If DB/tool fails, give a clear message instead of falling into the AI call.
                 return "Sorry, I couldn’t fetch your personal data just now. Please try again.";
             }
 
