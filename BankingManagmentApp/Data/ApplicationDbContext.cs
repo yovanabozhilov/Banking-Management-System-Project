@@ -22,7 +22,7 @@ namespace BankingManagmentApp.Data
             : base(options) { }
         
         public DbSet<Feedback> Feedbacks { get; set; } = default!;
-        
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -42,6 +42,7 @@ namespace BankingManagmentApp.Data
             modelBuilder.Entity<LoanRepayments>().Property(p => p.AmountDue).HasColumnType("decimal(18,2)");
             modelBuilder.Entity<LoanRepayments>().Property(p => p.AmountPaid).HasColumnType("decimal(18,2)");
             modelBuilder.Entity<Transactions>().Property(p => p.Amount).HasColumnType("decimal(18,2)");
+            modelBuilder.Entity<CreditFeatures>().HasKey(x => x.UserId);
         }
     }
 }
