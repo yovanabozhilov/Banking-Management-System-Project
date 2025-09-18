@@ -5,6 +5,9 @@ using BankingManagmentApp.Data;
 using BankingManagmentApp.Models.ML;
 using Microsoft.EntityFrameworkCore;
 
+using BankingManagmentApp.Services; // <-- for ICreditScoringService + CreditScoreResult
+
+
 namespace BankingManagmentApp.Services.Approval
 {
     public interface ILoanApprovalEngine

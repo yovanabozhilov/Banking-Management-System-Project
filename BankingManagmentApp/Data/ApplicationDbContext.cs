@@ -24,20 +24,25 @@ namespace BankingManagmentApp.Data
         {
             base.OnModelCreating(modelBuilder);
 
+            // vw_CreditFeatures -> keyless view mapping
             modelBuilder.Entity<CreditFeatures>(eb =>
             {
                 eb.HasNoKey();
-                eb.ToView("vw_CreditFeatures");
+                eb.ToView("vw_CreditFeatures"); // ensure the DB view exists
+                eb.Metadata.SetIsTableExcludedFromMigrations(true); 
                 eb.Property(p => p.UserId).HasColumnName("UserId");
             });
 
-            modelBuilder.Entity<Accounts>().Property(p => p.Balance).HasColumnType("decimal(18,2)");
+            modelBuilder.Entity<CreditFeatures>().HasKey(x=>x.UserId);
+
+                modelBuilder.Entity<Accounts>().Property(p => p.Balance).HasColumnType("decimal(18,2)");
             modelBuilder.Entity<Loans>().Property(p => p.Amount).HasColumnType("decimal(18,2)");
             modelBuilder.Entity<Loans>().Property(p => p.ApprovedAmount).HasColumnType("decimal(18,2)");
             modelBuilder.Entity<LoanRepayments>().Property(p => p.AmountDue).HasColumnType("decimal(18,2)");
             modelBuilder.Entity<LoanRepayments>().Property(p => p.AmountPaid).HasColumnType("decimal(18,2)");
             modelBuilder.Entity<Transactions>().Property(p => p.Amount).HasColumnType("decimal(18,2)");
 
+            // TemplateAnswer
             modelBuilder.Entity<TemplateAnswer>()
                 .Property(t => t.Keyword).IsRequired();
 

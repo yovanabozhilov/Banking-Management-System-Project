@@ -27,7 +27,7 @@ builder.Services.AddDefaultIdentity<Customers>(options =>
 {
     options.SignIn.RequireConfirmedAccount = true;
     options.SignIn.RequireConfirmedEmail = true;
-    options.User.RequireUniqueEmail = true;
+    options.User.RequireUniqueEmail = true ;
     options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
 })
 .AddRoles<IdentityRole>()

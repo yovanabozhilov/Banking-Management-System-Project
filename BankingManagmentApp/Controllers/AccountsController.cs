@@ -133,6 +133,8 @@ namespace BankingManagmentApp.Controllers
             return View(accounts);
         }
 
+
+
         // GET: Accounts/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {

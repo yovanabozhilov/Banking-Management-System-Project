@@ -144,6 +144,12 @@
                                     <span class="status-pill @(a.Status?.ToLower() == "active" ? "ok" : "warn")">
                                         @a.Status
                                     </span>
+                                    <a class="btn btn-sm btn-danger"
+                                       asp-controller="Accounts"
+                                       asp-action="Delete"
+                                       asp-route-id="@a.Id">
+                                        BLOCK
+                                    </a>
 
                                     <a class="btn btn-sm btn-outline-secondary"
                                        asp-controller="Profile" asp-action="ExportAccounts"
@@ -369,9 +375,9 @@
                 }
 
                 <div class="text-nowrap p-2">
-                <a class="btn btn-outline-primary btn-sm" asp-area="" asp-controller="Loans" asp-action="Create">
-                    Apply for credit
-                </a>
+                    <button class="btn btn-outline-primary btn-sm">
+                        <a class="nav-link" asp-area="" asp-controller="Loans" asp-action="Apply">Apply for credit</a>
+                    </button>
                 </div>
             </div>
         </div>
@@ -386,60 +392,104 @@
                 </div>
 
                 <div class="card-body p-0">
-                @if (!Model.UpcomingRepayments.Any())
-                {
-                    <div class="p-3 text-muted">No scheduled repayments.</div>
-                }
-                else
-                {
-                    <div class="table-responsive">
-                    <table class="table table-compact table-striped table-hover align-middle mb-0 w-100">
-                        <thead class="table-light">
-                        <tr>
-                            <th class="nowrap">Due</th>
-                            <th class="text-end nowrap">Due amount</th>
-                            <th class="text-end nowrap">Paid</th>
-                            <th>Status</th>
-                            <th class="text-end"></th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        @foreach (var r in Model.UpcomingRepayments)
-                        {
-                            var statusLower = r.Status?.ToLower();
-                            var statusClass = statusLower == "paid" ? "bg-success" 
-                                            : statusLower == "overdue" ? "bg-danger" 
-                                            : "bg-secondary";
-                            <tr>
-                            <td class="nowrap">@r.DueDate.ToString("dd.MM.yyyy")</td>
-                            <td class="text-end text-mono">@r.AmountDue.ToString("N2", bg)</td>
-                            <td class="text-end text-mono">@r.AmountPaid.ToString("N2", bg)</td>
-                            <td>
-                                <span class="badge badge-tight @statusClass">@r.Status</span>
-                                @if (r.IsOverdue)
-                                {
-                                <span class="text-danger ms-1 small">Overdue</span>
-                                }
-                            </td>
-                            <td class="text-end">
-                                <form asp-controller="Transactions" asp-action="Pay" method="post" class="m-0">
-                                <input type="hidden" name="repaymentId" value="@r.Id" />
-                                <button type="submit" class="btn btn-sm btn-primary">Pay</button>
-                                </form>
-                            </td>
-                            </tr>
-                        }
-                        </tbody>
-                    </table>
+                    @if (!Model.UpcomingRepayments.Any())
+                    {
+                        <div class="p-3 text-muted">No scheduled repayments.</div>
+                    }
+                    else
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-sm align-middle mb-0 w-100">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Due</th>
+                                        <th class="text-end">Due amount</th>
+                                        <th class="text-end">Paid</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var r in Model.UpcomingRepayments)
+                                    {
+                                        <tr>
+                                            <td>@r.DueDate.ToString("dd.MM.yyyy")</td>
+                                            <td class="text-end">@r.AmountDue.ToString("N2", bg)</td>
+                                            <td class="text-end">@r.AmountPaid.ToString("N2", bg)</td>
+                                            <td>
+                                                <span class="badge @(r.Status?.ToLower() == "paid" ? "bg-success" : r.Status?.ToLower() == "overdue" ? "bg-danger" : "bg-secondary")">
+                                                    @r.Status
+                                                </span>
+                                                @if (r.IsOverdue)
+                                                {
+                                                    <span class="text-danger">Overdue!</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                <form asp-controller="Transactions" asp-action="Pay" method="post">
+                                                    <input type="hidden" name="repaymentId" value="@r.Id" />
+                                                    <button type="submit" class="btn btn-primary">Pay</button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
                     </div>
-                }
+                <div>
+                    <div class="card shadow-sm flex-fill d-flex flex-column">
+                        <div class="card-header">
+                            <strong>Loan contracts</strong>
+                        </div>
+                        <div class="card-body p-0">
+                            @if (!Model.UpcomingRepayments.Any())
+                            {
+                                <div class="p-3 text-muted">No loan contracts.</div>
+                            }
+                            else
+                            {
+                                <table class="table table-striped mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>Loan ID</th>
+                                            <th>Customer</th>
+                                            <th>Status</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        
+                                        @foreach (var loan in Model.Loans)
+                                        {
+                                            @if(loan.Status=="Approved"){
+                                            <tr>
+                                                <td>@loan.Id</td>
+                                                <td>@loan.Customer.FirstName</td>
+                                                <td>@loan.Status</td>
+                                                <td>
+                                                    @if (loan.Status == "Approved")
+                                                    {
+                                                        <a asp-controller="Loans" asp-action="DownloadContract" asp-route-id="@loan.Id" class="btn btn-sm btn-primary">
+                                                            <i class="fas fa-download"></i> Download Contract
+                                                        </a>
+                                                    }
+                                                </td>
+                                            </tr>
+                                            }
+                                        }
+                                    </tbody>
+                                </table>
+                            }
+                        </div>
+                    </div>
 
-                @if (TempData["InsufficientFunds"] != null)
-                {
-                    <script>
-                    alert('@TempData["InsufficientFunds"]');
-                    </script>
-                }
+                    @if (TempData["InsufficientFunds"] != null)
+                    {
+                        <script>
+                            alert('@TempData["InsufficientFunds"]');
+                        </script>
+                    }
                 </div>
             </div>
         </div>

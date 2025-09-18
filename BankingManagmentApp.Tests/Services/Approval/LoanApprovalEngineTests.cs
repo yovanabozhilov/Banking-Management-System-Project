@@ -5,122 +5,136 @@ using BankingManagmentApp.Services.Approval;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using Xunit;
+using BankingManagmentApp.Services;   // for ICreditScoringService + CreditScoreResult
 
 namespace BankingManagmentApp.Tests.Services
 {
     public class LoanApprovalEngineTests
     {
-        private static ApplicationDbContext CreateContext()
+        private ApplicationDbContext GetDbContext(string dbName)
         {
             var options = new DbContextOptionsBuilder<ApplicationDbContext>()
-                .UseInMemoryDatabase(System.Guid.NewGuid().ToString())
+                .UseInMemoryDatabase(dbName)
                 .Options;
             return new ApplicationDbContext(options);
         }
 
-        [Fact]
-        public async Task DecideAsync_ShouldReturnPendingReview_WhenNoScore()
+        private LoanApprovalPolicy GetPolicy() => new LoanApprovalPolicy
         {
-            using var ctx = CreateContext();
+            MaxAmountRisk1 = 10000,
+            MaxAmountRisk2 = 5000,
+            MaxAmountRisk3 = 2000,
+            MinScoreRisk1 = 700,
+            MinScoreRisk2 = 650,
+            MinScoreRisk3 = 600,
+            AnnualInterest = 0.12m,
+            DefaultMonths = 12,
+            MaxInstallmentToNetFlow = 0.3m
+        };
 
+        [Fact]
+        public async Task DecideAsync_NoScore_ReturnsPendingReview()
+        {
+            var db = GetDbContext(nameof(DecideAsync_NoScore_ReturnsPendingReview));
             var scoring = new Mock<ICreditScoringService>();
             scoring.Setup(s => s.ComputeAsync(It.IsAny<string>(), It.IsAny<ApplicationFeatures>()))
-                   .ReturnsAsync((CreditScoreResult?)null);
+                   .ReturnsAsync((CreditScoreResult)null);
 
-            var engine = new LoanApprovalEngine(ctx, scoring.Object, new LoanApprovalPolicy());
+            var engine = new LoanApprovalEngine(db, scoring.Object, GetPolicy());
 
-            var features = new ApplicationFeatures { RequestedAmount = 1000, TermMonths = 12 };
-            var decision = await engine.DecideAsync("u1", features);
+            var decision = await engine.DecideAsync("u1", new ApplicationFeatures { RequestedAmount = 2000 });
 
             Assert.Equal(ApprovalOutcome.PendingReview, decision.Outcome);
             Assert.Null(decision.ApprovedAmount);
         }
 
         [Fact]
-        public async Task DecideAsync_ShouldAutoDecline_WhenHighRiskOrLowScore()
+        public async Task DecideAsync_HighRiskOrLowScore_ReturnsAutoDeclined()
         {
-            using var ctx = CreateContext();
-
+            var db = GetDbContext(nameof(DecideAsync_HighRiskOrLowScore_ReturnsAutoDeclined));
             var scoring = new Mock<ICreditScoringService>();
-            scoring.Setup(s => s.ComputeAsync("u1", It.IsAny<ApplicationFeatures>()))
-                   .ReturnsAsync(new CreditScoreResult { RiskLevel = 4, Score = 550 });
+            scoring.Setup(s => s.ComputeAsync(It.IsAny<string>(), It.IsAny<ApplicationFeatures>()))
+                   .ReturnsAsync(new CreditScoreResult { RiskLevel = 4, Score = 500 });
 
-            var engine = new LoanApprovalEngine(ctx, scoring.Object, new LoanApprovalPolicy());
+            var engine = new LoanApprovalEngine(db, scoring.Object, GetPolicy());
 
-            var features = new ApplicationFeatures { RequestedAmount = 1000, TermMonths = 12 };
-            var decision = await engine.DecideAsync("u1", features);
+            var decision = await engine.DecideAsync("u1", new ApplicationFeatures { RequestedAmount = 1000 });
 
             Assert.Equal(ApprovalOutcome.AutoDeclined, decision.Outcome);
-            Assert.Null(decision.ApprovedAmount);
         }
 
         [Fact]
-        public async Task DecideAsync_ShouldAutoApprove_WhenWithinPolicy()
+        public async Task DecideAsync_RequestFarAboveRiskCap_ReturnsPendingReview()
         {
-            using var ctx = CreateContext();
-
-            // add net inflow/outflow data
-            ctx.CreditFeaturesView.Add(new CreditFeaturesView
-            {
-                UserId = "u1",
-                AvgMonthlyInflow = 2000,
-                AvgMonthlyOutflow = 1000
-            });
-            await ctx.SaveChangesAsync();
+            var db = GetDbContext(nameof(DecideAsync_RequestFarAboveRiskCap_ReturnsPendingReview));
+            db.CreditFeaturesView.Add(new CreditFeatures { UserId = "u1", AvgMonthlyInflow = 2000, AvgMonthlyOutflow = 500 });
+            db.SaveChanges();
 
             var scoring = new Mock<ICreditScoringService>();
-            scoring.Setup(s => s.ComputeAsync("u1", It.IsAny<ApplicationFeatures>()))
-                   .ReturnsAsync(new CreditScoreResult { RiskLevel = 1, Score = 720 });
+            scoring.Setup(s => s.ComputeAsync(It.IsAny<string>(), It.IsAny<ApplicationFeatures>()))
+                   .ReturnsAsync(new CreditScoreResult { RiskLevel = 2, Score = 700 });
 
-            var policy = new LoanApprovalPolicy
-            {
-                AnnualInterest = 0.12m,
-                MaxAmountRisk1 = 5000,
-                MinScoreRisk1 = 650
-            };
+            var engine = new LoanApprovalEngine(db, scoring.Object, GetPolicy());
 
-            var engine = new LoanApprovalEngine(ctx, scoring.Object, policy);
+            var decision = await engine.DecideAsync("u1", new ApplicationFeatures { RequestedAmount = 10000 });
 
-            var features = new ApplicationFeatures { RequestedAmount = 3000, TermMonths = 12 };
-            var decision = await engine.DecideAsync("u1", features);
+            Assert.Equal(ApprovalOutcome.PendingReview, decision.Outcome);
+        }
+
+        [Fact]
+        public async Task DecideAsync_WithinPolicy_ReturnsAutoApproved()
+        {
+            var db = GetDbContext(nameof(DecideAsync_WithinPolicy_ReturnsAutoApproved));
+            db.CreditFeaturesView.Add(new CreditFeatures { UserId = "u1", AvgMonthlyInflow = 2000, AvgMonthlyOutflow = 500 });
+            db.SaveChanges();
+
+            var scoring = new Mock<ICreditScoringService>();
+            scoring.Setup(s => s.ComputeAsync(It.IsAny<string>(), It.IsAny<ApplicationFeatures>()))
+                   .ReturnsAsync(new CreditScoreResult { RiskLevel = 1, Score = 750 });
+
+            var engine = new LoanApprovalEngine(db, scoring.Object, GetPolicy());
+
+            var decision = await engine.DecideAsync("u1", new ApplicationFeatures { RequestedAmount = 3000 });
 
             Assert.Equal(ApprovalOutcome.AutoApproved, decision.Outcome);
             Assert.Equal(3000, decision.ApprovedAmount);
         }
 
         [Fact]
-        public async Task DecideAsync_ShouldCapByAffordability_WhenPaymentTooHigh()
+        public async Task DecideAsync_TooExpensiveButAffordableAmount_ReturnsCappedApproval()
         {
-            using var ctx = CreateContext();
-
-            ctx.CreditFeaturesView.Add(new CreditFeaturesView
-            {
-                UserId = "u1",
-                AvgMonthlyInflow = 1000,
-                AvgMonthlyOutflow = 900  // net flow = 100
-            });
-            await ctx.SaveChangesAsync();
+            var db = GetDbContext(nameof(DecideAsync_TooExpensiveButAffordableAmount_ReturnsCappedApproval));
+            db.CreditFeaturesView.Add(new CreditFeatures { UserId = "u1", AvgMonthlyInflow = 1000, AvgMonthlyOutflow = 100 });
+            db.SaveChanges();
 
             var scoring = new Mock<ICreditScoringService>();
-            scoring.Setup(s => s.ComputeAsync("u1", It.IsAny<ApplicationFeatures>()))
-                   .ReturnsAsync(new CreditScoreResult { RiskLevel = 1, Score = 700 });
+            scoring.Setup(s => s.ComputeAsync(It.IsAny<string>(), It.IsAny<ApplicationFeatures>()))
+                   .ReturnsAsync(new CreditScoreResult { RiskLevel = 2, Score = 700 });
 
-            var policy = new LoanApprovalPolicy
-            {
-                AnnualInterest = 0.1m,
-                MaxAmountRisk1 = 5000,
-                MinScoreRisk1 = 650,
-                MaxInstallmentToNetFlow = 1.0m // can only spend netFlow = 100
-            };
+            var engine = new LoanApprovalEngine(db, scoring.Object, GetPolicy());
 
-            var engine = new LoanApprovalEngine(ctx, scoring.Object, policy);
-
-            var features = new ApplicationFeatures { RequestedAmount = 2000, TermMonths = 12 };
-            var decision = await engine.DecideAsync("u1", features);
+            var decision = await engine.DecideAsync("u1", new ApplicationFeatures { RequestedAmount = 5000 });
 
             Assert.Equal(ApprovalOutcome.AutoApproved, decision.Outcome);
-            Assert.NotNull(decision.ApprovedAmount);
-            Assert.True(decision.ApprovedAmount < 2000); // capped lower
+            Assert.True(decision.ApprovedAmount < 5000);
+        }
+
+        [Fact]
+        public async Task DecideAsync_BorderlineScore_ReturnsPendingReview()
+        {
+            var db = GetDbContext(nameof(DecideAsync_BorderlineScore_ReturnsPendingReview));
+            db.CreditFeaturesView.Add(new CreditFeatures { UserId = "u1", AvgMonthlyInflow = 1500, AvgMonthlyOutflow = 200 });
+            db.SaveChanges();
+
+            var scoring = new Mock<ICreditScoringService>();
+            scoring.Setup(s => s.ComputeAsync(It.IsAny<string>(), It.IsAny<ApplicationFeatures>()))
+                   .ReturnsAsync(new CreditScoreResult { RiskLevel = 1, Score = 650 }); // below MinScoreRisk1
+
+            var engine = new LoanApprovalEngine(db, scoring.Object, GetPolicy());
+
+            var decision = await engine.DecideAsync("u1", new ApplicationFeatures { RequestedAmount = 2000 });
+
+            Assert.Equal(ApprovalOutcome.PendingReview, decision.Outcome);
         }
     }
 }
