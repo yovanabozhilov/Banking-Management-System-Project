@@ -1,6 +1,9 @@
+using Microsoft.EntityFrameworkCore;
+
 namespace BankingManagmentApp.Models.ML
 {
-    // Мапва 1:1 към dbo.vw_CreditFeatures
+    // Мапва 1:1 към dbo.vw_CreditFeatures (VIEW)
+    [Keyless]
     public class CreditFeatures
     {
         public string  UserId            { get; set; } = string.Empty;
