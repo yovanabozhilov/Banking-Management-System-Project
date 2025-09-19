@@ -10,12 +10,8 @@
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Create">
+        <form asp-action="Create" onsubmit="return confirmPayment(this)">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            @* <div class="form-group">
-                <label asp-for="AccountsId" class="control-label"></label>
-                <select asp-for="AccountsId" class ="form-control" asp-items="ViewBag.AccountsId"></select>
-            </div> *@
             <div class="mb-3">
                 <label asp-for="TransactionType" class="form-label">Choose transaction type</label>
                 <select asp-for="TransactionType" class="form-select">
@@ -25,30 +21,18 @@
                 </select>
                 <span asp-validation-for="TransactionType" class="text-danger"></span>
             </div>
-
-
             <div class="form-group">
                 <label asp-for="Amount" class="control-label"></label>
                 <input asp-for="Amount" class="form-control" />
                 <span asp-validation-for="Amount" class="text-danger"></span>
             </div>
-           @*  <div class="form-group">
-                <label asp-for="Date" class="control-label"></label>
-                <input asp-for="Date" class="form-control" />
-                <span asp-validation-for="Date" class="text-danger"></span>
-            </div> *@
             <div class="form-group">
                 <label asp-for="Description" class="control-label"></label>
                 <input asp-for="Description" class="form-control" />
                 <span asp-validation-for="Description" class="text-danger"></span>
             </div>
-           @*  <div class="form-group">
-                <label asp-for="ReferenceNumber" class="control-label"></label>
-                <input asp-for="ReferenceNumber" class="form-control" />
-                <span asp-validation-for="ReferenceNumber" class="text-danger"></span>
-            </div> *@
             <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
+                 <button id="confirm" type="submit" class="btn btn-sm btn-primary">Create</button>
             </div>
         </form>
     </div>
@@ -57,6 +41,32 @@
 <div>
     <a asp-action="Index">Back to List</a>
 </div>
+
+<script>
+    function confirmPayment(form) {
+        event.preventDefault(); 
+        const amount = form.querySelector("input[name='Amount']").value;
+        const description = form.querySelector("input[name='Description']").value;
+        Swal.fire({
+            title: 'Transaction Confirmation',
+            html: `Do you want to confirm this transaction? <br>
+                   Amount: <b>${amount} лв.</b> <br>
+                   Description: <b>${description}</b>`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, confirm',
+            cancelButtonText: 'Cancel',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                form.submit();
+            }
+        });
+
+        return false;
+    }
+</script>
+
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}

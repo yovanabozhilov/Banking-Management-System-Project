@@ -96,8 +96,8 @@ namespace BankingManagmentApp.Controllers
             var loanIds = loans.Select(l => l.Id).ToList();
 
             var upcomingRepayments = await _db.LoanRepayments
-                .Where(r => loanIds.Contains(r.LoanId))
                 .OrderBy(r => r.DueDate)
+                .Where(r => loanIds.Contains(r.LoanId)&& (r.Status!="Paid"&&r.Status!="Credit"))
                 .Take(5)
                 .ToListAsync();
 

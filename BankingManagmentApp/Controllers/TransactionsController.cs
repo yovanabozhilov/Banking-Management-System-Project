@@ -21,15 +21,11 @@ namespace BankingManagmentApp.Controllers
             _context = context;
             _userManager = userManager;
         }
-
-        // GET: Transactions
         public async Task<IActionResult> Index()
         {
             var applicationDbContext = _context.Transactions.Include(t => t.Accounts);
             return View(await applicationDbContext.ToListAsync());
         }
-
-        // GET: Transactions/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -48,54 +44,50 @@ namespace BankingManagmentApp.Controllers
             return View(transactions);
         }
 
-        // GET: Transactions/Create
         public IActionResult Create()
         {
             ViewData["AccountsId"] = new SelectList(_context.Accounts, "Id", "Id");
             return View();
         }
 
-        // POST: Transactions/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("AccountsId,TransactionType,Amount,Date,Description,ReferenceNumber")] Transactions transactions)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-            // намираме акаунта на този потребител
             var account = await _context.Accounts
                 .Include(a => a.Customer)
-                .FirstOrDefaultAsync(a => a.Customer.Id == userId);
+                .Where(a => a.Customer.Id == userId)
+                .ToListAsync();
 
             if (account == null)
             {
-                return Unauthorized(); // ако няма акаунт за този user
+                return Unauthorized();
             }
 
 
             if (!ModelState.IsValid)
             {
-                transactions.AccountsId = account.Id;
+                var accountToUse = account.FirstOrDefault(a => a.Balance >= transactions.Amount);
 
-                // попълваме автоматично някои стойности
-                //transactions.TransactionType = "Debit";
-                //var previousMonthDate = DateTime.Now.AddMonths(-1);
-                //transactions.Date = DateOnly.FromDateTime(previousMonthDate);
+                if (accountToUse == null)
+                {
+                    TempData["InsufficientFunds"] = "You do not have enough balance in your cards! Please try again later!";
+                    return RedirectToAction("Index", "Profile");
+                }
+                else
+                {
+                    accountToUse.Balance -= transactions.Amount;
+                }
+                transactions.AccountsId = accountToUse.Id;
                 transactions.Date = DateOnly.FromDateTime(DateTime.Now);
-
-                // пример за генериране на референтен номер (може да го смениш според логиката ти)
                 transactions.ReferenceNumber = new Random().Next(10000, 99999);
                 _context.Transactions.Add(transactions);
                 await _context.SaveChangesAsync();
                 return RedirectToAction("Index", "Profile");
             }
-
-            //ViewData["AccountsId"] = new SelectList(_context.Accounts, "Id", "Id", transactions.AccountsId);
             return View("Index", "Profile");
         }
-        // GET: Transactions/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -108,13 +100,9 @@ namespace BankingManagmentApp.Controllers
             {
                 return NotFound();
             }
-            // ViewData["AccountsId"] = new SelectList(_context.Accounts, "Id", "Id", transactions.AccountsId);
             return View("Index", "Profile");
         }
 
-        // POST: Transactions/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,AccountsId,TransactionType,Amount,Date,Description,ReferenceNumber")] Transactions transactions)
@@ -148,7 +136,6 @@ namespace BankingManagmentApp.Controllers
             return View(transactions);
         }
 
-        // GET: Transactions/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -167,7 +154,6 @@ namespace BankingManagmentApp.Controllers
             return View(transactions);
         }
 
-        // POST: Transactions/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
@@ -187,17 +173,15 @@ namespace BankingManagmentApp.Controllers
             return _context.Transactions.Any(e => e.Id == id);
         }
 
-        
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Pay(int repaymentId)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            // намираме акаунта на този user
             var accounts = await _context.Accounts
-        .Where(a => a.Customer.Id == userId)
-        .ToListAsync();
+            .Where(a => a.Customer.Id == userId)
+            .ToListAsync();
 
             if (!accounts.Any())
             {
@@ -212,25 +196,20 @@ namespace BankingManagmentApp.Controllers
                 return NotFound();
             }
 
-            // проверка дали има достатъчен баланс
             var accountToUse = accounts.FirstOrDefault(a => a.Balance >= repayment.AmountDue);
 
             if (accountToUse == null)
             {
-                // няма акаунт с достатъчен баланс – показваме alert
                 TempData["InsufficientFunds"] = "You do not have enough balance in your cards! Please try again later!";
                 return RedirectToAction("Index", "Profile");
             }
             else
             {
-                // намаляме баланса
                 accountToUse.Balance -= repayment.AmountDue;
             }
-            // маркираме вноската като платена
             repayment.Status = "Paid";
             repayment.PaymentDate = DateOnly.FromDateTime(DateTime.Now);
 
-            // записваме транзакцията
             var transaction = new Transactions
             {
                 AccountsId = accountToUse.Id,
@@ -246,65 +225,10 @@ namespace BankingManagmentApp.Controllers
             _context.Update(repayment);
 
             await _context.SaveChangesAsync();
-
+            TempData["Success"] = "Success!";
             return RedirectToAction("Index", "Profile");
         }
 
 
     }
 }
-
-
-
-
-//        // GET: Transactions/Create
-//        public IActionResult Pay()
-//        {
-//            ViewData["AccountsId"] = new SelectList(_context.Accounts, "Id", "Id");
-//            return View();
-//        }
-
-//        [HttpPost]
-//        [ValidateAntiForgeryToken]
-//        public async Task<IActionResult> Pay([Bind("AccountsId,TransactionType,Amount,Date,Description,ReferenceNumber")] Transactions transactions)
-//        {
-//            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-//            // намираме акаунта на този потребител
-//            var account = await _context.Accounts
-//                .Include(a => a.Customer)
-//                .FirstOrDefaultAsync(a => a.Customer.Id == userId);
-//            LoanRepayments repay = new LoanRepayments();
-
-//            if (account == null)
-//            {
-//                return Unauthorized(); // ако няма акаунт за този user
-//            }
-
-
-//            if (!ModelState.IsValid)
-//            {
-//                if (account.Balance > repay.AmountDue)
-//                {
-//                    transactions.AccountsId = account.Id;
-//                    transactions.Date = DateOnly.FromDateTime(DateTime.Now);
-
-//                    // пример за генериране на референтен номер (може да го смениш според логиката ти)
-//                    transactions.ReferenceNumber = new Random().Next(10000, 99999);
-//                    _context.Transactions.Add(transactions);
-//                }
-//                else
-//                {
-
-//                }
-//                await _context.SaveChangesAsync();
-//                return RedirectToAction("Index", "Profile");
-//            }
-
-//            //ViewData["AccountsId"] = new SelectList(_context.Accounts, "Id", "Id", transactions.AccountsId);
-//            return View("Index", "Profile");
-//        }
-
-
-//    }
-

@@ -430,7 +430,9 @@
                                         var statusClass = statusLower == "paid" ? "bg-success"
                                             : statusLower == "overdue" ? "bg-danger"
                                             : "bg-secondary";
-                                        <tr>
+                                       
+                                            @if(r.Status!="Paid"){ 
+                                            <tr>
                                             <td class="nowrap">@r.DueDate.ToString("dd.MM.yyyy")</td>
                                             <td class="text-end text-mono">@r.AmountDue.ToString("N2", bg)</td>
                                             <td class="text-end text-mono">@r.AmountPaid.ToString("N2", bg)</td>
@@ -438,22 +440,62 @@
                                                 <span class="badge badge-tight @statusClass">@r.Status</span>
                                             </td>
                                             <td class="text-end">
-                                                <form asp-controller="Transactions" asp-action="Pay" method="post" class="m-0">
+                                               @*  <form asp-controller="Transactions" asp-action="Pay" method="post" class="m-0">
                                                     <input type="hidden" name="repaymentId" value="@r.Id" />
-                                                    <button type="submit" class="btn btn-sm btn-primary">Pay</button>
+                                                    <button id="confirm" type="submit" class="btn btn-sm btn-primary">Pay</button>
+                                                </form> *@
+                                                <form asp-controller="Transactions" asp-action="Pay" method="post" class="m-0" onsubmit="return confirmPayment(this)">
+                                                    <input type="hidden" name="repaymentId" value="@r.Id" />
+                                                    <input type="hidden" name="repaymentId" value="@r.Id" />
+                                                    <input type="hidden" name="Amount" value="@r.AmountDue" />
+                                                    <input type="hidden" name="Description" value="@r.Id" />
+                                                    <button id="confirm" type="submit" class="btn btn-sm btn-primary">Pay</button>
                                                 </form>
                                             </td>
                                         </tr>
+                                        }
                                     }
                                 </tbody>
                             </table>
                         </div>
                     }
 
+                    <script>
+                        function confirmPayment(form) {
+                            event.preventDefault();
+
+                            // взимаме Amount от скритото поле във формата
+                            const amount = form.querySelector("input[name='Amount']").value;
+                            Swal.fire({
+                                title: 'Transaction Confirmation?',
+                                text: `Do you confirm this transaction=> Amount: ${amount} lv. `,
+                                icon: 'warning',
+                                showCancelButton: true,
+                                confirmButtonText: 'Yes, confirm',
+                                cancelButtonText: 'Cancel',
+                                reverseButtons: true
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    form.submit();
+                                }
+                            });
+
+                            return false;
+                        }
+                    </script>
                     @if (TempData["InsufficientFunds"] != null)
                     {
                         <script>
-                            alert('@TempData["InsufficientFunds"]');
+                            Swal.fire({
+                                title: 'Insufficient availability',
+                                text: '@TempData["InsufficientFunds"]',
+                                icon: 'error',
+                                confirmButtonText: 'Okay',
+                                customClass: {
+                                    popup: 'rounded-4 shadow-lg',
+                                    confirmButton: 'btn btn-danger px-4 py-2'
+                                }
+                            });
                         </script>
                     }
                 </div>

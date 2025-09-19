@@ -18,6 +18,7 @@ namespace BankingManagmentApp.Data
         public DbSet<CreditFeatures> CreditFeaturesView => Set<CreditFeatures>();
         public DbSet<Feedback> Feedbacks { get; set; } = default!;
 
+
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
