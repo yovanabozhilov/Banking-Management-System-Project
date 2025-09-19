@@ -279,14 +279,12 @@ namespace BankingManagmentApp.Migrations
 
             modelBuilder.Entity("BankingManagmentApp.Models.ML.CreditFeatures", b =>
                 {
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)")
-                        .HasColumnName("UserId");
-
                     b.Property<decimal>("AvgMonthlyInflow")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("AvgMonthlyOutflow")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<double?>("LoanAgeDaysAvg")
@@ -305,45 +303,17 @@ namespace BankingManagmentApp.Migrations
                         .HasColumnType("float");
 
                     b.Property<decimal>("TotalBalance")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
-
-                    b.HasKey("UserId");
-
-                    b.ToTable((string)null, t =>
-                        {
-                            t.ExcludeFromMigrations();
-                        });
-
-                    b.ToView("vw_CreditFeatures", (string)null);
-                });
-
-            modelBuilder.Entity("BankingManagmentApp.Models.PushSubscription", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Auth")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Endpoint")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("P256DH")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UserId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("UserId");
 
-                    b.HasKey("Id");
+                    b.ToTable((string)null);
 
-                    b.ToTable("PushSubscriptions");
+                    b.ToView("vw_CreditFeatures", (string)null);
                 });
 
             modelBuilder.Entity("BankingManagmentApp.Models.Transactions", b =>
