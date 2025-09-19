@@ -234,7 +234,7 @@ namespace BankingManagmentApp.Controllers
             var transaction = new Transactions
             {
                 AccountsId = accountToUse.Id,
-                TransactionType = "Loan Repayment",
+                TransactionType = "Debit",
                 Amount = repayment.AmountDue,
                 Date = DateOnly.FromDateTime(DateTime.Now),
                 Description = $"Плащане на вноска #{repayment.Id}",

@@ -2,6 +2,7 @@
 
 using BankingManagmentApp.Data;
 using BankingManagmentApp.Models;
+using BankingManagmentApp.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -29,7 +30,7 @@ namespace BankingManagmentApp.Areas.Identity.Pages.Account
         private readonly IUserStore<Customers> _userStore;
         private readonly IUserEmailStore<Customers> _emailStore;
         private readonly ILogger<RegisterModel> _logger;
-        private readonly IEmailSender _emailSender;
+        private readonly IEmailService _emailSender;
         private readonly ApplicationDbContext _context;
 
         public RegisterModel(
@@ -37,7 +38,7 @@ namespace BankingManagmentApp.Areas.Identity.Pages.Account
             IUserStore<Customers> userStore,
             SignInManager<Customers> signInManager,
             ILogger<RegisterModel> logger,
-            IEmailSender emailSender,
+            IEmailService emailSender,
             ApplicationDbContext context)
         {
             _userManager = userManager;
@@ -55,6 +56,10 @@ namespace BankingManagmentApp.Areas.Identity.Pages.Account
         public string ReturnUrl { get; set; }
 
         public IList<AuthenticationScheme> ExternalLogins { get; set; }
+
+        [TempData]
+        public string ConfirmationMessage { get; set; }
+
 
         public class InputModel
         {
@@ -170,24 +175,23 @@ namespace BankingManagmentApp.Areas.Identity.Pages.Account
 
                     var userId = await _userManager.GetUserIdAsync(user);
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                    code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+
+                    var encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+                    //code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
                     var callbackUrl = Url.Page(
                         "/Account/ConfirmEmail",
                         pageHandler: null,
-                        values: new { area = "Identity", userId = userId, code = code, returnUrl = returnUrl },
+                        values: new { area = "Identity", userId = userId, code = encodedToken, returnUrl = returnUrl },
                         protocol: Request.Scheme);
 
-                    await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
-                        $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
-
+                    await _emailSender.SendEmailAsync(
+                    Input.Email,
+                    "Confirm your email",
+                    $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
                     if (_userManager.Options.SignIn.RequireConfirmedAccount)
                     {
-                        return RedirectToPage("RegisterConfirmation", new { email = Input.Email, returnUrl = returnUrl });
-                    }
-                    else
-                    {
-                        await _signInManager.SignInAsync(user, isPersistent: false);
-                        return LocalRedirect(returnUrl);
+                        ConfirmationMessage = "Please, check your email and confirm your registration! ";
+                        return RedirectToPage("./Register");
                     }
                 }
                 foreach (var error in result.Errors)

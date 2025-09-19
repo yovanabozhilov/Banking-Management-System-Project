@@ -72,6 +72,13 @@
 
                         <button id="registerSubmit" type="submit" class="btn btn-light w-100 btn-lg mb-3" style="color: #6a4bcf; font-weight: 500;">Register</button>
 
+                        @if (TempData["ConfirmationMessage"] != null)
+                        {
+                            <div class="alert alert-info bg-danger">
+                                @TempData["ConfirmationMessage"]
+                            </div>
+                        }
+
                         @if ((Model.ExternalLogins?.Count ?? 0) > 0)
                         {
                             <hr style="border-color: rgba(255,255,255,0.3);" />
