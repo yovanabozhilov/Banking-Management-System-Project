@@ -53,6 +53,29 @@
                     @Html.DisplayFor(model => model.Customer.LastName)
                 </dd>
             </dl>
+            @if (Model.LoanApplications != null && Model.LoanApplications.Any())
+            {
+                <hr />
+                <h5>Attached Documents</h5>
+                <ul class="list-group list-group-flush">
+                    @foreach (var doc in Model.LoanApplications)
+                    {
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            @doc.FileName
+                            <a class="btn btn-sm btn-outline-primary"
+                               asp-action="DownloadDocument"
+                               asp-route-id="@doc.Id">
+                                Download
+                            </a>
+                        </li>
+                    }
+                </ul>
+            }
+            else
+            {
+                <hr />
+                <div class="text-muted mt-2">No documents attached.</div>
+            }
         </div>
 
         <div class="card-footer d-flex justify-content-between">

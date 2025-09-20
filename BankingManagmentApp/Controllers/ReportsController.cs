@@ -82,7 +82,6 @@ namespace BankingManagmentApp.Controllers
             var fileName = $"FinancialReport_{DateTime.Now:yyyyMMdd_HHmm}.pdf";
             var emailSubject = $"Financial Report {fileName}";
             var emailBody = "Please find your requested financial report attached.";
-            // You will need to get the recipient's email address, e.g., from the current user.
             var userEmail = User.Identity?.Name;
             var doc = new FinancialReportPdf(vm);
             var bytes = doc.GeneratePdf();

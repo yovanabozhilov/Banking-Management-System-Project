@@ -1,14 +1,15 @@
-using QuestPDF.Infrastructure;
 using BankingManagmentApp.Data;
 using BankingManagmentApp.Models;
 using BankingManagmentApp.Services;
 using BankingManagmentApp.Services.Approval;
 using BankingManagmentApp.Services.Forecasting;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.AI;
 using Microsoft.Extensions.Configuration;
 using OpenAI;
+using QuestPDF.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -59,6 +60,11 @@ builder.Services.AddScoped<ILoanWorkflow, LoanWorkflow>();
 // Ако получиш build грешка за липсващи типове, просто ги изтрий.
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<LoanContractGenerator>();
+builder.Services.Configure<FormOptions>(options =>
+{
+    options.MultipartBodyLengthLimit = 10 * 1024 * 1024; // 10 MB
+});
+
 
 // OpenAI Chat Client – поддържа и двата начина за конфиг (OpenAIKey или OpenAI:ApiKey)
 builder.Services.AddChatClient(sp =>

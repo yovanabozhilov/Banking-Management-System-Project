@@ -15,6 +15,8 @@ namespace BankingManagmentApp.Data
         public DbSet<CreditAssessments> CreditAssessments { get; set; }
         public DbSet<TemplateAnswer> TemplateAnswer { get; set; }
         public DbSet<ChatHistory> ChatHistory { get; set; }
+
+        public DbSet<LoanApplication> LoanApplication { get; set; } 
         public DbSet<CreditFeatures> CreditFeaturesView => Set<CreditFeatures>();
         public DbSet<Feedback> Feedbacks { get; set; } = default!;
 
