@@ -76,10 +76,10 @@
                 <div class="mt-3 d-flex flex-wrap gap-2">
                     @{
                         var totals = Model.Accounts
-                            .GroupBy(a => a.Currency)
-                            .Select(g => new { Currency = g.Key, Sum = g.Sum(x => x.Balance) })
-                            .OrderBy(x => x.Currency)
-                            .ToList();
+                        .GroupBy(a => a.Currency)
+                        .Select(g => new { Currency = g.Key, Sum = g.Sum(x => x.Balance) })
+                        .OrderBy(x => x.Currency)
+                        .ToList();
 
                         if (totals.Any())
                         {
@@ -237,25 +237,29 @@
                     </button>
 
                     <a class="btn btn-sm btn-outline-secondary" asp-controller="Profile" asp-action="Index">Clear</a>
+                </form>
+                <form asp-controller="Reports" asp-action="Index" method="post">
+                    @Html.AntiForgeryToken()
 
                     <button type="submit" class="btn btn-sm btn-primary"
-                            formaction="@Url.Action("ExportTransactions", "Profile")">
+                            formaction="@Url.Action("ExportExcel", "Reports")">
                         Export CSV
                     </button>
 
                     <button type="submit" class="btn btn-sm btn-primary"
-                            formaction="@Url.Action("ExportTransactionsPdf", "Profile")">
+                            formaction="@Url.Action("ExportPdf", "Reports")">
                         Export PDF
                     </button>
                 </form>
+
             }
         </div>
 
         <div class="card-body p-0">
             @{
                 var txItems = Model.TransactionType?.Any() == true
-                            ? Model.TransactionType
-                            : Model.LastTransactions;
+                ? Model.TransactionType
+                : Model.LastTransactions;
             }
 
             @if (txItems == null || !txItems.Any())
@@ -345,7 +349,7 @@
                                         <tr>
                                             <td class="nowrap">@l.Type</td>
                                             <td class="text-end text-mono">
-                                                @(isApproved ? l.ApprovedAmount.ToString("N2", bg) : "-")
+                                                @(isApproved? l.ApprovedAmount.ToString("N2", bg) : "-")
                                             </td>
                                             <td>
                                                 <span class="badge badge-tight @LoanStatusBadgeClass(l.Status)">
@@ -354,7 +358,7 @@
                                             </td>
                                             <td class="nowrap">@l.Term.ToString("dd.MM.yyyy")</td>
                                             <td class="nowrap">
-                                                @(isApproved ? l.ApprovalDate.ToString("dd.MM.yyyy") : "-")
+                                                @(isApproved? l.ApprovalDate.ToString("dd.MM.yyyy") : "-")
                                             </td>
                                             <td class="text-end">
                                                 @if (isApproved)
@@ -428,31 +432,32 @@
                                     {
                                         var statusLower = r.Status?.ToLower();
                                         var statusClass = statusLower == "paid" ? "bg-success"
-                                            : statusLower == "overdue" ? "bg-danger"
-                                            : "bg-secondary";
-                                       
-                                            @if(r.Status!="Paid"){ 
+                                        : statusLower == "overdue" ? "bg-danger"
+                                        : "bg-secondary";
+
+                                        @if (r.Status != "Paid")
+                                        {
                                             <tr>
-                                            <td class="nowrap">@r.DueDate.ToString("dd.MM.yyyy")</td>
-                                            <td class="text-end text-mono">@r.AmountDue.ToString("N2", bg)</td>
-                                            <td class="text-end text-mono">@r.AmountPaid.ToString("N2", bg)</td>
-                                            <td>
-                                                <span class="badge badge-tight @statusClass">@r.Status</span>
-                                            </td>
-                                            <td class="text-end">
-                                               @*  <form asp-controller="Transactions" asp-action="Pay" method="post" class="m-0">
+                                                <td class="nowrap">@r.DueDate.ToString("dd.MM.yyyy")</td>
+                                                <td class="text-end text-mono">@r.AmountDue.ToString("N2", bg)</td>
+                                                <td class="text-end text-mono">@r.AmountPaid.ToString("N2", bg)</td>
+                                                <td>
+                                                    <span class="badge badge-tight @statusClass">@r.Status</span>
+                                                </td>
+                                                <td class="text-end">
+                                                    @*  <form asp-controller="Transactions" asp-action="Pay" method="post" class="m-0">
                                                     <input type="hidden" name="repaymentId" value="@r.Id" />
                                                     <button id="confirm" type="submit" class="btn btn-sm btn-primary">Pay</button>
                                                 </form> *@
-                                                <form asp-controller="Transactions" asp-action="Pay" method="post" class="m-0" onsubmit="return confirmPayment(this)">
-                                                    <input type="hidden" name="repaymentId" value="@r.Id" />
-                                                    <input type="hidden" name="repaymentId" value="@r.Id" />
-                                                    <input type="hidden" name="Amount" value="@r.AmountDue" />
-                                                    <input type="hidden" name="Description" value="@r.Id" />
-                                                    <button id="confirm" type="submit" class="btn btn-sm btn-primary">Pay</button>
-                                                </form>
-                                            </td>
-                                        </tr>
+                                                    <form asp-controller="Transactions" asp-action="Pay" method="post" class="m-0" onsubmit="return confirmPayment(this)">
+                                                        <input type="hidden" name="repaymentId" value="@r.Id" />
+                                                        <input type="hidden" name="repaymentId" value="@r.Id" />
+                                                        <input type="hidden" name="Amount" value="@r.AmountDue" />
+                                                        <input type="hidden" name="Description" value="@r.Id" />
+                                                        <button id="confirm" type="submit" class="btn btn-sm btn-primary">Pay</button>
+                                                    </form>
+                                                </td>
+                                            </tr>
                                         }
                                     }
                                 </tbody>
