@@ -1,4 +1,4 @@
-﻿using BankingManagmentApp.Models;
+using BankingManagmentApp.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using BankingManagmentApp.Models.ML;
@@ -17,6 +17,7 @@ namespace BankingManagmentApp.Data
         public DbSet<ChatHistory> ChatHistory { get; set; }
 
         // Използваме това име и в тестовете
+        public DbSet<LoanApplication> LoanApplication { get; set; } 
         public DbSet<CreditFeatures> CreditFeaturesView => Set<CreditFeatures>();
 
         public DbSet<Feedback> Feedbacks { get; set; } = default!;
@@ -30,7 +31,6 @@ namespace BankingManagmentApp.Data
             // ---- CreditFeatures: View в нормална БД, "таблица" с ключ в InMemory за тестове ----
             if (Database.IsInMemory())
             {
-                // За InMemory позволяваме Add/Update, за да може тестовете да seed-ват данни
                 modelBuilder.Entity<CreditFeatures>(eb =>
                 {
                     eb.HasKey(x => x.UserId);

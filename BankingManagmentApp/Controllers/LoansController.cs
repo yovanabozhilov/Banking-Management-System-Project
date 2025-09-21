@@ -43,7 +43,7 @@ namespace BankingManagmentApp.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Apply([Bind("Type,Amount,Term")] Loans loan,
-                                               [FromServices] ILoanWorkflow workflow)
+                                               [FromServices] ILoanWorkflow workflow, List<IFormFile> documents)
         {
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
@@ -64,10 +64,57 @@ namespace BankingManagmentApp.Controllers
             }
             _context.Loans.Add(loan);
             await _context.SaveChangesAsync();
+            var allowedExtensions = new[] { ".pdf", ".jpg", ".jpeg", ".png" };
+            const long maxFileSize = 10 * 1024 * 1024; // 10 MB
+
+            foreach (var file in documents)
+            {
+                if (file == null || file.Length == 0) continue;
+
+                var extension = Path.GetExtension(file.FileName).ToLower();
+                if (!allowedExtensions.Contains(extension))
+                {
+                    ModelState.AddModelError("documents", $"File {file.FileName} has unsupported format.");
+                    continue;
+                }
+
+                if (file.Length > maxFileSize)
+                {
+                    ModelState.AddModelError("documents", $"File {file.FileName} exceeds 10 MB limit.");
+                    continue;
+                }
+                if (documents.Count > 5)
+                {
+                    ModelState.AddModelError("documents", "You can upload a maximum of 5 files.");
+                }
+
+                using var ms = new MemoryStream();
+                await file.CopyToAsync(ms);
+
+                var doc = new LoanApplication
+                {
+                    LoanId = loan.Id,
+                    FileName = file.FileName,
+                    ContentType = file.ContentType,
+                    Data = ms.ToArray(),
+                    UploadedAt = DateTime.UtcNow
+                };
+
+                _context.LoanApplication.Add(doc);
+            }
+
+            await _context.SaveChangesAsync();
 
             await workflow.ProcessNewApplicationAsync(loan);
-
             return RedirectToAction("Index", "Profile");
+        }
+        public async Task<IActionResult> DownloadDocument(int id)
+        {
+            var doc = await _context.LoanApplication.FindAsync(id);
+            if (doc == null)
+                return NotFound();
+
+            return File(doc.Data, doc.ContentType, doc.FileName);
         }
 
         // GET: Loans/MyLoans (списък на моите кредити)
@@ -163,6 +210,11 @@ namespace BankingManagmentApp.Controllers
 
             if (!User.IsInRole("Admin") && loan.CustomerId != _userManager.GetUserId(User))
                 return Forbid();
+
+            var loanApplication = await _context.Loans
+        .Include(l => l.Customer)
+        .Include(l => l.LoanApplications)
+        .FirstOrDefaultAsync(m => m.Id == id);
 
             ViewBag.Repayments = await _context.LoanRepayments
                 .Where(r => r.LoanId == loan.Id)

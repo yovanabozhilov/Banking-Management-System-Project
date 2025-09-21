@@ -1,4 +1,4 @@
-﻿﻿using BankingManagmentApp.Models;
+using BankingManagmentApp.Models;
 using BankingManagmentApp.Services;
 using MailKit.Net.Smtp;
 using Microsoft.Extensions.Configuration;

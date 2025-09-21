@@ -16,7 +16,9 @@ namespace BankingManagmentApp.Models
         public Customers Customer { get; set; }
         public ICollection<LoanRepayments> LoanRepayments { get; set; } = new List<LoanRepayments>();
         public ICollection<CreditAssessments> CreditAssessments { get; set; } = new List<CreditAssessments>();
-        
+
+        public ICollection<LoanApplication> LoanApplications { get; set; } = new List<LoanApplication>();
+
         [NotMapped]
         public bool IsRisky { get; set; }
     }

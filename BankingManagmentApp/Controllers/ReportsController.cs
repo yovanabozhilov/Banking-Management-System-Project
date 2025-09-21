@@ -11,6 +11,7 @@ using BankingManagmentApp.Services.Pdf;
 using BankingManagmentApp.Services.Excel;
 using QuestPDF.Fluent;
 using QuestPDF.Infrastructure;
+using BankingManagmentApp.Services;
 
 namespace BankingManagmentApp.Controllers
 {
@@ -18,10 +19,12 @@ namespace BankingManagmentApp.Controllers
     public class ReportsController : Controller
     {
         private readonly ApplicationDbContext _db;
+        private readonly IEmailService _emailService;
 
-        public ReportsController(ApplicationDbContext db)
+        public ReportsController(ApplicationDbContext db, IEmailService emailService)
         {
             _db = db;
+            _emailService = emailService;
         }
 
         [HttpGet]
@@ -76,9 +79,16 @@ namespace BankingManagmentApp.Controllers
             await PopulateAccountsSelect(filters);
             var vm = await BuildReport(filters);
 
-            var doc = new FinancialReportPdf(vm);
-            var bytes = doc.GeneratePdf(); // остава както е при теб
             var fileName = $"FinancialReport_{DateTime.Now:yyyyMMdd_HHmm}.pdf";
+            var emailSubject = $"Financial Report {fileName}";
+            var emailBody = "Please find your requested financial report attached.";
+            var userEmail = User.Identity?.Name;
+            var doc = new FinancialReportPdf(vm);
+            var bytes = doc.GeneratePdf();
+            if (!string.IsNullOrEmpty(userEmail))
+            {
+                await _emailService.SendEmailWithAttachmentAsync(userEmail, emailSubject, emailBody, bytes, fileName);
+            }
             return File(bytes, "application/pdf", fileName);
         }
 
@@ -90,8 +100,19 @@ namespace BankingManagmentApp.Controllers
             await PopulateAccountsSelect(filters);
             var vm = await BuildReport(filters);
 
-            var bytes = FinancialReportExcel.Build(vm);
             var fileName = $"FinancialReport_{DateTime.Now:yyyyMMdd_HHmm}.xlsx";
+
+            // Send the Excel file via email
+            var emailSubject = $"Financial Report {fileName}";
+            var emailBody = "Please find your requested financial report attached.";
+            // Get the recipient's email address
+            var userEmail = User.Identity?.Name;
+            var bytes = FinancialReportExcel.Build(vm);
+            //var fileName = $"FinancialReport_{DateTime.Now:yyyyMMdd_HHmm}.xlsx";
+            if (!string.IsNullOrEmpty(userEmail))
+            {
+                await _emailService.SendEmailWithAttachmentAsync(userEmail, emailSubject, emailBody, bytes, fileName);
+            }
             return File(bytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
         }
 

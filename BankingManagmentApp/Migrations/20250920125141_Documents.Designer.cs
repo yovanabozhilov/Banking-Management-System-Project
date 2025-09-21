@@ -4,6 +4,7 @@ using BankingManagmentApp.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BankingManagmentApp.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250920125141_Documents")]
+    partial class Documents
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -229,7 +232,8 @@ namespace BankingManagmentApp.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("LoanId");
+                    b.HasIndex("LoanId")
+                        .IsUnique();
 
                     b.ToTable("LoanApplication");
                 });
@@ -602,8 +606,8 @@ namespace BankingManagmentApp.Migrations
             modelBuilder.Entity("BankingManagmentApp.Models.LoanApplication", b =>
                 {
                     b.HasOne("BankingManagmentApp.Models.Loans", "Loan")
-                        .WithMany("LoanApplications")
-                        .HasForeignKey("LoanId")
+                        .WithOne("LoanApplication")
+                        .HasForeignKey("BankingManagmentApp.Models.LoanApplication", "LoanId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -721,7 +725,8 @@ namespace BankingManagmentApp.Migrations
                 {
                     b.Navigation("CreditAssessments");
 
-                    b.Navigation("LoanApplications");
+                    b.Navigation("LoanApplication")
+                        .IsRequired();
 
                     b.Navigation("LoanRepayments");
                 });
