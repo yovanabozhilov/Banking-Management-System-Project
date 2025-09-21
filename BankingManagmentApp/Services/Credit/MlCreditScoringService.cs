@@ -99,10 +99,14 @@ namespace BankingManagmentApp.Services
         {
             await TrainIfNeededAsync();
 
+            // НОВО: ако няма никакви данни за този user -> null
+            if (!await HasAnyUserDataAsync(userId))
+                return null;
+
             // Жив snapshot от текущото състояние в БД
             var snap = await GetLiveSnapshotAsync(userId);
 
-            // Изграждаме ML ред от живите данни (без да чакаме претрениране)
+            // Изграждаме ML ред от живите данни
             var row = new MlRow
             {
                 UserId            = userId,
@@ -117,10 +121,11 @@ namespace BankingManagmentApp.Services
             };
             Sanitize(row);
 
-            // Ако моделът още липсва – хевристичен fallback (пак с live данни)
+            // Ако моделът липсва – heuristic fallback
             if (_model is null || _clusterToRisk is null || _clusterToRisk.Count == 0)
                 return HeuristicFallback(row, snap);
 
+            // Има модел -> предикт + Cluster в бележките
             var engine  = _ml.Model.CreatePredictionEngine<MlRow, MlPrediction>(_model);
             var pred    = engine.Predict(row);
             var cluster = (int)pred.PredictedClusterId;
@@ -143,6 +148,7 @@ namespace BankingManagmentApp.Services
             var net = snap.AvgMonthlyInflow - snap.AvgMonthlyOutflow;
 
             var notes =
+                $"Cluster: {cluster}. " +  // НОВО: винаги показваме клъстера при ML модел
                 $"Risk: {riskLabel}. " +
                 $"You have {snap.NumLoans} loan{(snap.NumLoans == 1 ? "" : "s")} and {snap.NumAccounts} account{(snap.NumAccounts == 1 ? "" : "s")}. " +
                 $"On-time payments: {snap.OnTimeRatio.ToString("P0", inv)}, overdue: {snap.OverdueRatio.ToString("P0", inv)}. " +
@@ -516,6 +522,25 @@ namespace BankingManagmentApp.Services
                 RiskLevel = risk,
                 Notes     = notes
             };
+        }
+
+        // НОВО: проверка дали user има каквито и да е данни
+        private async Task<bool> HasAnyUserDataAsync(string userId, int lookbackDays = 90)
+        {
+            if (await _db.Accounts.AnyAsync(a => a.CustomerId == userId)) return true;
+            if (await _db.Loans.AnyAsync(l => l.CustomerId == userId)) return true;
+
+            var since = DateOnly.FromDateTime(DateTime.UtcNow.Date.AddDays(-lookbackDays));
+            if (await _db.Transactions
+                    .Include(t => t.Accounts)
+                    .AnyAsync(t => t.Accounts != null &&
+                                   t.Accounts.CustomerId == userId &&
+                                   t.Date >= since)) return true;
+
+            // ако имаш материализиран ред и във vw_CreditFeatures
+            if (await _db.Set<CreditFeatures>().AnyAsync(cf => cf.UserId == userId)) return true;
+
+            return false;
         }
     }
 }
