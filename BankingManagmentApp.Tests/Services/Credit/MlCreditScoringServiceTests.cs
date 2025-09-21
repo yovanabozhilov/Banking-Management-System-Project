@@ -20,15 +20,12 @@ namespace BankingManagmentApp.Tests.Services
 
         public MlCreditScoringServiceTests()
         {
-            // temporary test folder for ML artifacts
             _tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
             Directory.CreateDirectory(_tempDir);
 
-            // fake IWebHostEnvironment
             var env = new Mock<IWebHostEnvironment>();
             env.SetupGet(e => e.ContentRootPath).Returns(_tempDir);
 
-            // InMemory EF DbContext
             var opts = new DbContextOptionsBuilder<ApplicationDbContext>()
                 .UseInMemoryDatabase(Guid.NewGuid().ToString())
                 .Options;
@@ -40,53 +37,52 @@ namespace BankingManagmentApp.Tests.Services
         [Fact]
         public async Task ComputeAsync_NoUser_ReturnsNull()
         {
-            var result = await _service.ComputeAsync("missing");
+            var result = await _service.ComputeAsync("missing-user");
             Assert.Null(result);
         }
 
         [Fact]
-        public async Task ComputeAsync_UserWithFeatures_ReturnsClusterNotes()
+        public async Task ComputeAsync_UserWithFeatures_ReturnsRiskNotes()
         {
-            _db.CreditFeaturesView.Add(new CreditFeatures
+            _db.Set<CreditFeatures>().Add(new CreditFeatures
             {
                 UserId = "u1",
                 NumLoans = 0,
                 NumAccounts = 2,
                 OnTimeRatio = 0.9,
                 OverdueRatio = 0.0,
-                TotalBalance = 5000,
-                AvgMonthlyInflow = 2000,
-                AvgMonthlyOutflow = 1000
+                TotalBalance = 5000m,
+                AvgMonthlyInflow = 2000m,
+                AvgMonthlyOutflow = 1000m
             });
-            _db.SaveChanges();
+            await _db.SaveChangesAsync();
 
             var result = await _service.ComputeAsync("u1");
 
             Assert.NotNull(result);
             Assert.InRange(result!.Score, 300, 850);
-            // Service is producing "Cluster: ..." notes instead of heuristic fallback
-            Assert.Contains("Cluster:", result.Notes);
+            Assert.Contains("Risk:", result.Notes);
         }
 
         [Fact]
         public async Task ComputeAsync_WithApplication_AdjustsScore()
         {
-            _db.CreditFeaturesView.Add(new CreditFeatures
+            _db.Set<CreditFeatures>().Add(new CreditFeatures
             {
                 UserId = "u2",
                 NumLoans = 1,
                 NumAccounts = 1,
                 OnTimeRatio = 0.8,
                 OverdueRatio = 0.1,
-                TotalBalance = 3000,
-                AvgMonthlyInflow = 2500,
-                AvgMonthlyOutflow = 2000
+                TotalBalance = 3000m,
+                AvgMonthlyInflow = 2500m,
+                AvgMonthlyOutflow = 2000m
             });
-            _db.SaveChanges();
+            await _db.SaveChangesAsync();
 
             var app = new ApplicationFeatures
             {
-                RequestedAmount = 12000,
+                RequestedAmount = 12000m,
                 TermMonths = 36,
                 Product = ProductType.Auto
             };
@@ -101,22 +97,21 @@ namespace BankingManagmentApp.Tests.Services
         [Fact]
         public async Task TrainIfNeededAsync_TrainsModel_WhenNoArtifacts()
         {
-            _db.CreditFeaturesView.Add(new CreditFeatures
+            _db.Set<CreditFeatures>().Add(new CreditFeatures
             {
                 UserId = "u3",
                 NumLoans = 1,
                 NumAccounts = 2,
                 OnTimeRatio = 0.9,
                 OverdueRatio = 0.05,
-                TotalBalance = 10000,
-                AvgMonthlyInflow = 3000,
-                AvgMonthlyOutflow = 1000
+                TotalBalance = 10000m,
+                AvgMonthlyInflow = 3000m,
+                AvgMonthlyOutflow = 1000m
             });
-            _db.SaveChanges();
+            await _db.SaveChangesAsync();
 
             await _service.TrainIfNeededAsync();
 
-            // model artifacts should exist
             Assert.True(File.Exists(Path.Combine(_tempDir, "App_Data", "ML", "credit_kmeans.zip")));
             Assert.True(File.Exists(Path.Combine(_tempDir, "App_Data", "ML", "cluster_map.json")));
         }
@@ -124,19 +119,18 @@ namespace BankingManagmentApp.Tests.Services
         [Fact]
         public async Task ForceTrainAsync_AlwaysRetrains_WhenDataExists()
         {
-            // Ensure there is training data
-            _db.CreditFeaturesView.Add(new CreditFeatures
+            _db.Set<CreditFeatures>().Add(new CreditFeatures
             {
                 UserId = "uForce",
                 NumLoans = 1,
                 NumAccounts = 2,
                 OnTimeRatio = 0.95,
                 OverdueRatio = 0.05,
-                TotalBalance = 8000,
-                AvgMonthlyInflow = 3000,
-                AvgMonthlyOutflow = 1200
+                TotalBalance = 8000m,
+                AvgMonthlyInflow = 3000m,
+                AvgMonthlyOutflow = 1200m
             });
-            _db.SaveChanges();
+            await _db.SaveChangesAsync();
 
             await _service.ForceTrainAsync();
 

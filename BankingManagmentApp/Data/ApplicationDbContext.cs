@@ -1,4 +1,4 @@
-﻿using BankingManagmentApp.Models;
+using BankingManagmentApp.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using BankingManagmentApp.Models.ML;
@@ -16,8 +16,10 @@ namespace BankingManagmentApp.Data
         public DbSet<TemplateAnswer> TemplateAnswer { get; set; }
         public DbSet<ChatHistory> ChatHistory { get; set; }
 
+        // Използваме това име и в тестовете
         public DbSet<LoanApplication> LoanApplication { get; set; } 
         public DbSet<CreditFeatures> CreditFeaturesView => Set<CreditFeatures>();
+
         public DbSet<Feedback> Feedbacks { get; set; } = default!;
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
@@ -26,27 +28,34 @@ namespace BankingManagmentApp.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            // ---- vw_CreditFeatures -> keyless VIEW mapping ----
-            modelBuilder.Entity<CreditFeatures>(eb =>
+            // ---- CreditFeatures: View в нормална БД, "таблица" с ключ в InMemory за тестове ----
+            if (Database.IsInMemory())
             {
-                eb.HasNoKey();                  // keyless, защото е VIEW
-                eb.ToView("vw_CreditFeatures"); // ИМЕТО на изгледа в SQL (dbo.vw_CreditFeatures)
+                modelBuilder.Entity<CreditFeatures>(eb =>
+                {
+                    eb.HasKey(x => x.UserId);
+                    eb.ToTable("CreditFeatures"); // логическа таблица за InMemory provider
+                    eb.Property(p => p.TotalBalance).HasColumnType("decimal(18,2)");
+                    eb.Property(p => p.AvgMonthlyInflow).HasColumnType("decimal(18,2)");
+                    eb.Property(p => p.AvgMonthlyOutflow).HasColumnType("decimal(18,2)");
+                });
+            }
+            else
+            {
+                // В реалната БД това е VIEW
+                modelBuilder.Entity<CreditFeatures>(eb =>
+                {
+                    eb.HasNoKey();
+                    eb.ToView("vw_CreditFeatures");
+                    eb.Metadata.SetIsTableExcludedFromMigrations(true);
+                    eb.Property(p => p.UserId).HasColumnName("UserId");
+                    eb.Property(p => p.TotalBalance).HasColumnType("decimal(18,2)");
+                    eb.Property(p => p.AvgMonthlyInflow).HasColumnType("decimal(18,2)");
+                    eb.Property(p => p.AvgMonthlyOutflow).HasColumnType("decimal(18,2)");
+                });
+            }
 
-                // ВАЖНО: това НЕ трябва да присъства (чупи миграциите):
-                // eb.Metadata.SetIsTableExcludedFromMigrations(true);
-
-                eb.Property(p => p.UserId).HasColumnName("UserId");
-
-                // Decimal precision за избягване на EF Core warning-и
-                eb.Property(p => p.AvgMonthlyInflow).HasPrecision(18, 2);
-                eb.Property(p => p.AvgMonthlyOutflow).HasPrecision(18, 2);
-                eb.Property(p => p.TotalBalance).HasPrecision(18, 2);
-            });
-
-            // НЕ слагай HasKey върху CreditFeatures (то е VIEW, keyless)
-            // modelBuilder.Entity<CreditFeatures>().HasKey(x => x.UserId); // <-- махнато
-
-            // ---- Decimal конфигурации за останалите ентитети ----
+            // ---- Precision за парични полета ----
             modelBuilder.Entity<Accounts>().Property(p => p.Balance).HasColumnType("decimal(18,2)");
             modelBuilder.Entity<Loans>().Property(p => p.Amount).HasColumnType("decimal(18,2)");
             modelBuilder.Entity<Loans>().Property(p => p.ApprovedAmount).HasColumnType("decimal(18,2)");
@@ -54,7 +63,7 @@ namespace BankingManagmentApp.Data
             modelBuilder.Entity<LoanRepayments>().Property(p => p.AmountPaid).HasColumnType("decimal(18,2)");
             modelBuilder.Entity<Transactions>().Property(p => p.Amount).HasColumnType("decimal(18,2)");
 
-            // ---- TemplateAnswer constraints ----
+            // ---- TemplateAnswer ----
             modelBuilder.Entity<TemplateAnswer>()
                 .Property(t => t.Keyword).IsRequired();
 
