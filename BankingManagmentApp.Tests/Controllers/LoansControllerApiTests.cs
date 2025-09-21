@@ -1,14 +1,15 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using BankingManagmentApp.Controllers;
 using BankingManagmentApp.Models;
 using BankingManagmentApp.Services;
 using BankingManagmentApp.Services.Approval;
 using FluentAssertions;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace BankingManagmentApp.Tests.Controllers
@@ -102,7 +103,7 @@ namespace BankingManagmentApp.Tests.Controllers
             var sut = new LoansController(ctx, userManager, email, loanContractGenerator: null!);
             CtxHelper.AttachUser(sut, new System.Security.Claims.ClaimsPrincipal(new System.Security.Claims.ClaimsIdentity()));
 
-            var result = await sut.Apply(new Loans { Type = "Personal", Amount = 1000, Term = default }, new LoansFakeWorkflow());
+            var result = await sut.Apply(new Loans { Type = "Personal", Amount = 1000, Term = default }, new LoansFakeWorkflow(),null!);
             result.Should().BeOfType<ChallengeResult>();
         }
 
@@ -128,7 +129,7 @@ namespace BankingManagmentApp.Tests.Controllers
             sut.ModelState.AddModelError("x", "invalid");
 
             var loan = new Loans { Type = "Personal", Amount = 2500, Term = default };
-            var res = await sut.Apply(loan, workflow) as RedirectToActionResult;
+            var res = await sut.Apply(loan, workflow, new List<IFormFile>()) as RedirectToActionResult;
 
             res.Should().NotBeNull();
             res!.ControllerName.Should().Be("Profile");
@@ -280,7 +281,11 @@ namespace BankingManagmentApp.Tests.Controllers
                 ApprovalDate = DateTime.UtcNow
             };
 
-            var res = await sut.Create(dto) as RedirectToActionResult;
+            var workflow = new LoansFakeWorkflow(); // your simple fake workflow
+            var documents = new List<IFormFile>();  // empty list if no files are needed in the test
+
+            var res = await sut.Create(dto, workflow, documents)
+                      as RedirectToActionResult;
             res.Should().NotBeNull();
             res!.ActionName.Should().Be(nameof(LoansController.Index));
 

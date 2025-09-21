@@ -65,17 +65,25 @@ namespace BankingManagmentApp.Controllers
                 return Unauthorized();
             }
 
-
+            var accountToUse = account.FirstOrDefault();
             if (!ModelState.IsValid)
             {
-                var accountToUse = account.FirstOrDefault(a => a.Balance >= transactions.Amount);
+                if (transactions.TransactionType != "Credit")
+                {
+                    accountToUse = account.FirstOrDefault(a => a.Balance >= transactions.Amount);
+                }
+                else
+                {
+                    accountToUse = account.FirstOrDefault();
+                    accountToUse.Balance += transactions.Amount;
+                }
 
-                if (accountToUse == null)
+                if (accountToUse == null && transactions.TransactionType != "Credit")
                 {
                     TempData["InsufficientFunds"] = "You do not have enough balance in your cards! Please try again later!";
                     return RedirectToAction("Index", "Profile");
                 }
-                else
+                else if (accountToUse != null && transactions.TransactionType != "Credit")
                 {
                     accountToUse.Balance -= transactions.Amount;
                 }

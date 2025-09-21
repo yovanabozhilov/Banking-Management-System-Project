@@ -238,19 +238,22 @@
 
                     <a class="btn btn-sm btn-outline-secondary" asp-controller="Profile" asp-action="Index">Clear</a>
                 </form>
-                <form asp-controller="Reports" asp-action="Index" method="post">
-                    @Html.AntiForgeryToken()
+                @if (User.IsInRole("Admin"))
+                {
+                    <form asp-controller="Reports" asp-action="Index" method="post">
+                        @Html.AntiForgeryToken()
 
-                    <button type="submit" class="btn btn-sm btn-primary"
-                            formaction="@Url.Action("ExportExcel", "Reports")">
-                        Export CSV
-                    </button>
+                        <button type="submit" class="btn btn-sm btn-primary"
+                                formaction="@Url.Action("ExportExcel", "Reports")">
+                            Export CSV
+                        </button>
 
-                    <button type="submit" class="btn btn-sm btn-primary"
-                            formaction="@Url.Action("ExportPdf", "Reports")">
-                        Export PDF
-                    </button>
-                </form>
+                        <button type="submit" class="btn btn-sm btn-primary"
+                                formaction="@Url.Action("ExportPdf", "Reports")">
+                            Export PDF
+                        </button>
+                    </form>
+                }
 
             }
         </div>
@@ -394,7 +397,7 @@
                 }
 
                 <div class="text-nowrap p-2">
-                    <a class="btn btn-outline-primary btn-sm" asp-area="" asp-controller="Loans" asp-action="Apply">
+                    <a class="btn btn-outline-primary btn-sm" asp-area="" asp-controller="Loans" asp-action="Create">
                         Apply for credit
                     </a>
                 </div>

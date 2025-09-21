@@ -43,7 +43,7 @@ namespace BankingManagmentApp.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Apply([Bind("Type,Amount,Term")] Loans loan,
-                                               [FromServices] ILoanWorkflow workflow, List<IFormFile> documents)
+                                              [FromServices] ILoanWorkflow workflow, List<IFormFile> documents)
         {
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
@@ -229,7 +229,7 @@ namespace BankingManagmentApp.Controllers
 
 
         // GET: Loans/Create (админ създава ръчно)
-        [Authorize(Roles = "Admin")]
+        // [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
             ViewData["CustomerId"] = new SelectList(_context.Customers, "Id", "Email");
@@ -239,18 +239,72 @@ namespace BankingManagmentApp.Controllers
         // POST: Loans/Create (админ създава ръчно)
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Create([Bind("Id,CustomerId,Type,Amount,Term,Date,Status,ApprovedAmount,ApprovalDate")] Loans loans)
+        // [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> Create([Bind("Type,Amount,Term")] Loans loan,
+                                              [FromServices] ILoanWorkflow workflow, List<IFormFile> documents)
         {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+                return Challenge();
+
             if (!ModelState.IsValid)
             {
-                ViewData["CustomerId"] = new SelectList(_context.Customers, "Id", "Email", loans.CustomerId);
-                return View(loans);
+                // return View(loan);
+                loan.CustomerId = user.Id;
+                loan.Status = "Pending ";
+                loan.Date = DateTime.UtcNow;
+
+
+                if (loan.Term == default)
+                    loan.Term = DateOnly.FromDateTime(DateTime.Today.AddMonths(12));
+
+
+            }
+            _context.Loans.Add(loan);
+            await _context.SaveChangesAsync();
+            var allowedExtensions = new[] { ".pdf", ".jpg", ".jpeg", ".png" };
+            const long maxFileSize = 10 * 1024 * 1024; // 10 MB
+
+            foreach (var file in documents)
+            {
+                if (file == null || file.Length == 0) continue;
+
+                var extension = Path.GetExtension(file.FileName).ToLower();
+                if (!allowedExtensions.Contains(extension))
+                {
+                    ModelState.AddModelError("documents", $"File {file.FileName} has unsupported format.");
+                    continue;
+                }
+
+                if (file.Length > maxFileSize)
+                {
+                    ModelState.AddModelError("documents", $"File {file.FileName} exceeds 10 MB limit.");
+                    continue;
+                }
+                if (documents.Count > 5)
+                {
+                    ModelState.AddModelError("documents", "You can upload a maximum of 5 files.");
+                }
+
+                using var ms = new MemoryStream();
+                await file.CopyToAsync(ms);
+
+                var doc = new LoanApplication
+                {
+                    LoanId = loan.Id,
+                    FileName = file.FileName,
+                    ContentType = file.ContentType,
+                    Data = ms.ToArray(),
+                    UploadedAt = DateTime.UtcNow
+                };
+
+                _context.LoanApplication.Add(doc);
             }
 
-            _context.Add(loans);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+
+            await workflow.ProcessNewApplicationAsync(loan);
+            return RedirectToAction("Index", "Profile");
         }
 
         // GET: Loans/Edit/5

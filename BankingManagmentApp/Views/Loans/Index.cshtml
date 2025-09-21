@@ -12,10 +12,10 @@
         var st = s?.ToLower();
         return st switch
         {
-            "approved" or "autoapproved"  => "bg-success",
-            "pending"  or "pendingreview" => "bg-warning text-dark",
-            "declined" or "autodeclined"  => "bg-danger",
-            _                              => "bg-secondary"
+            "approved" or "autoapproved" => "bg-success",
+            "pending" or "pendingreview" => "bg-warning text-dark",
+            "declined" or "autodeclined" => "bg-danger",
+            _ => "bg-secondary"
         };
     }
 }
@@ -64,9 +64,12 @@
                                         <span class="badge @LoanStatusBadgeClass(item.Status)">
                                             @item.Status
                                         </span>
-                                        @if (item.IsRisky)
+                                        @if (User.IsInRole("Admin"))
                                         {
-                                            <span class="text-danger ms-2">⚠ Рисков клиент</span>
+                                            @if (item.IsRisky)
+                                            {
+                                                <span class="text-danger ms-2">⚠ Рисков клиент</span>
+                                            }
                                         }
                                     </td>
                                     <td class="text-end">@(item.Status.ToLower().Contains("approved") ? item.ApprovedAmount.ToString("N2", bg) : "-")</td>

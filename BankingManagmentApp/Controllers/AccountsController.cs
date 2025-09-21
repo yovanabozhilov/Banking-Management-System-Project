@@ -47,7 +47,18 @@ namespace BankingManagmentApp.Controllers
 
             return View(accounts);
         }
+        private string GenerateIBAN()
+        {
+            string countryCode = "BG";
+            Random rnd = new Random();
+            string checkDigits = rnd.Next(10, 99).ToString();
 
+            string bankCode = "XXXX";
+
+            string accountNumber = DateTime.Now.Ticks.ToString().Substring(0, 10);
+
+            return $"{countryCode}{checkDigits}{bankCode}{accountNumber}";
+        }
         // GET: Accounts/Create
         public IActionResult Create()
         {
@@ -66,7 +77,7 @@ namespace BankingManagmentApp.Controllers
             if (!ModelState.IsValid)
             {
                 accounts.CustomerId = user.Id;
-                accounts.IBAN = " ";
+                accounts.IBAN =GenerateIBAN();
                 accounts.AccountType = "User";
                 accounts.Balance = 0;
                 accounts.Currency = "BGN";
@@ -166,7 +177,7 @@ namespace BankingManagmentApp.Controllers
             }
 
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction("Index","Profile");
         }
 
         private bool AccountsExists(int id)

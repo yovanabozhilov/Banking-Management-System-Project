@@ -15,10 +15,9 @@
                 <h5 class="mb-3 text-muted text-center">Loan Details</h5>
                 <hr />
 
-                <form asp-action="Apply" method="post">
+                <form asp-action="Apply" method="post" enctype="multipart/form-data">
                     @Html.AntiForgeryToken()
                     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-
                     <div class="mb-3">
                         <label asp-for="Type" class="form-label">Choose loan type</label>
                         <select asp-for="Type" class="form-select">
@@ -31,18 +30,18 @@
                         </select>
                         <span asp-validation-for="Type" class="text-danger"></span>
                     </div>
-
                     <div class="mb-3">
                         <label asp-for="Amount" class="form-label">Amount</label>
                         <input asp-for="Amount" class="form-control" />
                         <span asp-validation-for="Amount" class="text-danger"></span>
                     </div>
-
-                    @* <div class="mb-3">
-                        <label asp-for="Term" class="form-label"></label>
-                        <input asp-for="Term" class="form-control" />
-                        <span asp-validation-for="Term" class="text-danger"></span>
-                    </div> *@
+                    <div class="mb-3">
+                        <label>Upload Documents (PDF, JPG, PNG; max 10 MB each)</label><br />
+                        <small class="text-muted">Upload ID, salary proof, bank statements.</small>
+                        <input type="file" name="documents" multiple
+                               accept=".pdf,.jpg,.jpeg,.png"
+                               class="form-control" />
+                    </div>
 
                     <div class="d-grid">
                         <button type="submit" class="btn btn-primary btn-lg">Apply</button>
