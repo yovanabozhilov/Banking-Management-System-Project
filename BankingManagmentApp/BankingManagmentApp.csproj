@@ -46,4 +46,12 @@
 		<PackageReference Include="Microsoft.ML" Version="3.*" />
 	</ItemGroup>
 
+	<ItemGroup>
+		<InternalsVisibleTo Include="BankingManagmentApp.Tests" />
+	</ItemGroup>
+
+	<ItemGroup>
+  		<PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="8.0.4" />
+	</ItemGroup>
+
 </Project>
