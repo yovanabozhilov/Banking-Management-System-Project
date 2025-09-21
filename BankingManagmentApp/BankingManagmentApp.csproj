@@ -46,9 +46,4 @@
 		<PackageReference Include="Microsoft.ML" Version="3.*" />
 	</ItemGroup>
 
-	<ItemGroup>
-		<PackageReference Include="MailKit" Version="4.13.0" />
-		<PackageReference Include="MimeKit" Version="4.13.0" />
-	</ItemGroup>
-
 </Project>
