@@ -6,6 +6,15 @@
     var bg = CultureInfo.GetCultureInfo("bg-BG");
 }
 
+@section Head {
+  <link rel="stylesheet" href="~/css/loans.css" asp-append-version="true" />
+}
+
+@{
+    // apply the purple→white gradient (same approach as Apply page)
+    ViewData["BodyClass"] = "loans-full-bg";
+}
+
 @functions {
     string LoanStatusBadgeClass(string? s)
     {
@@ -20,77 +29,114 @@
     }
 }
 
-<div class="container mt-5">
-    <div class="card shadow-lg border-0">
-        <div class="card-header d-flex justify-content-between align-items-center bg-primary text-white">
-            <h3 class="mb-0">Loans</h3>
-            <a asp-action="Create" class="btn btn-light btn-sm">+ Create New</a>
-        </div>
+<div class="loan-page">
+  <div class="container-xxl">
+    <div class="row justify-content-center">
+      <div class="col-12 col-xxl-10">
 
-        <div class="card-body p-0">
+        <div class="card loan-list-card shadow-lg border-0">
+          <!-- Header -->
+          <div class="loan-list-header d-flex flex-wrap justify-content-between align-items-center">
+            <div class="d-flex align-items-center gap-3">
+              <div class="loan-badge">
+                <i class="fa-solid fa-sack-dollar"></i>
+              </div>
+              <div>
+                <h3 class="mb-0">Loans</h3>
+                <small class="opacity-75">Overview of all loan applications</small>
+              </div>
+            </div>
+
+            <div class="text-nowrap mt-3 mt-md-0">
+              <a asp-action="Create" class="btn btn-light btn-lg">
+                <i class="fa-solid fa-plus me-2"></i>Create new
+              </a>
+            </div>
+          </div>
+
+          <!-- Body -->
+          <div class="card-body p-0">
             @if (!Model.Any())
             {
-                <div class="p-4 text-muted text-center">No loans found.</div>
+                <div class="p-4 text-center text-muted">
+                    No loans found.
+                </div>
             }
             else
             {
                 <div class="table-responsive">
-                    <table class="table table-hover table-striped align-middle mb-0">
-                        <thead class="table-light">
-                            <tr>
-                                <th>@Html.DisplayNameFor(model => model.Type)</th>
-                                <th class="text-end">@Html.DisplayNameFor(model => model.Amount)</th>
-                                <th>@Html.DisplayNameFor(model => model.Term)</th>
-                                <th>@Html.DisplayNameFor(model => model.Date)</th>
-                                <th>@Html.DisplayNameFor(model => model.Status)</th>
-                                <th class="text-end">@Html.DisplayNameFor(model => model.ApprovedAmount)</th>
-                                <th>@Html.DisplayNameFor(model => model.ApprovalDate)</th>
-                                <th>@Html.DisplayNameFor(model => model.Customer)</th>
-                                <th class="text-center">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var item in Model)
-                            {
-                                var st = item.Status?.ToLower();
-                                var isApproved = st == "approved" || st == "autoapproved";
+                  <table class="table table-hover table-striped align-middle mb-0 table-compact">
+                    <thead class="table-light sticky-top">
+                      <tr>
+                        <th>Type</th>
+                        <th class="text-end">Amount</th>
+                        <th>Term</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th class="text-end">Approved amount</th>
+                        <th>Approval date</th>
+                        <th>Customer</th>
+                        <th class="text-center">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @foreach (var item in Model)
+                      {
+                          var st = item.Status?.ToLower();
+                          var isApproved = st == "approved" || st == "autoapproved";
 
-                                <tr class="@(item.IsRisky ? "table-warning" : "")">
-                                    <td>@item.Type</td>
-                                    <td class="text-end">@item.Amount.ToString("N2", bg)</td>
-                                    <td>@item.Term.ToString("dd.MM.yyyy")</td>
-                                    <td>@item.Date.ToString("dd.MM.yyyy")</td>
-                                    <td>
-                                        <span class="badge @LoanStatusBadgeClass(item.Status)">
-                                            @item.Status
-                                        </span>
-                                        @if (User.IsInRole("Admin"))
-                                        {
-                                            @if (item.IsRisky)
-                                            {
-                                                <span class="text-danger ms-2">⚠ Рисков клиент</span>
-                                            }
-                                        }
-                                    </td>
-                                    <td class="text-end">@(item.Status.ToLower().Contains("approved") ? item.ApprovedAmount.ToString("N2", bg) : "-")</td>
-                                    <td>@(item.Status.ToLower().Contains("approved") ? item.ApprovalDate.ToString("dd.MM.yyyy") : "-")</td>
-                                    <td>@item.Customer?.FirstName @item.Customer?.LastName</td>
-                                    <td class="text-center">
-                                        <div class="btn-group btn-group-sm" role="group">
-                                            @if (User.IsInRole("Admin"))
-                                            {
-                                                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-outline-primary">Edit</a>
-                                                <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-outline-danger">Delete</a>
-                                            }
-                                            <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-outline-secondary">Details</a>
-                                        </div>
-                                    </td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
+                          <tr class="@(item.IsRisky ? "table-warning" : "")">
+                            <td>@item.Type</td>
+                            <td class="text-end text-mono">@item.Amount.ToString("N2", bg)</td>
+                            <td class="nowrap">@item.Term.ToString("dd.MM.yyyy")</td>
+                            <td class="nowrap">@item.Date.ToString("dd.MM.yyyy")</td>
+                            <td>
+                              <span class="badge badge-tight @LoanStatusBadgeClass(item.Status)">
+                                @item.Status
+                              </span>
+                              @if (User.IsInRole("Admin") && item.IsRisky)
+                              {
+                                  <span class="ms-2 risk-flag" title="Risky customer">⚠ Risk</span>
+                              }
+                            </td>
+                            <td class="text-end text-mono">@(isApproved ? item.ApprovedAmount.ToString("N2", bg) : "-")</td>
+                            <td class="nowrap">@(isApproved ? item.ApprovalDate.ToString("dd.MM.yyyy") : "-")</td>
+                            <td class="text-truncate" style="max-width:220px;">
+                              @item.Customer?.FirstName @item.Customer?.LastName
+                            </td>
+                            <td class="text-center">
+                              <div class="btn-group btn-group-sm" role="group">
+                                @if (User.IsInRole("Admin"))
+                                {
+                                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-outline-primary">
+                                      <i class="fa-regular fa-pen-to-square"></i>
+                                    </a>
+                                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-outline-danger">
+                                      <i class="fa-regular fa-trash-can"></i>
+                                    </a>
+                                }
+                                <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-outline-secondary">
+                                  <i class="fa-regular fa-eye"></i>
+                                </a>
+                              </div>
+                            </td>
+                          </tr>
+                      }
+                    </tbody>
+                  </table>
                 </div>
             }
+          </div>
         </div>
+
+      </div>
     </div>
+  </div>
 </div>
+
+@section Scripts {
+  <script>
+    // Ensure gradient is applied even if Layout doesn't use ViewData["BodyClass"]
+    document.body.classList.add('loans-full-bg');
+  </script>
+}

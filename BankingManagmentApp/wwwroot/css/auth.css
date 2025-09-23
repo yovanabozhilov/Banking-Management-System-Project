@@ -1,0 +1,112 @@
+/* =========================
+   Auth (Login / Register)
+   ========================= */
+
+/* ФОН ЗА ЦЯЛАТА СТРАНИЦА (градиент само за login/register) */
+body.auth-full-bg { position: relative; }
+/* ФОН – от лилаво (горе) към бяло (долу) */
+body.auth-full-bg::before{
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    /* леки лилави петна за дълбочина */
+    radial-gradient(1400px 700px at -10% -20%, rgba(106,75,207,.28), transparent 60%),
+    radial-gradient(1000px 600px at 120% 0%, rgba(142,109,253,.24), transparent 60%),
+    /* основният плавен преход */
+    linear-gradient(180deg, #422897 0%, #8e6dfd 40%, #d7cffd 75%, #ffffff 100%);
+  background-attachment: fixed;
+}
+
+/* Ако ползваш тъмна тема, пак към бяло (по-меко) */
+[data-bs-theme="dark"] body.auth-full-bg::before{
+  background:
+    radial-gradient(1400px 700px at -10% -20%, rgba(106,75,207,.32), transparent 60%),
+    radial-gradient(1000px 600px at 120% 0%, rgba(142,109,253,.28), transparent 60%),
+    linear-gradient(180deg, #533db3 0%, #8468ee 45%, #e9e6ff 85%, #ffffff 100%);
+}
+
+/* НИЩО за .navbar тук -> header-ът остава какъвто е */
+
+/* Центриране и spacing около картата */
+.auth-page{
+  min-height: calc(100svh - 140px);
+  display: grid;
+  place-items: start center;
+  padding: 2rem 0;
+}
+.auth-wrap{ max-width: 1100px; margin: 0 auto; }
+
+/* Картата: по-широка, с лява илюстрация */
+.auth-card{ border-radius: 1rem; overflow: hidden; background: transparent; }
+
+/* колона със снимка вляво (виж Login.cshtml: .auth-illustration) */
+.auth-illustration{
+  min-height: 100%;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+}
+.auth-illustration::after{
+  content:"";
+  position:absolute; inset:0;
+  background: linear-gradient(90deg, rgba(0,0,0,.35), rgba(0,0,0,.15));
+}
+
+/* панелът с формата вдясно – светъл фон */
+.auth-panel{ background:#fff; }
+[data-bs-theme="dark"] .auth-panel{ background:#1b1f22; color: var(--bs-body-color); }
+
+/* Лек долен marge след картата (равно отгоре/отдолу) */
+.auth-page .auth-card{ margin: 24px 0 32px; }
+@media (min-width:768px){ .auth-page .auth-card{ margin: 32px 0 48px; } }
+
+/* Header в картата */
+.auth-header{
+  padding: 1.75rem 1rem;
+  color:#fff;
+  background: linear-gradient(135deg,#6a4bcf,#8e6dfd);
+}
+
+/* Тяло на картата */
+.auth-body{ background: transparent; }
+
+/* Inputs с иконка отляво */
+.input-icon{
+  position:absolute; top:50%; left:.85rem; transform:translateY(-50%);
+  opacity:.6; pointer-events:none; font-size:1.1rem;
+}
+.ps-5{ padding-left:2.5rem !important; }
+
+/* Captcha ред */
+.captcha-group .captcha-img{ max-height:56px; background:#fff; }
+.btn-refresh-captcha{ white-space:nowrap; }
+
+/* Бранд бутон */
+.btn-primary{
+  background: linear-gradient(135deg,#6a4bcf,#8e6dfd);
+  border:none;
+}
+.btn-primary:hover{ filter:brightness(1.05); }
+
+/* Големи input-group-и със заобляне */
+.input-group-lg > .form-control,
+.input-group-lg > .input-group-text,
+.input-group-lg > .btn{ border-radius:.75rem; }
+.input-group .form-control.border-start-0{ border-left:0 !important; }
+
+/* Валидационни съобщения */
+.alert[role="alert"]{ border-radius:.75rem; }
+
+/* Линкове в тялото */
+.auth-body a{ text-decoration:none; }
+.auth-body a:hover{ text-decoration:underline; }
+
+/* Малки тъмни доработки */
+[data-bs-theme="dark"] .auth-header{ color:#e9ecef; }
+[data-bs-theme="dark"] .btn-outline-secondary{ color:#cfd6dd; border-color:#3a3f44; }
+
+
+

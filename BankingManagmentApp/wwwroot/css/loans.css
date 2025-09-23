@@ -1,0 +1,234 @@
+/* =========================
+   Loans (Index + Apply)
+   ========================= */
+
+/* Page-wide gradient (purple -> white) only when you set ViewData["BodyClass"] = "loans-full-bg" */
+body.loans-full-bg { position: relative; }
+body.loans-full-bg::before{
+  content:"";
+  position: fixed;
+  inset: 0;
+  z-index: -1;              /* behind header/footer/content */
+  pointer-events: none;
+  background:
+    radial-gradient(1400px 700px at -10% -20%, rgba(106,75,207,.28), transparent 60%),
+    radial-gradient(1000px 600px at 120% 0%, rgba(142,109,253,.24), transparent 60%),
+    linear-gradient(180deg, #422897 0%, #8e6dfd 40%, #d7cffd 75%, #ffffff 100%);
+  background-attachment: fixed;
+}
+[data-bs-theme="dark"] body.loans-full-bg::before{
+  background:
+    radial-gradient(1400px 700px at -10% -20%, rgba(106,75,207,.32), transparent 60%),
+    radial-gradient(1000px 600px at 120% 0%, rgba(142,109,253,.28), transparent 60%),
+    linear-gradient(180deg, #533db3 0%, #8468ee 45%, #e9e6ff 85%, #ffffff 100%);
+}
+
+/* Shared page spacing (keeps your header/footer intact) */
+.loan-page{ padding: 2rem 0 3rem; }
+
+/* ----------------------------------
+   Header chips used in Index & Apply
+----------------------------------- */
+.loan-badge{
+  width: 48px; height: 48px;
+  display: grid; place-items: center;
+  border-radius: 12px;
+  background: rgba(255,255,255,.18);
+  backdrop-filter: blur(2px);
+  font-size: 1.25rem; color: #fff;
+}
+
+/* =========================
+   APPLY card (you already use these)
+   ========================= */
+.loan-card{ border-radius: 1rem; overflow: hidden; }
+.loan-header{
+  padding: 1.5rem;
+  color: #fff;
+  background: linear-gradient(135deg, #6a4bcf, #8e6dfd);
+}
+.loan-body{ background: #fff; }
+[data-bs-theme="dark"] .loan-body{ background:#1b1f22; color: var(--bs-body-color); }
+
+.input-group-lg > .form-control,
+.input-group-lg > .input-group-text,
+.input-group-lg > .btn{ border-radius:.75rem; }
+
+.hint-chip{
+  font-size: .8rem; padding: .15rem .5rem; border-radius: 999px;
+  background: rgba(106,75,207,.12); color:#4b3faf;
+}
+
+.file-list{ list-style:none; padding-left:0; }
+.file-item{
+  display:flex; align-items:center; gap:.5rem;
+  padding:.5rem .75rem; margin:0 0 .5rem 0;
+  border-radius:.5rem; background:rgba(0,0,0,.03);
+}
+.file-item .name{ flex:1; }
+.file-item .size{ font-variant-numeric: tabular-nums; opacity:.7; }
+.file-item .oversize{ margin-left:.5rem; font-size:.8rem; color:#b00020; }
+
+.btn-primary{
+  background: linear-gradient(135deg, #6a4bcf, #8e6dfd);
+  border: none;
+}
+.btn-primary:hover{ filter: brightness(1.05); }
+
+/* =========================
+   INDEX list/table
+   ========================= */
+.loan-list-card{ border-radius: 1rem; overflow: hidden; }
+
+/* Gradient header strip like Apply */
+.loan-list-header{
+  padding: 1.25rem 1.5rem;
+  color: #fff;
+  background: linear-gradient(135deg, #6a4bcf, #8e6dfd);
+}
+
+/* Compact table spacing & tidy look */
+.table-compact th,
+.table-compact td{ padding: .75rem 1rem; }
+@media (max-width: 576px){
+  .table-compact th,
+  .table-compact td{ padding: .5rem .75rem; }
+}
+
+/* Sticky header inside the card body */
+.table thead.sticky-top{
+  position: sticky; top: 0; z-index: 3;
+}
+.table thead.sticky-top th{
+  background: var(--bs-body-bg, #fff) !important;   /* ensure opaque */
+  box-shadow: 0 2px 0 rgba(0,0,0,.04);
+}
+[data-bs-theme="dark"] .table thead.sticky-top th{
+  background: #111418 !important;
+}
+
+/* Monospaced numbers for alignment */
+.text-mono{
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-variant-numeric: tabular-nums;
+}
+.nowrap{ white-space: nowrap; }
+
+/* Tight badges for statuses */
+.badge-tight{
+  display: inline-block;
+  padding: .4rem .6rem;
+  border-radius: 999px;
+  font-weight: 600;
+}
+
+/* Extra visual hint for risky rows */
+.risk-flag{ color:#b00020; font-weight:600; }
+
+/* Keep table zebra contrast in dark */
+[data-bs-theme="dark"] .table-striped>tbody>tr:nth-of-type(odd)>*{
+  --bs-table-accent-bg: rgba(255,255,255,.03);
+}
+[data-bs-theme="dark"] .table-hover>tbody>tr:hover>*{
+  --bs-table-accent-bg: rgba(255,255,255,.06);
+}
+
+/* "Create new" button on the right in header stays readable */
+.loan-list-header .btn.btn-light{
+  color:#4b3faf; border: none;
+}
+.loan-list-header .btn.btn-light:hover{
+  filter: brightness(1.05);
+}
+
+/* ---- Details page polish ---- */
+.details-dl {
+  display: grid;
+  gap: .5rem 1.25rem;
+}
+.details-dl .details-row {
+  display: grid;
+  grid-template-columns: 180px 1fr;
+  align-items: baseline;
+  padding: .5rem 0;
+  border-bottom: 1px dashed rgba(0,0,0,.06);
+}
+[data-bs-theme="dark"] .details-dl .details-row {
+  border-bottom-color: rgba(255,255,255,.08);
+}
+.details-dl dt {
+  margin: 0;
+  color: var(--bs-secondary-color);
+  font-size: .925rem;
+}
+.details-dl dd {
+  margin: 0;
+}
+.text-mono { font-variant-numeric: tabular-nums; }
+
+/* Section title for blocks inside the card */
+.section-title { font-size: 1.05rem; }
+
+/* Documents list */
+.doc-list .doc-item {
+  padding: .6rem .75rem;
+  border: 1px solid rgba(0,0,0,.06);
+  border-radius: .5rem;
+  background: #fff;
+  margin-bottom: .5rem;
+}
+[data-bs-theme="dark"] .doc-list .doc-item {
+  background: #1b1f22;
+  border-color: rgba(255,255,255,.08);
+}
+.doc-item .doc-name { max-width: 50vw; }
+
+.badge-tight {
+  padding: .4rem .6rem;
+  border-radius: .5rem;
+}
+
+/* Danger header variant for Delete */
+.loan-header.danger {
+  background: linear-gradient(135deg, #dc3545, #ff6b6b);
+  color: #fff;
+}
+.loan-badge.danger {
+  width: 56px; height: 56px;
+  display: grid; place-items: center;
+  border-radius: 14px;
+  background: rgba(255,255,255,.18);
+  backdrop-filter: blur(2px);
+  font-size: 1.2rem;
+  color: #fff;
+}
+
+/* Soft danger callout */
+.alert-danger-soft {
+  background: rgba(220,53,69,.08);
+  border: 1px solid rgba(220,53,69,.25);
+  color: #842029;
+}
+[data-bs-theme="dark"] .alert-danger-soft {
+  background: rgba(220,53,69,.12);
+  border-color: rgba(220,53,69,.35);
+  color: #ffb3b8;
+}
+
+/* Reuse details layout (if not already added) */
+.details-dl { display: grid; gap: .5rem 1.25rem; }
+.details-dl .details-row {
+  display: grid;
+  grid-template-columns: 180px 1fr;
+  align-items: baseline;
+  padding: .5rem 0;
+  border-bottom: 1px dashed rgba(0,0,0,.06);
+}
+[data-bs-theme="dark"] .details-dl .details-row {
+  border-bottom-color: rgba(255,255,255,.08);
+}
+.details-dl dt { margin: 0; color: var(--bs-secondary-color); font-size: .925rem; }
+.details-dl dd { margin: 0; }
+.text-mono { font-variant-numeric: tabular-nums; }
+
+.badge-tight { padding: .4rem .6rem; border-radius: .5rem; }

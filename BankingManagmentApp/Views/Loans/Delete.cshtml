@@ -1,60 +1,141 @@
 ﻿@model BankingManagmentApp.Models.Loans
+@using System.Globalization
 
 @{
-    ViewData["Title"] = "Delete Loan";
+    ViewData["Title"] = "Cancel Loan";
+    ViewData["BodyClass"] = "loans-full-bg";   // reuse the purple→white gradient
+    var bg = CultureInfo.GetCultureInfo("bg-BG");
 }
 
-<div class="container mt-5">
-    <div class="card shadow-lg border-0 mx-auto" style="max-width: 700px;">
-        <div class="card-header bg-danger text-white text-center">
-            <h3 class="mb-0">Cancel Loan</h3>
-        </div>
+@section Head {
+  <link rel="stylesheet" href="~/css/loans.css" asp-append-version="true" />
+}
 
-        <div class="card-body p-4">
-            <h5 class="text-center text-muted mb-4">Are you sure you want to cancel this loan?</h5>
+@functions {
+    string LoanStatusBadgeClass(string? s)
+    {
+        var st = s?.ToLower();
+        return st switch
+        {
+            "approved" or "autoapproved" => "bg-success",
+            "pending" or "pendingreview" => "bg-warning text-dark",
+            "declined" or "autodeclined" or "rejected" => "bg-danger",
+            _ => "bg-secondary"
+        };
+    }
+}
 
-            <dl class="row mb-4">
-                <dt class="col-sm-4 text-muted">Type</dt>
-                <dd class="col-sm-8">@Html.DisplayFor(model => model.Type)</dd>
+<div class="loan-page">
+  <div class="container-xxl">
+    <div class="row justify-content-center">
+      <div class="col-12 col-lg-9 col-xl-8">
+        <div class="loan-card card shadow-lg border-0">
 
-                <dt class="col-sm-4 text-muted">Amount</dt>
-                <dd class="col-sm-8">@Html.DisplayFor(model => model.Amount)</dd>
+          <!-- Header (danger variant) -->
+          <div class="loan-header danger">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+              <div class="d-flex align-items-center gap-3">
+                <div class="loan-badge danger">
+                  <i class="fa-solid fa-trash-can" aria-hidden="true"></i>
+                </div>
+                <div>
+                  <h3 class="mb-0">Cancel Loan</h3>
+                  <small class="opacity-75">Please confirm this irreversible action</small>
+                </div>
+              </div>
+              <span class="badge badge-tight @LoanStatusBadgeClass(Model?.Status)">
+                @Model?.Status
+              </span>
+            </div>
+          </div>
 
-                <dt class="col-sm-4 text-muted">Term</dt>
-                <dd class="col-sm-8">@Html.DisplayFor(model => model.Term)</dd>
+          <!-- Body -->
+          <div class="card-body p-4 p-md-5">
 
-                <dt class="col-sm-4 text-muted">Date</dt>
-                <dd class="col-sm-8">@Html.DisplayFor(model => model.Date)</dd>
+            <!-- Soft danger callout -->
+            <div class="alert-danger-soft d-flex align-items-start gap-2 mb-4 rounded-3 p-3">
+              <i class="fa-solid fa-triangle-exclamation mt-1" aria-hidden="true"></i>
+              <div>
+                <strong>Warning:</strong> This action can’t be undone. Any attached documents will no longer be available.
+              </div>
+            </div>
 
-                <dt class="col-sm-4 text-muted">Status</dt>
-                <dd class="col-sm-8">@Html.DisplayFor(model => model.Status)</dd>
+            <!-- Key facts -->
+            <dl class="details-dl mb-4">
+              <div class="details-row">
+                <dt>Type</dt>
+                <dd>@Model?.Type</dd>
+              </div>
 
-                @if (Model.Status == "Pending"||Model.Status=="Rejected")
+              <div class="details-row">
+                <dt>Amount</dt>
+                <dd class="text-mono">@Model?.Amount.ToString("N2", bg) <span class="text-muted">BGN</span></dd>
+              </div>
+
+              <div class="details-row">
+                <dt>Term</dt>
+                <dd>@Model?.Term.ToString("dd.MM.yyyy")</dd>
+              </div>
+
+              <div class="details-row">
+                <dt>Date</dt>
+                <dd>@Model?.Date.ToString("dd.MM.yyyy")</dd>
+              </div>
+
+              <div class="details-row">
+                <dt>Approved Amount</dt>
+                @if (string.Equals(Model?.Status, "Approved", System.StringComparison.OrdinalIgnoreCase) ||
+                     string.Equals(Model?.Status, "AutoApproved", System.StringComparison.OrdinalIgnoreCase))
                 {
-                    <dt class="col-sm-4 text-muted">Approved Amount</dt>
-                    <dd class="col-sm-8">-</dd>
-                    <dt class="col-sm-4 text-muted">Approval Date</dt>
-                    <dd class="col-sm-8">-</dd>
+                  <dd class="text-mono">@Model?.ApprovedAmount.ToString("N2", bg) <span class="text-muted">BGN</span></dd>
                 }
                 else
                 {
-                    <dt class="col-sm-4 text-muted">Approved Amount</dt>
-                    <dd class="col-sm-8">@Html.DisplayFor(model => model.ApprovedAmount) lv</dd>
-                    <dt class="col-sm-4 text-muted">Approval Date</dt>
-                    <dd class="col-sm-8">@Html.DisplayFor(model => model.ApprovalDate)</dd>
+                  <dd class="text-muted">-</dd>
                 }
+              </div>
 
-                <dt class="col-sm-4 text-muted">Customer</dt>
-                <dd class="col-sm-8">@Html.DisplayFor(model => model.Customer.FirstName)
-                    @Html.DisplayFor(model => model.Customer.LastName)
-                </dd>
+              <div class="details-row">
+                <dt>Approval Date</dt>
+                @if (string.Equals(Model?.Status, "Approved", System.StringComparison.OrdinalIgnoreCase) ||
+                     string.Equals(Model?.Status, "AutoApproved", System.StringComparison.OrdinalIgnoreCase))
+                {
+                  <dd>@Model?.ApprovalDate.ToString("dd.MM.yyyy")</dd>
+                }
+                else
+                {
+                  <dd class="text-muted">-</dd>
+                }
+              </div>
+
+              <div class="details-row">
+                <dt>Customer</dt>
+                <dd>@Model?.Customer?.FirstName @Model?.Customer?.LastName</dd>
+              </div>
             </dl>
 
-            <form asp-action="Delete" class="d-flex justify-content-between">
-                <input type="hidden" asp-for="Id" />
-                <button type="submit" class="btn btn-danger">Delete</button>
-                <a asp-action="Index" class="btn btn-outline-secondary">Back to List</a>
+            <!-- Confirm form -->
+            <form asp-action="Delete" method="post" class="d-flex justify-content-between flex-wrap gap-2">
+              @Html.AntiForgeryToken()
+              <input type="hidden" asp-for="Id" />
+              <a asp-action="Index" class="btn btn-outline-secondary">
+                <i class="fa-solid fa-arrow-left-long me-1"></i> Back to list
+              </a>
+              <button type="submit" class="btn btn-danger">
+                <i class="fa-regular fa-trash-can me-1"></i> Delete
+              </button>
             </form>
+          </div>
+
         </div>
+      </div>
     </div>
+  </div>
 </div>
+
+@section Scripts {
+  <script>
+    // Fallback: apply gradient if Layout doesn’t read BodyClass
+    document.body.classList.add('loans-full-bg');
+  </script>
+}

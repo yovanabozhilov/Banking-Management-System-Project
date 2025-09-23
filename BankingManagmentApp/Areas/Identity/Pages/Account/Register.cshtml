@@ -1,107 +1,249 @@
 ﻿@page
-@model RegisterModel
+@model BankingManagmentApp.Areas.Identity.Pages.Account.RegisterModel
 @using System.Globalization
 
 @{
     ViewData["Title"] = "Register";
-    var bg = CultureInfo.GetCultureInfo("bg-BG");
 }
 
-<div class="container-profile mt-5">
+@section Head {
+  <link rel="stylesheet" href="~/css/auth.css" asp-append-version="true" />
+}
 
-    <div class="row justify-content-center">
-        <div class="col-12 col-md-8 col-lg-6">
+@{
+    // ако Layout не добавя автоматично клас към <body>, по-долу има JS, който го добавя
+    ViewData["BodyClass"] = "auth-full-bg";
+}
 
-            <div class="card shadow-sm rounded-3 border-0" style="background: linear-gradient(135deg, #6a4bcf, #8e6dfd); color: white;">
-                <div class="card-header text-center rounded-top-3 py-4" style="background-color: rgba(0,0,0,0.1);">
-                    <h2>Create a new account</h2>
-                    <small>Fill in the form to register</small>
+<div class="auth-page">
+  <div class="container-xxl">
+    <div class="auth-wrap">
+      <div class="row justify-content-center">
+        <div class="col-12">
+
+          <div class="auth-card shadow-lg border-0">
+            <div class="row g-0 align-items-stretch">
+
+              <!-- LEFT: Illustration (само на ≥lg) -->
+              <div class="col-lg-5 d-none d-lg-block auth-illustration"
+                   style="background-image:url('/images/auth/login-side.jpg')">
+              </div>
+
+              <!-- RIGHT: Form panel -->
+              <div class="col-12 col-lg-7 auth-panel">
+                <!-- Header -->
+                <div class="auth-header text-center">
+                  <h2 class="mb-1">Create your account</h2>
+                  <small class="opacity-75">Fill in the form to register</small>
                 </div>
 
-                <div class="card-body p-5">
-                    <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
-                        <div asp-validation-summary="ModelOnly" class="text-light mb-4" role="alert"></div>
+                <!-- Body -->
+                <div class="auth-body card-body p-4 p-md-5">
+                  <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger small" role="alert"></div>
 
-                        <div class="form-floating mb-4">
-                            <input asp-for="Input.Email" class="form-control form-control-lg" autocomplete="username" placeholder="Email" style="background-color: rgba(255,255,255,0.1); color: white; border: none;" />
-                            <label asp-for="Input.Email" class="text-light">Email</label>
-                            <span asp-validation-for="Input.Email" class="text-warning"></span>
-                        </div>
+                    <!-- Email -->
+                    <div class="mb-3">
+                      <label asp-for="Input.Email" class="form-label">Email</label>
+                      <div class="position-relative">
+                        <span class="input-icon"><i class="fa-regular fa-envelope"></i></span>
+                        <input asp-for="Input.Email"
+                               class="form-control form-control-lg ps-5"
+                               autocomplete="username"
+                               placeholder="name@example.com" />
+                      </div>
+                      <span asp-validation-for="Input.Email" class="text-danger small"></span>
+                    </div>
 
-                        <div class="form-floating mb-4">
-                            <input asp-for="Input.FirstName" class="form-control form-control-lg" autocomplete="given-name" placeholder="First Name" style="background-color: rgba(255,255,255,0.1); color: white; border: none;" />
-                            <label asp-for="Input.FirstName" class="text-light">First Name</label>
-                            <span asp-validation-for="Input.FirstName" class="text-warning"></span>
-                        </div>
+                    <!-- First Name -->
+                    <div class="mb-3">
+                      <label asp-for="Input.FirstName" class="form-label">First Name</label>
+                      <div class="position-relative">
+                        <span class="input-icon"><i class="fa-regular fa-user"></i></span>
+                        <input asp-for="Input.FirstName"
+                               class="form-control form-control-lg ps-5"
+                               autocomplete="given-name"
+                               placeholder="Your first name" />
+                      </div>
+                      <span asp-validation-for="Input.FirstName" class="text-danger small"></span>
+                    </div>
 
-                        <div class="form-floating mb-4">
-                            <input asp-for="Input.LastName" class="form-control form-control-lg" autocomplete="family-name" placeholder="Last Name" style="background-color: rgba(255,255,255,0.1); color: white; border: none;" />
-                            <label asp-for="Input.LastName" class="text-light">Last Name</label>
-                            <span asp-validation-for="Input.LastName" class="text-warning"></span>
-                        </div>
+                    <!-- Last Name -->
+                    <div class="mb-3">
+                      <label asp-for="Input.LastName" class="form-label">Last Name</label>
+                      <div class="position-relative">
+                        <span class="input-icon"><i class="fa-regular fa-user"></i></span>
+                        <input asp-for="Input.LastName"
+                               class="form-control form-control-lg ps-5"
+                               autocomplete="family-name"
+                               placeholder="Your last name" />
+                      </div>
+                      <span asp-validation-for="Input.LastName" class="text-danger small"></span>
+                    </div>
 
-                        <div class="form-floating mb-4">
-                            <input asp-for="Input.PhoneNumber" class="form-control form-control-lg" autocomplete="tel" placeholder="Phone Number" style="background-color: rgba(255,255,255,0.1); color: white; border: none;" />
-                            <label asp-for="Input.PhoneNumber" class="text-light">Phone Number</label>
-                            <span asp-validation-for="Input.PhoneNumber" class="text-warning"></span>
-                        </div>
+                    <!-- Phone -->
+                    <div class="mb-3">
+                      <label asp-for="Input.PhoneNumber" class="form-label">Phone Number</label>
+                      <div class="position-relative">
+                        <span class="input-icon"><i class="fa-solid fa-phone"></i></span>
+                        <input asp-for="Input.PhoneNumber"
+                               class="form-control form-control-lg ps-5"
+                               autocomplete="tel"
+                               placeholder="+359 ..."/>
+                      </div>
+                      <span asp-validation-for="Input.PhoneNumber" class="text-danger small"></span>
+                    </div>
 
-                        <div class="form-floating mb-4">
-                            <input asp-for="Input.Address" class="form-control form-control-lg" autocomplete="street-address" placeholder="Address" style="background-color: rgba(255,255,255,0.1); color: white; border: none;" />
-                            <label asp-for="Input.Address" class="text-light">Address</label>
-                            <span asp-validation-for="Input.Address" class="text-warning"></span>
-                        </div>
+                    <!-- Address -->
+                    <div class="mb-3">
+                      <label asp-for="Input.Address" class="form-label">Address</label>
+                      <div class="position-relative">
+                        <span class="input-icon"><i class="fa-solid fa-location-dot"></i></span>
+                        <input asp-for="Input.Address"
+                               class="form-control form-control-lg ps-5"
+                               autocomplete="street-address"
+                               placeholder="Street, number, city" />
+                      </div>
+                      <span asp-validation-for="Input.Address" class="text-danger small"></span>
+                    </div>
 
-                        <div class="form-floating mb-4">
-                            <input asp-for="Input.DateOfBirth" class="form-control form-control-lg" autocomplete="street-address" placeholder="Address" style="background-color: rgba(255,255,255,0.1); color: white; border: none;" />
-                            <label asp-for="Input.DateOfBirth" class="text-light">Date Of Birth</label>
-                            <span asp-validation-for="Input.DateOfBirth" class="text-warning"></span>
-                        </div>
+                    <!-- Date of Birth -->
+                    <div class="mb-3">
+                      <label asp-for="Input.DateOfBirth" class="form-label">Date of Birth</label>
+                      <div class="position-relative">
+                        <span class="input-icon"><i class="fa-regular fa-calendar-days"></i></span>
+                        <input asp-for="Input.DateOfBirth"
+                               type="date"
+                               class="form-control form-control-lg ps-5"
+                               placeholder="YYYY-MM-DD" />
+                      </div>
+                      <span asp-validation-for="Input.DateOfBirth" class="text-danger small"></span>
+                    </div>
 
-                        <div class="form-floating mb-4">
-                            <input asp-for="Input.Password" class="form-control form-control-lg" autocomplete="new-password" placeholder="Password" style="background-color: rgba(255,255,255,0.1); color: white; border: none;" />
-                            <label asp-for="Input.Password" class="text-light">Password</label>
-                            <span asp-validation-for="Input.Password" class="text-warning"></span>
-                        </div>
+                    <!-- Password -->
+                    <div class="mb-3">
+                      <label asp-for="Input.Password" class="form-label">Password</label>
+                      <div class="input-group input-group-lg">
+                        <span class="input-group-text bg-transparent border-end-0">
+                          <i class="fa-solid fa-key"></i>
+                        </span>
+                        <input asp-for="Input.Password"
+                               class="form-control border-start-0"
+                               autocomplete="new-password"
+                               placeholder="Create a password"
+                               id="passwordInput" />
+                        <button type="button"
+                                class="btn btn-outline-secondary"
+                                id="togglePassword"
+                                aria-label="Show or hide password">
+                          <i class="fa-regular fa-eye"></i>
+                        </button>
+                      </div>
+                      <span asp-validation-for="Input.Password" class="text-danger small"></span>
+                    </div>
 
-                        <div class="form-floating mb-4">
-                            <input asp-for="Input.ConfirmPassword" class="form-control form-control-lg" autocomplete="new-password" placeholder="Confirm Password" style="background-color: rgba(255,255,255,0.1); color: white; border: none;" />
-                            <label asp-for="Input.ConfirmPassword" class="text-light">Confirm Password</label>
-                            <span asp-validation-for="Input.ConfirmPassword" class="text-warning"></span>
-                        </div>
+                    <!-- Confirm Password -->
+                    <div class="mb-4">
+                      <label asp-for="Input.ConfirmPassword" class="form-label">Confirm Password</label>
+                      <div class="input-group input-group-lg">
+                        <span class="input-group-text bg-transparent border-end-0">
+                          <i class="fa-solid fa-lock"></i>
+                        </span>
+                        <input asp-for="Input.ConfirmPassword"
+                               class="form-control border-start-0"
+                               autocomplete="new-password"
+                               placeholder="Repeat the password"
+                               id="confirmPasswordInput" />
+                        <button type="button"
+                                class="btn btn-outline-secondary"
+                                id="toggleConfirmPassword"
+                                aria-label="Show or hide confirm password">
+                          <i class="fa-regular fa-eye"></i>
+                        </button>
+                      </div>
+                      <span asp-validation-for="Input.ConfirmPassword" class="text-danger small"></span>
+                    </div>
 
-                        <button id="registerSubmit" type="submit" class="btn btn-light w-100 btn-lg mb-3" style="color: #6a4bcf; font-weight: 500;">Register</button>
+                    <!-- Submit -->
+                    <button id="registerSubmit" type="submit" class="btn btn-primary w-100 btn-lg mb-3">
+                      <i class="fa-regular fa-circle-check me-2"></i> Register
+                    </button>
 
-                        @if (TempData["ConfirmationMessage"] != null)
+                    @* Confirmation message (ако има) *@
+                    @if (TempData["ConfirmationMessage"] != null)
+                    {
+                      <div class="alert alert-info mt-3" role="alert">
+                        @TempData["ConfirmationMessage"]
+                      </div>
+                    }
+
+                    <!-- External providers -->
+                    @if ((Model.ExternalLogins?.Count ?? 0) > 0)
+                    {
+                      <hr class="my-4" />
+                      <p class="text-center small text-muted mb-3">Or register using</p>
+                      <div class="d-grid gap-2">
+                        @foreach (var provider in Model.ExternalLogins!)
                         {
-                            <div class="alert alert-info bg-danger">
-                                @TempData["ConfirmationMessage"]
-                            </div>
+                          <form method="post" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl">
+                            <button type="submit"
+                                    class="btn btn-outline-secondary btn-lg w-100"
+                                    name="provider"
+                                    value="@provider.Name">
+                              @provider.DisplayName
+                            </button>
+                          </form>
                         }
-
-                        @if ((Model.ExternalLogins?.Count ?? 0) > 0)
-                        {
-                            <hr style="border-color: rgba(255,255,255,0.3);" />
-                            <p class="text-center small mb-3 text-light">Or register using</p>
-                            <div class="d-flex flex-column gap-2">
-                                @foreach (var provider in Model.ExternalLogins!)
-                                {
-                                    <form method="post" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl">
-                                        <button type="submit" class="btn btn-outline-light w-100 btn-lg" name="provider" value="@provider.Name">
-                                            @provider.DisplayName
-                                        </button>
-                                    </form>
-                                }
-                            </div>
-                        }
-                    </form>
+                      </div>
+                    }
+                  </form>
                 </div>
+              </div>
+
             </div>
+          </div>
 
         </div>
+      </div>
     </div>
+  </div>
 </div>
 
 @section Scripts {
-    <partial name="_ValidationScriptsPartial" />
+  <partial name="_ValidationScriptsPartial" />
+
+  <script>
+    // Show/Hide password
+    (function () {
+      const btn = document.getElementById('togglePassword');
+      const input = document.getElementById('passwordInput');
+      if (btn && input) {
+        btn.addEventListener('click', () => {
+          const isPwd = input.getAttribute('type') === 'password';
+          input.setAttribute('type', isPwd ? 'text' : 'password');
+          btn.innerHTML = isPwd
+            ? '<i class="fa-regular fa-eye-slash"></i>'
+            : '<i class="fa-regular fa-eye"></i>';
+        });
+      }
+    })();
+
+    // Show/Hide confirm password
+    (function () {
+      const btn = document.getElementById('toggleConfirmPassword');
+      const input = document.getElementById('confirmPasswordInput');
+      if (btn && input) {
+        btn.addEventListener('click', () => {
+          const isPwd = input.getAttribute('type') === 'password';
+          input.setAttribute('type', isPwd ? 'text' : 'password');
+          btn.innerHTML = isPwd
+            ? '<i class="fa-regular fa-eye-slash"></i>'
+            : '<i class="fa-regular fa-eye"></i>';
+        });
+      }
+    })();
+
+    // Активиране на фоновия градиент (ако Layout не чете ViewData["BodyClass"])
+    document.body.classList.add('auth-full-bg');
+  </script>
 }

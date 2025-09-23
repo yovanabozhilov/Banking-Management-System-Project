@@ -1,0 +1,27 @@
+<svg width="1200" height="1600" viewBox="0 0 1200 1600" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg4" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#4a33a6"></stop>
+      <stop offset="50%" stop-color="#8e6dfd"></stop>
+      <stop offset="100%" stop-color="#ffffff"></stop>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.55" cy="0.38" r="0.4">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.35"></stop>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"></stop>
+    </radialGradient>
+  </defs>
+
+  <rect width="1200" height="1600" fill="url(#bg4)"></rect>
+  <circle cx="660" cy="540" r="320" fill="url(#glow)"></circle>
+
+  <!-- щит -->
+  <g transform="translate(360,620)">
+    <path d="M240 0 L480 80 L480 260 C480 360 380 470 240 520 C100 470 0 360 0 260 L0 80 Z" fill="#ffffff" opacity="0.9"></path>
+    <!-- катинар върху щита -->
+    <g transform="translate(150,180)">
+      <rect x="0" y="80" width="180" height="140" rx="18" fill="#dcd2ff"></rect>
+      <path d="M40,80 v-30 a50,50 0 0 1 100,0 v30" fill="none" stroke="#b8a7ff" stroke-width="16" stroke-linecap="round"></path>
+      <circle cx="90" cy="150" r="12" fill="#b8a7ff"></circle>
+    </g>
+  </g>
+</svg>

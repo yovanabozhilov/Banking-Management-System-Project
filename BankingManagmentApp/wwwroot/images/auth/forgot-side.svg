@@ -1,0 +1,30 @@
+<svg width="1200" height="1600" viewBox="0 0 1200 1600" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg3" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#5b3fbf"></stop>
+      <stop offset="50%" stop-color="#8e6dfd"></stop>
+      <stop offset="100%" stop-color="#ffffff"></stop>
+    </linearGradient>
+    <radialGradient id="halo" cx="0.5" cy="0.35" r="0.45">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.35"></stop>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"></stop>
+    </radialGradient>
+  </defs>
+
+  <rect width="1200" height="1600" fill="url(#bg3)"></rect>
+  <circle cx="600" cy="560" r="380" fill="url(#halo)"></circle>
+
+  <!-- плик -->
+  <g transform="translate(200,640)">
+    <rect x="0" y="0" width="800" height="440" rx="18" fill="#ffffff" opacity="0.9"></rect>
+    <path d="M0,0 L400,260 L800,0 Z" fill="#dcd2ff"></path>
+    <path d="M0,440 L320,210" stroke="#dcd2ff" stroke-width="6" stroke-linecap="round" opacity="0.9"></path>
+    <path d="M800,440 L480,210" stroke="#dcd2ff" stroke-width="6" stroke-linecap="round" opacity="0.9"></path>
+  </g>
+
+  <!-- дребни точки -->
+  <g fill="#ffffff" opacity="0.18">
+    <circle cx="180" cy="1180" r="4"></circle><circle cx="240" cy="1150" r="3"></circle>
+    <circle cx="300" cy="1210" r="3"></circle><circle cx="360" cy="1170" r="4"></circle>
+  </g>
+</svg>
