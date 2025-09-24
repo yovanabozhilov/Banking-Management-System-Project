@@ -1,55 +1,65 @@
 ﻿@model BankingManagmentApp.Models.Accounts
 
 @{
-    ViewData["Title"] = "Delete";
+    ViewData["Title"] = "Block Account";
+    ViewData["BodyClass"] = "profile-full-bg"; // optional: purple gradient background
 }
+<link rel="stylesheet" href="~/css/profile.css" asp-append-version="true" />
 
-<h1>Block</h1>
+<div class="profile-page">
+    <div class="container-xxl">
+        <div class="row justify-content-center">
+            <div class="col-12 col-lg-6 col-xl-5">
+                <div class="profile-card card shadow-lg border-0">
 
-<h3>Are you sure you want to block this card?</h3>
-<div>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.IBAN)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.IBAN)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Balance)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Balance)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Currency)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Currency)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.CreateAt)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.CreateAt)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Status)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Status)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Customer)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Customer.FirstName)
-        </dd>
-    </dl>
-    
-    <form asp-action="Delete">
-        <input type="hidden" asp-for="Id" />
-        <input type="submit" value="Block" class="btn btn-danger" /> 
-    </form>
+                    <!-- Header -->
+                    <div class="profile-header d-flex align-items-center gap-3 p-4 border-bottom">
+                        <div class="profile-badge">
+                            <i class="fa-solid fa-ban"></i>
+                        </div>
+                        <div>
+                            <h3 class="mb-0">@ViewData["Title"]</h3>
+                            <small class="opacity-75">Are you sure you want to block this account?</small>
+                        </div>
+                    </div>
+
+                    <!-- Body -->
+                    <div class="card-body p-4 p-md-5">
+                        <dl class="row mb-4">
+                            <dt class="col-sm-4">IBAN</dt>
+                            <dd class="col-sm-8">@Html.DisplayFor(model => model.IBAN)</dd>
+
+                            <dt class="col-sm-4">Balance</dt>
+                            <dd class="col-sm-8">@Html.DisplayFor(model => model.Balance)</dd>
+
+                            <dt class="col-sm-4">Currency</dt>
+                            <dd class="col-sm-8">@Html.DisplayFor(model => model.Currency)</dd>
+
+                            <dt class="col-sm-4">Created At</dt>
+                            <dd class="col-sm-8">@Html.DisplayFor(model => model.CreateAt)</dd>
+
+                            <dt class="col-sm-4">Status</dt>
+                            <dd class="col-sm-8">@Html.DisplayFor(model => model.Status)</dd>
+
+                            <dt class="col-sm-4">Customer</dt>
+                            <dd class="col-sm-8">@Html.DisplayFor(model => model.Customer.FirstName)</dd>
+                        </dl>
+
+                        <div class="d-flex gap-2">
+                            <form asp-action="Delete" class="flex-fill">
+                                <input type="hidden" asp-for="Id" />
+                                <button type="submit" class="btn btn-danger w-100">
+                                    <i class="fa-solid fa-ban me-1"></i> Block
+                                </button>
+                            </form>
+                            <a asp-action="Index" class="btn btn-outline-secondary flex-fill">
+                                <i class="fa-solid fa-arrow-left me-1"></i> Back to List
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

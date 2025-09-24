@@ -1,73 +1,97 @@
 ﻿@model BankingManagmentApp.Models.Transactions
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Create Transaction";
+    ViewData["BodyClass"] = "profile-full-bg"; // enable purple gradient background
 }
+<link rel="stylesheet" href="~/css/profile.css" asp-append-version="true" />
 
-<h1>Create</h1>
+<div class="profile-page">
+    <div class="container-xxl">
+        <div class="row justify-content-center">
+            <div class="col-12 col-lg-6 col-xl-5">
+                <div class="profile-card card shadow-lg border-0">
 
-<h4>Transactions</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create" onsubmit="return confirmPayment(this)">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="mb-3">
-                <label asp-for="TransactionType" class="form-label">Choose transaction type</label>
-                <select asp-for="TransactionType" class="form-select">
-                    <option value="">-- Select --</option>
-                    <option value="Credit">Credit</option>
-                    <option value="Debit">Debit</option>
-                </select>
-                <span asp-validation-for="TransactionType" class="text-danger"></span>
+                    <!-- Header -->
+                    <div class="profile-header d-flex align-items-center gap-3 p-4 border-bottom">
+                        <div class="profile-badge">
+                            <i class="fa-solid fa-money-bill-transfer"></i>
+                        </div>
+                        <div>
+                            <h3 class="mb-0">@ViewData["Title"]</h3>
+                            <small class="opacity-75">Fill in the transaction details</small>
+                        </div>
+                    </div>
+
+                    <!-- Body -->
+                    <div class="card-body p-4 p-md-5">
+                        <form asp-action="Create" onsubmit="return confirmPayment(this)" class="row g-3">
+                            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                            <div class="col-12">
+                                <label asp-for="TransactionType" class="form-label">Transaction Type</label>
+                                <select asp-for="TransactionType" class="form-select">
+                                    <option value="">-- Select --</option>
+                                    <option value="Credit">Credit</option>
+                                    <option value="Debit">Debit</option>
+                                </select>
+                                <span asp-validation-for="TransactionType" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-12">
+                                <label asp-for="Amount" class="form-label">Amount</label>
+                                <input asp-for="Amount" class="form-control" placeholder="0.00" />
+                                <span asp-validation-for="Amount" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-12">
+                                <label asp-for="Description" class="form-label">Description</label>
+                                <input asp-for="Description" class="form-control" placeholder="Transaction description" />
+                                <span asp-validation-for="Description" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="fa-solid fa-check me-2"></i> Create Transaction
+                                </button>
+                            </div>
+                        </form>
+
+                        <div class="mt-3 text-center">
+                            <a asp-action="Index" class="text-decoration-none">&larr; Back to List</a>
+                        </div>
+                    </div>
+
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="Amount" class="control-label"></label>
-                <input asp-for="Amount" class="form-control" />
-                <span asp-validation-for="Amount" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Description" class="control-label"></label>
-                <input asp-for="Description" class="form-control" />
-                <span asp-validation-for="Description" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                 <button id="confirm" type="submit" class="btn btn-sm btn-primary">Create</button>
-            </div>
-        </form>
+        </div>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
-<script>
-    function confirmPayment(form) {
-        event.preventDefault(); 
-        const amount = form.querySelector("input[name='Amount']").value;
-        const description = form.querySelector("input[name='Description']").value;
-        Swal.fire({
-            title: 'Transaction Confirmation',
-            html: `Do you want to confirm this transaction? <br>
-                   Amount: <b>${amount} лв.</b> <br>
-                   Description: <b>${description}</b>`,
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Yes, confirm',
-            cancelButtonText: 'Cancel',
-            reverseButtons: true
-        }).then((result) => {
-            if (result.isConfirmed) {
-                form.submit();
-            }
-        });
-
-        return false;
-    }
-</script>
-
-
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        function confirmPayment(form) {
+            event.preventDefault(); 
+            const amount = form.querySelector("input[name='Amount']").value;
+            const description = form.querySelector("input[name='Description']").value;
+            Swal.fire({
+                title: 'Transaction Confirmation',
+                html: `Do you want to confirm this transaction? <br>
+                       Amount: <b>${amount} лв.</b> <br>
+                       Description: <b>${description}</b>`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, confirm',
+                cancelButtonText: 'Cancel',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            });
+
+            return false;
+        }
+    </script>
 }

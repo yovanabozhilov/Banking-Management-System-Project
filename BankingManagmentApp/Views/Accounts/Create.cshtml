@@ -1,29 +1,53 @@
 ﻿@model BankingManagmentApp.Models.Accounts
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Apply for a New Card";
+    ViewData["BodyClass"] = "profile-full-bg"; // enable purple gradient background
 }
+<link rel="stylesheet" href="~/css/profile.css" asp-append-version="true" />
 
-<h1>Apply for a new card</h1>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            
-            <div class="form-group">
-                <input type="submit" value="Submit you want to create a new card" class="btn btn-primary" />
+<div class="profile-page">
+    <div class="container-xxl">
+        <div class="row justify-content-center">
+            <div class="col-12 col-lg-6 col-xl-5">
+                <div class="profile-card card shadow-lg border-0">
+
+                    <!-- Header -->
+                    <div class="profile-header d-flex align-items-center gap-3 p-4 border-bottom">
+                        <div class="profile-badge">
+                            <i class="fa-solid fa-credit-card"></i>
+                        </div>
+                        <div>
+                            <h3 class="mb-0">@ViewData["Title"]</h3>
+                            <small class="opacity-75">Submit your request to create a new account/card.</small>
+                        </div>
+                    </div>
+
+                    <!-- Body -->
+                    <div class="card-body p-4 p-md-5">
+                        <form asp-action="Create">
+                            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                            <div class="mb-3">
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="fa-solid fa-paper-plane me-1"></i> Submit Request
+                                </button>
+                            </div>
+
+                            <div class="text-center mt-2">
+                                <a asp-action="Index" class="btn btn-outline-secondary w-100">
+                                    Back to List
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+
+                </div>
             </div>
-        </form>
+        </div>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
 @section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
+    <partial name="_ValidationScriptsPartial" />
 }

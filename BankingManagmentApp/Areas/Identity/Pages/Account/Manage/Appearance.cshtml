@@ -3,52 +3,71 @@
 @{
     ViewData["Title"] = "Appearance";
     ViewData["ActivePage"] = ManageNavPages.Appearance;
+    ViewData["BodyClass"] = "profile-full-bg";    // enables the purple gradient background
 }
+<link rel="stylesheet" href="~/css/profile.css" asp-append-version="true" />
 
-<h4 class="mb-4">Appearance</h4>
-<partial name="_StatusMessage" for="StatusMessage" />
+<div class="profile-page">
+  <div class="container-xxl">
+    <div class="row justify-content-center">
+      <div class="col-12 col-lg-12 col-xl-11">
+        <div class="profile-card card shadow-lg border-0">
 
-<div class="row">
-    <div class="col-12 col-lg-8">
-        <div class="card shadow-sm border-0">
-            <div class="card-body p-4">
-                <form method="post" id="appearance-form">
-                    <fieldset>
-                        <legend class="h6 mb-3">Theme</legend>
-
-                        <div class="btn-group" role="group" aria-label="Theme selection">
-                            <input type="radio" class="btn-check" name="Input.Mode" id="modeLight" value="light"
-                                   @(Model.Input?.Mode == "light" ? "checked" : "")>
-                            <label class="btn btn-outline-primary" for="modeLight">Light</label>
-
-                            <input type="radio" class="btn-check" name="Input.Mode" id="modeDark" value="dark"
-                                   @(Model.Input?.Mode == "dark" ? "checked" : "")>
-                            <label class="btn btn-outline-primary" for="modeDark">Dark</label>
-
-                            <input type="radio" class="btn-check" name="Input.Mode" id="modeSystem" value="system"
-                                   @(Model.Input?.Mode == "system" ? "checked" : "")>
-                            <label class="btn btn-outline-primary" for="modeSystem">System</label>
-                        </div>
-                    </fieldset>
-
-                    <div class="mt-4">
-                        <button type="submit" class="btn btn-primary">Save preference</button>
-                    </div>
-                </form>
-
-                <hr class="my-4"/>
-
-                <div class="small text-body-secondary">
-                    <strong>Tip:</strong> "System" follows the operating system setting.
-                </div>
+          <!-- Header -->
+          <div class="profile-header d-flex align-items-center gap-3 p-4 border-bottom">
+            <div class="profile-badge">
+              <i class="fa-solid fa-palette"></i>
             </div>
+            <div>
+              <h3 class="mb-0">@ViewData["Title"]</h3>
+              <small class="opacity-75">Choose your preferred color theme</small>
+            </div>
+          </div>
+
+          <!-- Body -->
+          <div class="card-body p-4 p-md-5">
+            <partial name="_StatusMessage" for="StatusMessage" />
+
+            <form method="post" id="appearance-form">
+              <fieldset>
+                <legend class="h6 mb-3">Theme</legend>
+
+                <div class="btn-group" role="group" aria-label="Theme selection">
+                  <input type="radio" class="btn-check" name="Input.Mode" id="modeLight" value="light"
+                         @(Model.Input?.Mode == "light" ? "checked" : "")>
+                  <label class="btn btn-outline-primary" for="modeLight">Light</label>
+
+                  <input type="radio" class="btn-check" name="Input.Mode" id="modeDark" value="dark"
+                         @(Model.Input?.Mode == "dark" ? "checked" : "")>
+                  <label class="btn btn-outline-primary" for="modeDark">Dark</label>
+
+                  <input type="radio" class="btn-check" name="Input.Mode" id="modeSystem" value="system"
+                         @(Model.Input?.Mode == "system" ? "checked" : "")>
+                  <label class="btn btn-outline-primary" for="modeSystem">System</label>
+                </div>
+              </fieldset>
+
+              <div class="mt-4">
+                <button type="submit" class="btn btn-primary">Save preference</button>
+              </div>
+            </form>
+
+            <hr class="my-4"/>
+
+            <div class="small text-body-secondary">
+              <strong>Tip:</strong> “System” follows your operating system’s light/dark setting.
+            </div>
+          </div>
+
         </div>
+      </div>
     </div>
+  </div>
 </div>
 
 @section Scripts {
 <script>
-  // Live preview при избор (без презареждане)
+  // Live preview of theme without reloading
   const radios = document.querySelectorAll('input[name="Input.Mode"]');
   function apply(mode) {
     const actual = mode === 'system'

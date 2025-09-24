@@ -232,3 +232,13 @@ body.loans-full-bg::before{
 .text-mono { font-variant-numeric: tabular-nums; }
 
 .badge-tight { padding: .4rem .6rem; border-radius: .5rem; }
+
+.card-footer a.btn-link {
+    color: #6c757d;
+    text-decoration: none;
+}
+
+.card-footer a.btn-link:hover {
+    color: #acacac;
+    text-decoration: none;
+}

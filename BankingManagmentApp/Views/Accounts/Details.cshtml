@@ -1,60 +1,65 @@
 ﻿@model BankingManagmentApp.Models.Accounts
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Account Details";
+    ViewData["BodyClass"] = "profile-full-bg"; // enable purple gradient background
 }
+<link rel="stylesheet" href="~/css/profile.css" asp-append-version="true" />
 
-<h1>Details</h1>
+<div class="profile-page">
+    <div class="container-xxl">
+        <div class="row justify-content-center">
+            <div class="col-12 col-lg-6 col-xl-5">
+                <div class="profile-card card shadow-lg border-0">
 
-<div>
-    <h4>Accounts</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.IBAN)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.IBAN)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.AccountType)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.AccountType)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Balance)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Balance)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Currency)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Currency)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.CreateAt)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.CreateAt)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Status)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Status)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Customer)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Customer.Id)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+                    <!-- Header -->
+                    <div class="profile-header d-flex align-items-center gap-3 p-4 border-bottom">
+                        <div class="profile-badge">
+                            <i class="fa-solid fa-eye"></i>
+                        </div>
+                        <div>
+                            <h3 class="mb-0">@ViewData["Title"]</h3>
+                            <small class="opacity-75">Account information</small>
+                        </div>
+                    </div>
+
+                    <!-- Body -->
+                    <div class="card-body p-4 p-md-5">
+                        <dl class="row mb-4">
+                            <dt class="col-sm-4">IBAN</dt>
+                            <dd class="col-sm-8">@Html.DisplayFor(model => model.IBAN)</dd>
+
+                            <dt class="col-sm-4">Account Type</dt>
+                            <dd class="col-sm-8">@Html.DisplayFor(model => model.AccountType)</dd>
+
+                            <dt class="col-sm-4">Balance</dt>
+                            <dd class="col-sm-8">@Html.DisplayFor(model => model.Balance)</dd>
+
+                            <dt class="col-sm-4">Currency</dt>
+                            <dd class="col-sm-8">@Html.DisplayFor(model => model.Currency)</dd>
+
+                            <dt class="col-sm-4">Created At</dt>
+                            <dd class="col-sm-8">@Html.DisplayFor(model => model.CreateAt)</dd>
+
+                            <dt class="col-sm-4">Status</dt>
+                            <dd class="col-sm-8">@Html.DisplayFor(model => model.Status)</dd>
+
+                            <dt class="col-sm-4">Customer ID</dt>
+                            <dd class="col-sm-8">@Html.DisplayFor(model => model.Customer.Id)</dd>
+                        </dl>
+
+                        <div class="d-flex gap-2">
+                            <a asp-action="Edit" asp-route-id="@Model?.Id" class="btn btn-primary flex-fill">
+                                <i class="fa-solid fa-edit me-1"></i> Edit
+                            </a>
+                            <a asp-action="Index" class="btn btn-outline-secondary flex-fill">
+                                <i class="fa-solid fa-arrow-left me-1"></i> Back to List
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

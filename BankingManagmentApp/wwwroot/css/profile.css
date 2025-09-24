@@ -1,0 +1,125 @@
+body.profile-full-bg {
+  position: relative;
+}
+body.profile-full-bg::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(1400px 700px at -10% -20%, rgba(106,75,207,.28), transparent 60%),
+    radial-gradient(1000px 600px at 120% 0%, rgba(142,109,253,.24), transparent 60%),
+    linear-gradient(180deg, #422897 0%, #8e6dfd 40%, #d7cffd 75%, #ffffff 100%);
+  background-attachment: fixed;
+}
+
+[data-bs-theme="dark"] body.profile-full-bg::before {
+  background:
+    radial-gradient(1400px 700px at -10% -20%, rgba(106,75,207,.32), transparent 60%),
+    radial-gradient(1000px 600px at 120% 0%, rgba(142,109,253,.28), transparent 60%),
+    linear-gradient(180deg, #533db3 0%, #8468ee 45%, #e9e6ff 85%, #ffffff 100%);
+}
+
+/* Shared page spacing (keeps your header/footer intact) */
+.profile-page{ padding: 2rem 0 3rem; }
+
+.profile-full-bg {
+    background: linear-gradient(135deg, #e6f0ff 0%, #f9faff 100%);
+    min-height: 100vh;
+}
+
+.profile-card {
+    border-radius: 1rem;
+    background: #fff;
+}
+
+/* Purple header strip on the card */
+body.profile-full-bg .profile-header {
+    /* same gradient you used for buttons */
+    background: linear-gradient(135deg, #6a4bcf, #8e6dfd);
+    color: #fff;
+    border-top-left-radius: 1rem;
+    border-top-right-radius: 1rem;
+}
+
+/* Left-menu active link (Identity Manage nav) */
+body.profile-full-bg .nav-pills .nav-link.active,
+body.profile-full-bg .nav-pills .show > .nav-link {
+    background: linear-gradient(135deg, #6a4bcf, #8e6dfd);
+    color: #fff;
+}
+
+/* Optional: hover effect for other links in the left menu */
+body.profile-full-bg .nav-pills .nav-link:hover {
+    color: #6a4bcf;
+}
+
+.profile-badge i {
+    font-size: 2.2rem;
+}
+
+/* Purple primary button – same as loans page */
+body.profile-full-bg .btn-primary {
+  background: linear-gradient(135deg, #6a4bcf, #8e6dfd);
+  border: none;
+}
+
+body.profile-full-bg .btn-primary:hover {
+  filter: brightness(1.05);
+}
+
+.card-footer.bg-transparent.text-center.py-3 a.btn-link {
+  text-decoration: none;
+  color: #6c757d;
+}
+
+.card-footer.bg-transparent.text-center.py-3 a.btn-link:hover {
+  color: #acacac;
+}
+
+/* Remove blue border on the left of the card/header */
+.profile-card,
+.profile-card .profile-header {
+    border-left: none !important;        /* remove any existing blue border */
+}
+
+/* Optional: force a purple left border if you want it as part of design */
+.profile-card .profile-header {
+    border-left: 4px solid #6a4bcf;      /* purple accent line on the left */
+}
+
+/* Purple theme for radio-button group */
+.btn-outline-primary,
+.btn-outline-primary:focus {
+    color: #6f42c1;               /* text purple */
+    border-color: #6f42c1;        /* border purple */
+}
+
+.btn-outline-primary:hover,
+.btn-check:focus + .btn-outline-primary,
+.btn-check:active + .btn-outline-primary,
+.btn-outline-primary.active,
+.btn-outline-primary.dropdown-toggle.show {
+    background-color: #6f42c1;    /* purple background on hover/active */
+    border-color: #6f42c1;
+    color: #fff;                  /* white text when active */
+}
+
+.btn-check:checked + .btn-outline-primary {
+    background-color: #6f42c1;    /* purple when selected */
+    border-color: #6f42c1;
+    color: #fff;
+}
+
+.btn-custom-purple {
+    background-color: #ffffff; /* white background */
+    color: #6f42c1;           /* purple text (adjust to match your theme) */
+    border: 1px solid #6f42c1;
+}
+
+.btn-custom-purple:hover {
+    background-color: #6f42c1;
+    color: #ffffff;
+    border-color: #6f42c1;
+}

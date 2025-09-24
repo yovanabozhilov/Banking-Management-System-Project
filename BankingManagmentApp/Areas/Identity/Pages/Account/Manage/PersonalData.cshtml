@@ -3,62 +3,88 @@
 @{
     ViewData["Title"] = "Personal Data";
     ViewData["ActivePage"] = ManageNavPages.PersonalData;
+    ViewData["BodyClass"] = "profile-full-bg";   // enables purple gradient background
 }
+<link rel="stylesheet" href="~/css/profile.css" asp-append-version="true" />
 
-<h4 class="mb-4">Personal data</h4>
+<div class="profile-page">
+  <div class="container-xxl">
+    <div class="row justify-content-center">
+      <div class="col-12 col-lg-12 col-xl-11">
+        <div class="profile-card card shadow-lg border-0">
 
-<div class="row g-4">
+          <!-- Header -->
+          <div class="profile-header d-flex align-items-center gap-3 p-4 border-bottom">
+            <div class="profile-badge">
+              <i class="fa-solid fa-id-card"></i>
+            </div>
+            <div>
+              <h3 class="mb-0">@ViewData["Title"]</h3>
+              <small class="opacity-75">Manage or export your personal information</small>
+            </div>
+          </div>
 
-    <!-- Export data card -->
-    <div class="col-12 col-lg-6">
-        <div class="card shadow-sm border-0 h-100">
-            <div class="card-body p-4">
-                <h5 class="card-title mb-2">Download your data</h5>
-                <p class="text-muted mb-3">
-                    You can export a copy of your personal information in a machine-readable JSON file.
-                </p>
+          <!-- Body -->
+          <div class="card-body p-4 p-md-5">
+            <div class="row g-4">
 
-                <ul class="mb-4 small text-muted">
-                    <li>Profile details (first/last name, address, date of birth, phone, email).</li>
-                    <li>Linked external login provider keys.</li>
-                    <li>Authenticator key (if configured).</li>
-                </ul>
+              <!-- Export data card -->
+              <div class="col-12 col-lg-6">
+                <div class="card shadow-sm border-0 h-100">
+                  <div class="card-body p-4">
+                    <h5 class="card-title mb-2">Download your data</h5>
+                    <p class="text-muted mb-3">
+                      Export a copy of your personal information in a machine-readable JSON file.
+                    </p>
 
-                <form id="download-data" asp-page="DownloadPersonalData" method="post" class="d-inline">
-                    <button class="btn btn-primary" type="submit">
+                    <ul class="mb-4 small text-muted">
+                      <li>Profile details (name, address, birth date, phone, email)</li>
+                      <li>Linked external login provider keys</li>
+                      <li>Authenticator key (if configured)</li>
+                    </ul>
+
+                    <form id="download-data" asp-page="DownloadPersonalData" method="post" class="d-inline">
+                      <button class="btn btn-primary" type="submit">
                         Download JSON
-                    </button>
-                </form>
+                      </button>
+                    </form>
 
-                <p class="small text-muted mt-3 mb-0">
-                    The exported file is for your records. Keep it safe and do not share it publicly.
-                </p>
-            </div>
-        </div>
-    </div>
-
-    <!-- Delete account card -->
-    <div class="col-12 col-lg-6">
-        <div class="card shadow-sm border-0 h-100">
-            <div class="card-body p-4">
-                <h5 class="card-title mb-2 text-danger">Delete your account</h5>
-                <div class="alert alert-warning mb-3" role="alert">
-                    <strong>This action is permanent.</strong> Deleting your account will remove all personal data and cannot be undone.
+                    <p class="small text-muted mt-3 mb-0">
+                      The exported file is for your records. Keep it safe and do not share it publicly.
+                    </p>
+                  </div>
                 </div>
+              </div>
 
-                <ul class="mb-4 small text-muted">
-                    <li>Your profile and authentication data will be erased.</li>
-                    <li>You will be signed out from all devices.</li>
-                    <li>This cannot be recovered later.</li>
-                </ul>
+              <!-- Delete account card -->
+              <div class="col-12 col-lg-6">
+                <div class="card shadow-sm border-0 h-100">
+                  <div class="card-body p-4">
+                    <h5 class="card-title mb-2 text-danger">Delete your account</h5>
+                    <div class="alert alert-warning mb-3" role="alert">
+                      <strong>This action is permanent.</strong>
+                      Deleting your account will remove all personal data and cannot be undone.
+                    </div>
 
-                <a id="delete" asp-page="DeletePersonalData" class="btn btn-outline-danger">
-                    Continue to delete
-                </a>
+                    <ul class="mb-4 small text-muted">
+                      <li>Your profile and authentication data will be erased.</li>
+                      <li>You will be signed out from all devices.</li>
+                      <li>This cannot be recovered later.</li>
+                    </ul>
+
+                    <a id="delete" asp-page="DeletePersonalData" class="btn btn-outline-danger">
+                      Continue to delete
+                    </a>
+                  </div>
+                </div>
+              </div>
+
             </div>
+          </div>
         </div>
+      </div>
     </div>
-
+  </div>
 </div>
 
 @section Scripts {
