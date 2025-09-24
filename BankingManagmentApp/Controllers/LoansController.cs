@@ -431,21 +431,34 @@ namespace BankingManagmentApp.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = "Admin")]
+        [Authorize] 
         public async Task<IActionResult> DownloadContract(int id)
         {
-            var loan = await _context.Loans
-                                     .Include(l => l.Customer)
-                                     .FirstOrDefaultAsync(l => l.Id == id);
+            var userId = _userManager.GetUserId(User);
 
-            if (loan == null || loan.Status != "Approved")
-            {
+            var loan = await _context.Loans
+                .Include(l => l.Customer)
+                .FirstOrDefaultAsync(l => l.Id == id);
+
+            if (loan is null)
                 return NotFound();
-            }
+
+            if (!User.IsInRole("Admin") && loan.CustomerId != userId)
+                return Forbid();
+
+            var st = (loan.Status ?? "").Trim().ToLowerInvariant();
+            var isApproved = st == "approved" || st == "autoapproved";
+            if (!isApproved)
+                return NotFound();
+
+            if (loan.ApprovalDate == default)
+                loan.ApprovalDate = DateTime.UtcNow;
+            if (loan.ApprovedAmount <= 0 && loan.Amount > 0)
+                loan.ApprovedAmount = loan.Amount;
 
             var pdfBytes = await _loanContractGenerator.GeneratePdfAsync(loan);
-
-            return File(pdfBytes, "application/pdf", $"Договор_Заем_{loan.Id}.pdf");
+            var fileName = $"Договор_Заем_{loan.Id}.pdf";
+            return File(pdfBytes, "application/pdf", fileName);
         }
 
         // GET: Loans/Delete/5

@@ -4,43 +4,40 @@
 
 @{
     ViewData["Title"] = "Log in";
+    ViewData["BodyClass"] = "auth-full-bg";
 }
 
 @section Head {
   <link rel="stylesheet" href="~/css/auth.css" asp-append-version="true" />
 }
 
-@{
-    ViewData["BodyClass"] = "auth-full-bg";
-}
-
-<div class="auth-page">
-  <div class="container-xxl">
+<!-- повече въздух от header/footer, но широка карта както преди -->
+<div class="auth-page py-5">
+  <div class="container-xxl pb-5">
     <div class="auth-wrap">
       <div class="row justify-content-center">
+        <!-- ВРЪЩАМЕ ШИРИНАТА КАКТО ПРЕДИ: без стесняване -->
         <div class="col-12">
 
           <div class="auth-card shadow-lg border-0">
             <div class="row g-0 align-items-stretch">
 
-              <!-- LEFT: Illustration (покажи само на ≥lg) -->
+              <!-- LEFT: Illustration (само ≥lg) -->
               <div class="col-lg-5 d-none d-lg-block auth-illustration"
-                   style="background-image:url('/images/auth/login-side.jpg')">
-                <!-- декоративен overlay идва от ::after в CSS -->
+                   style="background-image:url('/images/auth/register.webp')">
               </div>
 
-              <!-- RIGHT: Wider form panel -->
+              <!-- RIGHT: Form panel (компактен отвътре) -->
               <div class="col-12 col-lg-7 auth-panel">
                 <!-- Header -->
-                <div class="auth-header text-center">
+                <div class="auth-header d-flex flex-column justify-content-center align-items-center text-center py-2 py-lg-3 px-4">
                   <h2 class="mb-1">Welcome back</h2>
                   <small class="opacity-75">Log in to access your account</small>
                 </div>
 
-                <!-- Body -->
+                <!-- Body: компактни полета (без -lg класове) -->
                 <div class="auth-body card-body p-4 p-md-5">
                   <form id="account" method="post">
-                    @* (По твое желание премахнат общият alert над Email) *@
                     @* <div asp-validation-summary="All" class="alert alert-danger small" role="alert"></div> *@
 
                     <!-- Email -->
@@ -51,7 +48,7 @@
                           <i class="fa-regular fa-envelope"></i>
                         </span>
                         <input asp-for="Input.Email"
-                               class="form-control form-control-lg ps-5"
+                               class="form-control ps-5"
                                autocomplete="username"
                                placeholder="name@example.com" />
                       </div>
@@ -61,7 +58,7 @@
                     <!-- Password + toggle -->
                     <div class="mb-3">
                       <label asp-for="Input.Password" class="form-label">Password</label>
-                      <div class="input-group input-group-lg">
+                      <div class="input-group">
                         <span class="input-group-text bg-transparent border-end-0">
                           <i class="fa-solid fa-key"></i>
                         </span>
@@ -96,7 +93,7 @@
 
                       <div class="mt-3">
                         <input asp-for="Input.CaptchaInput"
-                               class="form-control form-control-lg"
+                               class="form-control"
                                placeholder="Enter the code shown above" />
                         <span asp-validation-for="Input.CaptchaInput" class="text-danger small"></span>
                       </div>
@@ -110,15 +107,19 @@
                       </label>
                     </div>
 
-                    <!-- Submit -->
-                    <button type="submit" class="btn btn-primary btn-lg w-100 mb-3">
+                    <!-- Submit (стандартен размер) -->
+                    <button type="submit" class="btn btn-primary w-100 mb-3">
                       <i class="fa-solid fa-right-to-bracket me-2"></i> Log in
                     </button>
 
                     <!-- Links -->
-                    <div class="d-flex justify-content-between small">
+                    <div class="d-flex justify-content-between align-items-center small">
                       <a asp-page="./ForgotPassword" class="link-offset-2">Forgot your password?</a>
-                      <a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl" class="link-offset-2">Create account</a>
+
+                      <span>
+                        Don’t have an account?
+                        <a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl" class="link-offset-2">Sign up</a>
+                      </span>
                     </div>
 
                     <!-- External providers -->
@@ -131,7 +132,7 @@
                         {
                           <form method="post" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl">
                             <button type="submit"
-                                    class="btn btn-outline-secondary btn-lg w-100"
+                                    class="btn btn-outline-secondary w-100"
                                     name="provider"
                                     value="@provider.Name">
                               @provider.DisplayName
@@ -184,7 +185,7 @@
       }
     })();
 
-    // Активиране на фоновия градиент (ако Layout не чете ViewData["BodyClass"])
+    // Фонов градиент, ако Layout не чете ViewData["BodyClass"]
     document.body.classList.add('auth-full-bg');
   </script>
 }

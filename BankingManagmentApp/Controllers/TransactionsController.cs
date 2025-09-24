@@ -98,17 +98,16 @@ namespace BankingManagmentApp.Controllers
         }
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
-            var transactions = await _context.Transactions.FindAsync(id);
-            if (transactions == null)
-            {
-                return NotFound();
-            }
-            return View("Index", "Profile");
+            var transaction = await _context.Transactions
+                .Include(t => t.Accounts)
+                .FirstOrDefaultAsync(t => t.Id == id);
+
+            if (transaction == null) return NotFound();
+
+            ViewData["AccountsId"] = new SelectList(_context.Accounts, "Id", "Id", transaction.AccountsId);
+            return View(transaction); // <-- важно!
         }
 
         [HttpPost]

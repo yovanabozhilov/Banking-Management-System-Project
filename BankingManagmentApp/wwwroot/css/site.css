@@ -170,7 +170,7 @@ body {
   border-color: var(--chip-accent-border) !important;
 }
 
-/* За Bootstrap badges, ако и тях искаш да са в акцент */
+/* За Bootstrap badges */
 .badge.chip-accent{
   background-color: var(--chip-accent-bg) !important;
   color: var(--chip-accent-fg) !important;

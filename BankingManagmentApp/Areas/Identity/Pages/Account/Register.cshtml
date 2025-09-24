@@ -4,19 +4,16 @@
 
 @{
     ViewData["Title"] = "Register";
+    ViewData["BodyClass"] = "auth-full-bg";
 }
 
 @section Head {
   <link rel="stylesheet" href="~/css/auth.css" asp-append-version="true" />
 }
 
-@{
-    // ако Layout не добавя автоматично клас към <body>, по-долу има JS, който го добавя
-    ViewData["BodyClass"] = "auth-full-bg";
-}
-
-<div class="auth-page">
-  <div class="container-xxl">
+<!-- повече въздух от header/footer, но широка карта както преди -->
+<div class="auth-page py-5">
+  <div class="container-xxl pb-5">
     <div class="auth-wrap">
       <div class="row justify-content-center">
         <div class="col-12">
@@ -26,13 +23,13 @@
 
               <!-- LEFT: Illustration (само на ≥lg) -->
               <div class="col-lg-5 d-none d-lg-block auth-illustration"
-                   style="background-image:url('/images/auth/login-side.jpg')">
+                   style="background-image:url('/images/auth/register-2.jpg')">
               </div>
 
-              <!-- RIGHT: Form panel -->
+              <!-- RIGHT: Form panel (компактен отвътре) -->
               <div class="col-12 col-lg-7 auth-panel">
                 <!-- Header -->
-                <div class="auth-header text-center">
+                <div class="auth-header d-flex flex-column justify-content-center align-items-center text-center py-2 py-lg-3 px-4">
                   <h2 class="mb-1">Create your account</h2>
                   <small class="opacity-75">Fill in the form to register</small>
                 </div>
@@ -48,7 +45,7 @@
                       <div class="position-relative">
                         <span class="input-icon"><i class="fa-regular fa-envelope"></i></span>
                         <input asp-for="Input.Email"
-                               class="form-control form-control-lg ps-5"
+                               class="form-control ps-5"
                                autocomplete="username"
                                placeholder="name@example.com" />
                       </div>
@@ -61,7 +58,7 @@
                       <div class="position-relative">
                         <span class="input-icon"><i class="fa-regular fa-user"></i></span>
                         <input asp-for="Input.FirstName"
-                               class="form-control form-control-lg ps-5"
+                               class="form-control ps-5"
                                autocomplete="given-name"
                                placeholder="Your first name" />
                       </div>
@@ -74,7 +71,7 @@
                       <div class="position-relative">
                         <span class="input-icon"><i class="fa-regular fa-user"></i></span>
                         <input asp-for="Input.LastName"
-                               class="form-control form-control-lg ps-5"
+                               class="form-control ps-5"
                                autocomplete="family-name"
                                placeholder="Your last name" />
                       </div>
@@ -87,9 +84,9 @@
                       <div class="position-relative">
                         <span class="input-icon"><i class="fa-solid fa-phone"></i></span>
                         <input asp-for="Input.PhoneNumber"
-                               class="form-control form-control-lg ps-5"
+                               class="form-control ps-5"
                                autocomplete="tel"
-                               placeholder="+359 ..."/>
+                               placeholder="+359 ..." />
                       </div>
                       <span asp-validation-for="Input.PhoneNumber" class="text-danger small"></span>
                     </div>
@@ -100,7 +97,7 @@
                       <div class="position-relative">
                         <span class="input-icon"><i class="fa-solid fa-location-dot"></i></span>
                         <input asp-for="Input.Address"
-                               class="form-control form-control-lg ps-5"
+                               class="form-control ps-5"
                                autocomplete="street-address"
                                placeholder="Street, number, city" />
                       </div>
@@ -114,7 +111,7 @@
                         <span class="input-icon"><i class="fa-regular fa-calendar-days"></i></span>
                         <input asp-for="Input.DateOfBirth"
                                type="date"
-                               class="form-control form-control-lg ps-5"
+                               class="form-control ps-5"
                                placeholder="YYYY-MM-DD" />
                       </div>
                       <span asp-validation-for="Input.DateOfBirth" class="text-danger small"></span>
@@ -123,7 +120,7 @@
                     <!-- Password -->
                     <div class="mb-3">
                       <label asp-for="Input.Password" class="form-label">Password</label>
-                      <div class="input-group input-group-lg">
+                      <div class="input-group">
                         <span class="input-group-text bg-transparent border-end-0">
                           <i class="fa-solid fa-key"></i>
                         </span>
@@ -145,7 +142,7 @@
                     <!-- Confirm Password -->
                     <div class="mb-4">
                       <label asp-for="Input.ConfirmPassword" class="form-label">Confirm Password</label>
-                      <div class="input-group input-group-lg">
+                      <div class="input-group">
                         <span class="input-group-text bg-transparent border-end-0">
                           <i class="fa-solid fa-lock"></i>
                         </span>
@@ -165,9 +162,17 @@
                     </div>
 
                     <!-- Submit -->
-                    <button id="registerSubmit" type="submit" class="btn btn-primary w-100 btn-lg mb-3">
+                    <button id="registerSubmit" type="submit" class="btn btn-primary w-100 mb-3">
                       <i class="fa-regular fa-circle-check me-2"></i> Register
                     </button>
+
+                    <!-- NEW: Already have an account? -->
+                    <p class="text-center small mb-3">
+                      Already have an account?
+                      <a asp-page="./Login" asp-route-returnUrl="@Model.ReturnUrl" class="link-offset-2">
+                        Log in
+                      </a>
+                    </p>
 
                     @* Confirmation message (ако има) *@
                     @if (TempData["ConfirmationMessage"] != null)
@@ -187,7 +192,7 @@
                         {
                           <form method="post" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl">
                             <button type="submit"
-                                    class="btn btn-outline-secondary btn-lg w-100"
+                                    class="btn btn-outline-secondary w-100"
                                     name="provider"
                                     value="@provider.Name">
                               @provider.DisplayName
@@ -243,7 +248,7 @@
       }
     })();
 
-    // Активиране на фоновия градиент (ако Layout не чете ViewData["BodyClass"])
+    // Фонов градиент, ако Layout не чете ViewData["BodyClass"]
     document.body.classList.add('auth-full-bg');
   </script>
 }

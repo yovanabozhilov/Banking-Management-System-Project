@@ -9,14 +9,15 @@
   <link rel="stylesheet" href="~/css/loans.css" asp-append-version="true" />
 }
 
-<div class="loan-page">
-  <div class="container-xxl">
+<!-- по-голямо разстояние от header/footer -->
+<div class="profile-page py-5">
+  <div class="container-xxl pb-5">
     <div class="row justify-content-center">
-      <div class="col-12 col-lg-9 col-xl-8">
+      <div class="col-12 col-lg-6 col-xl-5">
         <div class="loan-card card shadow-lg border-0">
 
           <!-- Header -->
-          <div class="loan-header">
+          <div class="loan-header p-4">
             <div class="d-flex align-items-center gap-3">
               <div class="loan-badge">
                 <i class="fa-regular fa-pen-to-square" aria-hidden="true"></i>
@@ -34,19 +35,20 @@
               @Html.AntiForgeryToken()
               <input type="hidden" asp-for="Id" />
               
-              <div asp-validation-summary="ModelOnly" class="alert alert-danger d-none" role="alert"></div>
+              <!-- По-четимо summary (без alert кутия) -->
+              <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
               <!-- Type -->
               <div class="mb-3">
                 <label asp-for="Type" class="form-label">Type</label>
-                <input asp-for="Type" class="form-control form-control-lg" placeholder="e.g. Personal Loan" />
+                <input asp-for="Type" class="form-control" placeholder="e.g. Personal Loan" />
                 <span asp-validation-for="Type" class="text-danger small"></span>
               </div>
 
               <!-- Amount -->
               <div class="mb-3">
                 <label asp-for="Amount" class="form-label">Amount</label>
-                <div class="input-group input-group-lg">
+                <div class="input-group">
                   <span class="input-group-text">BGN</span>
                   <input asp-for="Amount"
                          class="form-control"
@@ -61,7 +63,7 @@
               <!-- Status -->
               <div class="mb-3">
                 <label asp-for="Status" class="form-label">Status</label>
-                <select asp-for="Status" class="form-select form-select-lg">
+                <select asp-for="Status" class="form-select">
                   <option value="Pending">Pending</option>
                   <option value="Approved">Approved</option>
                   <option value="Rejected">Rejected</option>
@@ -72,7 +74,7 @@
               <!-- Approved Amount -->
               <div class="mb-2">
                 <label asp-for="ApprovedAmount" class="form-label">Approved Amount</label>
-                <div class="input-group input-group-lg">
+                <div class="input-group">
                   <span class="input-group-text">BGN</span>
                   <input asp-for="ApprovedAmount"
                          class="form-control"
@@ -105,14 +107,6 @@
 @section Scripts {
   <partial name="_ValidationScriptsPartial" />
   <script>
-    // Show validation summary if there are items
-    (function () {
-      const summary = document.querySelector('[asp-validation-summary="ModelOnly"]') || document.querySelector('.validation-summary-errors, .validation-summary-valid');
-      if (!summary) return;
-      const hasErrors = summary.querySelector('ul li');
-      if (hasErrors) summary.classList.remove('d-none');
-    })();
-
     // Ensure gradient if Layout doesn't apply BodyClass
     document.body.classList.add('loans-full-bg');
   </script>

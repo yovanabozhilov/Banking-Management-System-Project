@@ -2,47 +2,45 @@
 
 @{
     ViewData["Title"] = "Apply";
-    // Let the layout stay as-is (header & footer unchanged).
-    // If your layout uses ViewData["BodyClass"], this adds the gradient.
-    ViewData["BodyClass"] = "loans-full-bg";
+    ViewData["BodyClass"] = "loans-full-bg"; // purple gradient bg за loans
 }
 
 @section Head {
   <link rel="stylesheet" href="~/css/loans.css" asp-append-version="true" />
 }
 
-<div class="loan-page">
-  <div class="container-xxl">
+<!-- по-голямо разстояние от header/footer -->
+<div class="profile-page py-5">
+  <div class="container-xxl pb-5">
     <div class="row justify-content-center">
-      <div class="col-12 col-lg-9 col-xl-8">
+      <!-- същите ширини като при Accounts/Create -->
+      <div class="col-12 col-lg-6 col-xl-5">
         <div class="loan-card card shadow-lg border-0">
-
+          
           <!-- Header -->
-          <div class="loan-header">
-            <div class="d-flex align-items-center gap-3">
-              <div class="loan-badge">
-                <i class="fa-solid fa-file-signature"></i>
-              </div>
-              <div>
-                <h3 class="mb-0">Apply for a New Loan</h3>
-                <small class="opacity-75">Fill the details below and attach your documents</small>
-              </div>
+          <div class="loan-header d-flex align-items-center gap-3 p-4 border-bottom-0">
+            <div class="loan-badge">
+              <i class="fa-solid fa-file-signature"></i>
+            </div>
+            <div>
+              <h3 class="mb-0">Apply for a New Loan</h3>
+              <small class="opacity-75">Fill the details below and attach your documents.</small>
             </div>
           </div>
 
           <!-- Body -->
-          <div class="loan-body card-body p-4 p-md-5">
+          <div class="card-body p-4 p-md-5">
             <form asp-action="Apply" method="post" enctype="multipart/form-data" class="loan-form">
               @Html.AntiForgeryToken()
 
-              <div asp-validation-summary="ModelOnly" class="alert alert-danger d-none" role="alert"></div>
+              <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
               <!-- Loan type -->
               <div class="mb-3">
                 <label asp-for="Type" class="form-label">
                   Loan type <span class="required-star">*</span>
                 </label>
-                <select asp-for="Type" class="form-select form-select-lg" required>
+                <select asp-for="Type" class="form-select" required>
                   <option value="">-- Select --</option>
                   <option value="Personal Loan">Personal Loan</option>
                   <option value="Home Loan">Home Loan</option>
@@ -58,14 +56,13 @@
                 <label asp-for="Amount" class="form-label">
                   Amount <span class="required-star">*</span>
                 </label>
-                <div class="input-group input-group-lg">
-                  <span class="input-group-text">BGN</span>
+                <div class="input-group">
                   <input asp-for="Amount"
                          class="form-control"
                          inputmode="decimal"
                          step="0.01"
                          min="0"
-                         placeholder="e.g. 10,000.00"
+                         placeholder="e.g. 1000.00"
                          required />
                 </div>
                 <div class="form-text">Approximate amount you wish to borrow.</div>
@@ -85,23 +82,26 @@
                        name="documents"
                        multiple
                        accept=".pdf,.jpg,.jpeg,.png"
-                       class="form-control form-control-lg"
+                       class="form-control"
                        id="loanDocsInput" />
                 <ul id="loanDocsList" class="file-list mt-2 mb-0"></ul>
               </div>
 
               <!-- Submit -->
-              <div class="d-grid">
-                <button type="submit" class="btn btn-primary btn-lg">
-                  <i class="fa-solid fa-paper-plane me-2"></i> Apply
+              <div class="mb-3">
+                <button type="submit" class="btn btn-primary w-100">
+                  <i class="fa-solid fa-paper-plane me-1"></i> Apply
                 </button>
               </div>
-            </form>
-          </div>
 
-          <!-- Footer (card) -->
-          <div class="card-footer bg-transparent text-center py-3">
-            <a asp-action="Index" class="btn btn-link">Back to list</a>
+              <!-- Back to list -->
+              <div class="text-center mt-2">
+                <a asp-action="Index" class="btn btn-outline-secondary w-100">
+                  Back to List
+                </a>
+              </div>
+
+            </form>
           </div>
 
         </div>
@@ -114,15 +114,6 @@
   <partial name="_ValidationScriptsPartial" />
 
   <script>
-    // Show validation summary if there are items
-    (function () {
-      const summary = document.querySelector('[asp-validation-summary="ModelOnly"]')
-                     || document.querySelector('.validation-summary-errors, .validation-summary-valid');
-      if (!summary) return;
-      const hasErrors = summary.querySelector('ul li');
-      if (hasErrors) summary.classList.remove('d-none');
-    })();
-
     // File list preview (frontend-only)
     (function () {
       const input = document.getElementById('loanDocsInput');
@@ -155,7 +146,7 @@
       }
     })();
 
-    // Fallback: if your layout doesn't output ViewData["BodyClass"] on <body>
+    // Fallback: ако layout-ът не добавя ViewData["BodyClass"] на <body>
     document.body.classList.add('loans-full-bg');
   </script>
 }

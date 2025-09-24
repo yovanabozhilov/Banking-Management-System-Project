@@ -1,0 +1,126 @@
+:root{
+  --chat-purple:#6f42c1;
+  --chat-purple-2:#5b36a3;
+  --chat-purple-3:#4d2f8a;
+  --chat-bubble-ai:#f3effa;
+}
+
+/* Лилав header/граници */
+.bg-chat{
+  background-color:var(--chat-purple)!important;
+  border-color:var(--chat-purple)!important;
+  color:#fff!important;
+}
+
+/* Лилави бутони */
+.btn-chat{
+  color:#fff!important;
+  background-color:var(--chat-purple)!important;
+  border-color:var(--chat-purple)!important;
+}
+.btn-chat:hover{
+  background-color:var(--chat-purple-2)!important;
+  border-color:var(--chat-purple-2)!important;
+}
+.btn-chat:active{
+  background-color:var(--chat-purple-3)!important;
+  border-color:var(--chat-purple-3)!important;
+}
+
+/* Контурни бутони (бързи въпроси) */
+.btn-outline-chat{
+  color:var(--chat-purple)!important;
+  border-color:var(--chat-purple)!important;
+  background:transparent!important;
+}
+.btn-outline-chat:hover{
+  color:#fff!important;
+  background-color:var(--chat-purple)!important;
+  border-color:var(--chat-purple)!important;
+}
+
+/* Балончета */
+.bubble-user{
+  background-color:var(--chat-purple)!important;
+  color:#fff!important;
+  border:0!important;
+  border-radius:12px!important;
+}
+.bubble-ai{
+  background-color:var(--chat-bubble-ai)!important;
+  color:#222!important;
+  border:1px solid rgba(0,0,0,.08)!important;
+  border-radius:12px!important;
+}
+
+/* Плаващ бутон */
+#chatbot-toggle{
+  background-color:var(--chat-purple)!important;
+  border-color:var(--chat-purple)!important;
+  color:#fff!important;
+}
+#chatbot-toggle:hover{
+  background-color:var(--chat-purple-2)!important;
+  border-color:var(--chat-purple-2)!important;
+}
+
+/* Правим close иконката бяла */
+.btn-close-white{ filter: invert(1); }
+
+/* === SCOPED OVERRIDES: ако в markup още има bg-primary/btn-primary === */
+#chatbot-container .card-header.bg-primary{
+  background-color:var(--chat-purple)!important;
+  border-color:var(--chat-purple)!important;
+  color:#fff!important;
+}
+#chatbot-container .btn-primary{
+  background-color:var(--chat-purple)!important;
+  border-color:var(--chat-purple)!important;
+  color:#fff!important;
+}
+#chatbot-container .btn-primary:hover{
+  background-color:var(--chat-purple-2)!important;
+  border-color:var(--chat-purple-2)!important;
+}
+#chatbot-container .btn-outline-primary{
+  color:var(--chat-purple)!important;
+  border-color:var(--chat-purple)!important;
+  background:transparent!important;
+}
+#chatbot-container .btn-outline-primary:hover{
+  color:#fff!important;
+  background-color:var(--chat-purple)!important;
+  border-color:var(--chat-purple)!important;
+}
+/* user bubble, ако JS все още добавя bg-primary */
+#chatbot-container .bg-primary.text-white.align-self-end{
+  background-color:var(--chat-purple)!important;
+  border-color:var(--chat-purple)!important;
+}
+
+/* === Typing indicator (three dots) === */
+.typing-bubble{
+  background-color: var(--chat-bubble-ai);
+  color:#333;
+  border:1px solid rgba(0,0,0,.08);
+  border-radius:12px;
+  padding:8px 10px;
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  max-width:80%;
+}
+.typing-bubble .dot{
+  width:6px; height:6px;
+  border-radius:50%;
+  background: var(--chat-purple);
+  display:inline-block;
+  animation: typingBounce 1.2s infinite ease-in-out;
+}
+.typing-bubble .dot:nth-child(2){ animation-delay: .15s; }
+.typing-bubble .dot:nth-child(3){ animation-delay: .30s; }
+
+@keyframes typingBounce{
+  0%, 80%, 100% { opacity:.25; transform: translateY(0); }
+  40% { opacity:1; transform: translateY(-4px); }
+}
