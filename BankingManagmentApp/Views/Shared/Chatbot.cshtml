@@ -1,18 +1,17 @@
-﻿<div id="chatbot-container" class="card shadow-lg border-0"
+﻿@* Рендер само за логнати *@
+@if (User?.Identity?.IsAuthenticated == true)
+{
+<div id="chatbot-container" class="card shadow-lg border-0"
      style="position: fixed; bottom: 90px; right: 20px; width: 350px; height: 500px; display: none; flex-direction: column; z-index: 1050;">
 
-    <!-- Header -->
     <div class="card-header d-flex justify-content-between align-items-center bg-chat text-white">
         <span>AI Banking Assistant</span>
         <button type="button" class="btn-close btn-close-white" aria-label="Close" onclick="toggleChatbot()"></button>
     </div>
 
-    <!-- Chat messages -->
     <div id="chatWindowBot" class="card-body overflow-auto d-flex flex-column" style="background-color: var(--bs-body-bg);">
-        <!-- Messages will appear here -->
     </div>
 
-    <!-- Suggested quick questions -->
     <div class="d-flex flex-wrap p-2 border-top">
         <button class="btn btn-sm btn-outline-chat m-1" onclick="sendQuick('Create Account')">Create Account</button>
         <button class="btn btn-sm btn-outline-chat m-1" onclick="sendQuick('Forgot Password')">Forgot Password</button>
@@ -26,15 +25,13 @@
         <button class="btn btn-sm btn-outline-chat m-1" onclick="sendQuick('Early Repayment')">Early Repayment</button>
     </div>
 
-    <!-- Input -->
     <div class="card-footer d-flex">
-        <input id="prompt" type="text" class="form-control me-2" placeholder="Type a message..."
-               onkeypress="if(event.key==='Enter'){sendMessage();}" />
-        <button class="btn btn-chat" onclick="sendMessage()">Send</button>
+        <input id="promptBot" type="text" class="form-control me-2" placeholder="Type a message..."
+               onkeypress="if(event.key==='Enter'){sendMessageBot();}" />
+        <button class="btn btn-chat" onclick="sendMessageBot()">Send</button>
     </div>
 </div>
 
-<!-- Floating Chat Button -->
 <button id="chatbot-toggle"
         class="btn btn-chat rounded-circle shadow d-flex align-items-center justify-content-center"
         style="position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px; z-index: 1050;"
@@ -55,7 +52,7 @@
     }
   }
 
-  function addMessage(text, sender) {
+  function addMessageBot(text, sender) {
     const chatWindow = document.getElementById('chatWindowBot');
     const msgDiv = document.createElement('div');
     msgDiv.classList.add("p-2", "mb-2", "rounded", "text-break");
@@ -72,37 +69,35 @@
     chatWindow.scrollTop = chatWindow.scrollHeight;
   }
 
-  // --- Typing indicator helpers ---
   let typingEl = null;
-  function showTyping() {
+  function showTypingBot() {
     const chatWindow = document.getElementById('chatWindowBot');
-    hideTyping(); // само един индикатор
+    hideTypingBot();
     typingEl = document.createElement('div');
     typingEl.classList.add("typing-bubble", "align-self-start", "p-2", "mb-2", "rounded");
     typingEl.innerHTML = '<span class="dot"></span><span class="dot"></span><span class="dot"></span>';
     chatWindow.appendChild(typingEl);
     chatWindow.scrollTop = chatWindow.scrollHeight;
   }
-  function hideTyping() {
+  function hideTypingBot() {
     if (typingEl) { typingEl.remove(); typingEl = null; }
   }
 
   function sendQuick(question) {
-    const input = document.getElementById('prompt');
+    const input = document.getElementById('promptBot');
     input.value = question;
-    sendMessage();
+    sendMessageBot();
   }
 
-  async function sendMessage() {
-    const input = document.getElementById('prompt');
+  async function sendMessageBot() {
+    const input = document.getElementById('promptBot');
     const prompt = input.value.trim();
     if (!prompt) return;
 
-    addMessage(prompt, "user");
+    addMessageBot(prompt, "user");
     input.value = "";
 
-    // покажи „пише…“
-    showTyping();
+    showTypingBot();
 
     try {
       const res = await fetch('/chat/send', {
@@ -112,14 +107,13 @@
       });
 
       const data = await res.json();
-
-      // скрий индикатора и покажи отговора
-      hideTyping();
-      addMessage(data.reply ?? "(no reply)", "ai");
+      hideTypingBot();
+      addMessageBot(data.reply ?? "(no reply)", "ai");
     } catch (e) {
-      hideTyping();
-      addMessage("Sorry, something went wrong. Please try again.", "ai");
+      hideTypingBot();
+      addMessageBot("Sorry, something went wrong. Please try again.", "ai");
       console.error(e);
     }
   }
 </script>
+}
