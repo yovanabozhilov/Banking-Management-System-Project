@@ -14,7 +14,6 @@ using Xunit;
 
 namespace BankingManagmentApp.Tests.Controllers
 {
-    // ---- Simple workflow fake
     internal sealed class LoansFakeWorkflow : ILoanWorkflow
     {
         public int LastProcessedLoanId { get; private set; }
@@ -25,7 +24,6 @@ namespace BankingManagmentApp.Tests.Controllers
         }
     }
 
-    // ---- Email fake that matches the CURRENT IEmailService
     internal sealed class LoansFakeEmailService : IEmailService
     {
         public enum EmailKind { StatusUpdate, Plain, WithAttachment }
@@ -52,7 +50,7 @@ namespace BankingManagmentApp.Tests.Controllers
                 Body: null,
                 LoanId: loanId,
                 NewStatus: newStatus,
-                AttachmentBytes: attachmentBytes, // controller може да подаде null
+                AttachmentBytes: attachmentBytes, 
                 AttachmentName: $"Loan_Contract{loanId}.pdf"
             ));
             return Task.CompletedTask;
@@ -96,7 +94,7 @@ namespace BankingManagmentApp.Tests.Controllers
         {
             using var ctx = CtxHelper.NewInMemoryContext();
 
-            var store = new FakeUserStore(); // no users added
+            var store = new FakeUserStore(); 
             var userManager = UserManagerFactory.Create(store);
             var email = new LoansFakeEmailService();
 
@@ -125,7 +123,6 @@ namespace BankingManagmentApp.Tests.Controllers
             var sut = new LoansController(ctx, userManager, email, loanContractGenerator: null!);
             CtxHelper.AttachUser(sut, CtxHelper.PrincipalFor("c1"));
 
-            // Force INVALID model => controller fills defaults (per current code)
             sut.ModelState.AddModelError("x", "invalid");
 
             var loan = new Loans { Type = "Personal", Amount = 2500, Term = default };
@@ -137,7 +134,7 @@ namespace BankingManagmentApp.Tests.Controllers
 
             var saved = ctx.Loans.Single();
             saved.CustomerId.Should().Be("c1");
-            saved.Status.Should().Be("Pending "); // note trailing space in controller
+            saved.Status.Should().Be("Pending ");
             saved.Term.Should().NotBe(default);
             workflow.LastProcessedLoanId.Should().Be(saved.Id);
         }
@@ -198,7 +195,6 @@ namespace BankingManagmentApp.Tests.Controllers
         [Fact]
         public async Task Edit_Post_InvalidModel_Admin_Declined_Sends_StatusEmail_No_Repayments_Redirects()
         {
-            // Use Declined status to avoid PDF generation dependency.
             using var ctx = CtxHelper.NewInMemoryContext();
 
             var customer = new Customers { Id = "c1", Email = "c1@x.com", UserName = "c1" };
@@ -214,7 +210,6 @@ namespace BankingManagmentApp.Tests.Controllers
             ctx.Loans.Add(loan);
             await ctx.SaveChangesAsync();
 
-            // Controller uses _context.Update(postedLoan) — изчистваме тракването преди POST.
             ctx.ChangeTracker.Clear();
 
             var store = new FakeUserStore(); store.Add(customer);
@@ -224,7 +219,7 @@ namespace BankingManagmentApp.Tests.Controllers
             var sut = new LoansController(ctx, userManager, email, loanContractGenerator: null!);
             CtxHelper.AttachUser(sut, CtxHelper.PrincipalFor("c1", isAdmin: true));
 
-            sut.ModelState.AddModelError("x", "invalid"); // enter update branch per current code
+            sut.ModelState.AddModelError("x", "invalid"); 
 
             var postDto = new Loans
             {
@@ -239,16 +234,14 @@ namespace BankingManagmentApp.Tests.Controllers
             res.Should().NotBeNull();
             res!.ActionName.Should().Be(nameof(LoansController.Index));
 
-            // Expect ONE status update email, no attachment for Declined
             email.Calls.Should().HaveCount(1);
             var call = email.Calls.Single();
             call.Kind.Should().Be(LoansFakeEmailService.EmailKind.StatusUpdate);
             call.To.Should().Be("c1@x.com");
             call.LoanId.Should().Be(loan.Id);
             call.NewStatus.Should().Be("Declined");
-            call.AttachmentBytes.Should().BeNull(); // controller passes null for 'Declined'
+            call.AttachmentBytes.Should().BeNull(); 
 
-            // No repayments created for Declined
             ctx.LoanRepayments.Where(r => r.LoanId == loan.Id).Count().Should().Be(0);
         }
 
@@ -277,12 +270,11 @@ namespace BankingManagmentApp.Tests.Controllers
                 Date = DateTime.UtcNow,
                 Status = "Pending",
                 ApprovedAmount = 0,
-                // НЕ задаваме null за ApprovalDate, защото е non-nullable
                 ApprovalDate = DateTime.UtcNow
             };
 
-            var workflow = new LoansFakeWorkflow(); // your simple fake workflow
-            var documents = new List<IFormFile>();  // empty list if no files are needed in the test
+            var workflow = new LoansFakeWorkflow(); 
+            var documents = new List<IFormFile>();  
 
             var res = await sut.Create(dto, workflow, documents)
                       as RedirectToActionResult;

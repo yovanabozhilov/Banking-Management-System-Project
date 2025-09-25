@@ -16,7 +16,6 @@ namespace BankingManagmentApp.Tests.Controllers
         {
             using var ctx = CtxHelper.NewInMemoryContext();
 
-            // Assumes DbSet<Feedback> Feedbacks with at least Id, Comment
             ctx.Feedbacks.AddRange(
                 new Feedback { Comment = "I love the app, it is excellent!" },
                 new Feedback { Comment = "This is the worst service, awful experience." },

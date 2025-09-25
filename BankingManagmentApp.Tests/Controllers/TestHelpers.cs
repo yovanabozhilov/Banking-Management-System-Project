@@ -51,7 +51,6 @@ namespace BankingManagmentApp.Tests.Controllers
         }
     }
 
-    // Minimal in-memory user store for tests
     internal sealed class FakeUserStore : IUserStore<Customers>
     {
         private readonly Dictionary<string, Customers> _byId = new();
@@ -61,7 +60,6 @@ namespace BankingManagmentApp.Tests.Controllers
         public Task<Customers?> FindByIdAsync(string userId, CancellationToken ct) =>
             Task.FromResult(_byId.TryGetValue(userId, out var u) ? u : null);
 
-        // Unused members implemented minimally:
         public Task<string> GetUserIdAsync(Customers user, CancellationToken ct) => Task.FromResult(user.Id);
         public Task<string?> GetUserNameAsync(Customers user, CancellationToken ct) => Task.FromResult(user.UserName);
         public Task SetUserNameAsync(Customers user, string? userName, CancellationToken ct) { user.UserName = userName; return Task.CompletedTask; }
@@ -81,15 +79,13 @@ namespace BankingManagmentApp.Tests.Controllers
         {
             return new UserManager<Customers>(
                 store,
-                null, // IOptions<IdentityOptions>
+                null, 
                 new PasswordHasher<Customers>(),
                 Array.Empty<IUserValidator<Customers>>(),
                 Array.Empty<IPasswordValidator<Customers>>(),
                 null, null, null, null);
         }
     }
-
-    // ===== Test doubles for Loans =====
 
     internal sealed class LoanWorkflowFake : ILoanWorkflow
     {
@@ -127,7 +123,7 @@ namespace BankingManagmentApp.Tests.Controllers
                 null,
                 loanId,
                 newStatus,
-                attachmentBytes, // може да е null на runtime
+                attachmentBytes, 
                 $"Loan_Contract{loanId}.pdf"
             ));
             return Task.CompletedTask;

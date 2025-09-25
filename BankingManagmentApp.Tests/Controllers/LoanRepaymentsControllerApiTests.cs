@@ -17,7 +17,7 @@ namespace BankingManagmentApp.Tests.Controllers
         private ApplicationDbContext GetDbContext()
         {
             var options = new DbContextOptionsBuilder<ApplicationDbContext>()
-                .UseInMemoryDatabase(Guid.NewGuid().ToString()) // unique db per test
+                .UseInMemoryDatabase(Guid.NewGuid().ToString()) 
                 .Options;
 
             return new ApplicationDbContext(options);
@@ -43,7 +43,6 @@ namespace BankingManagmentApp.Tests.Controllers
         [Fact]
         public async Task Index_ShouldMarkOverdueRepayments()
         {
-            // Arrange
             var context = GetDbContext();
             var userId = "user123";
 
@@ -73,7 +72,7 @@ namespace BankingManagmentApp.Tests.Controllers
             {
                 Id = 1,
                 Loan = loan,
-                DueDate = DateOnly.FromDateTime(DateTime.Today.AddDays(-5)), // overdue
+                DueDate = DateOnly.FromDateTime(DateTime.Today.AddDays(-5)), 
                 Status = "Pending",
                 AmountDue = 100,
                 AmountPaid = 0
@@ -83,7 +82,7 @@ namespace BankingManagmentApp.Tests.Controllers
             {
                 Id = 2,
                 Loan = loan,
-                DueDate = DateOnly.FromDateTime(DateTime.Today.AddDays(5)), // future
+                DueDate = DateOnly.FromDateTime(DateTime.Today.AddDays(5)), 
                 Status = "Pending",
                 AmountDue = 200,
                 AmountPaid = 0
@@ -96,30 +95,25 @@ namespace BankingManagmentApp.Tests.Controllers
 
             var controller = GetController(context, userId);
 
-            // Act
             var result = await controller.Index();
 
-            // Assert
             result.Should().BeOfType<ViewResult>();
 
             var updatedRepayment1 = await context.LoanRepayments.FindAsync(1);
             var updatedRepayment2 = await context.LoanRepayments.FindAsync(2);
 
-            updatedRepayment1!.Status.Should().Be("Overdue");   // past due date
-            updatedRepayment2!.Status.Should().Be("Pending");   // still in the future
+            updatedRepayment1!.Status.Should().Be("Overdue");  
+            updatedRepayment2!.Status.Should().Be("Pending");   
         }
 
         [Fact]
         public async Task Index_ShouldReturnEmptyList_WhenNoRepayments()
         {
-            // Arrange
             var context = GetDbContext();
             var controller = GetController(context, "user999");
 
-            // Act
             var result = await controller.Index();
 
-            // Assert
             result.Should().BeOfType<ViewResult>();
             (await context.LoanRepayments.CountAsync()).Should().Be(0);
         }
