@@ -19,7 +19,7 @@ namespace BankingManagmentApp.Controllers
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             var repayments = await _context.LoanRepayments
-                .Where(r => r.Loan.Customer.Id == userId)
+                .Where(r => r.Loan.Customer.Id == userId && r.Status == "Approved")
                 .OrderByDescending(x=>x.DueDate)
                 .ToListAsync();
 
