@@ -46,9 +46,10 @@
                         </dl>
 
                         <div class="d-flex gap-2">
-                            <form asp-action="Delete" class="flex-fill">
+                            <!-- Променено: бутонът е type="button", формата има id -->
+                            <form asp-action="Delete" class="flex-fill" id="blockForm" method="post">
                                 <input type="hidden" asp-for="Id" />
-                                <button type="submit" class="btn btn-danger w-100">
+                                <button type="button" id="confirmBlockBtn" class="btn btn-danger w-100">
                                     <i class="fa-solid fa-ban me-1"></i> Block
                                 </button>
                             </form>
@@ -63,3 +64,34 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        (function () {
+            const btn = document.getElementById('confirmBlockBtn');
+            const form = document.getElementById('blockForm');
+            if (!btn || !form) return;
+
+            btn.addEventListener('click', function () {
+                if (window.Swal) {
+                    Swal.fire({
+                        title: 'Block this account?',
+                        text: 'This will prevent further transactions until it is unblocked.',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonText: 'Yes, block',
+                        cancelButtonText: 'Cancel',
+                        reverseButtons: true,
+                        focusCancel: true
+                    }).then((res) => {
+                        if (res.isConfirmed) form.submit();
+                    });
+                } else {
+                    if (confirm('Block this account?\nThis will prevent further transactions until it is unblocked.')) {
+                        form.submit();
+                    }
+                }
+            });
+        })();
+    </script>
+}

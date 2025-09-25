@@ -2,14 +2,14 @@
 
 @{
     ViewData["Title"] = "Delete Transaction";
-    ViewData["BodyClass"] = "profile-full-bg"; // enable purple gradient background
+    ViewData["BodyClass"] = "profile-full-bg";
 }
 <link rel="stylesheet" href="~/css/profile.css" asp-append-version="true" />
 
 <div class="profile-page">
     <div class="container-xxl">
         <div class="row justify-content-center">
-            <div class="col-12 col-lg-8 col-xl-7">
+            <div class="col-12 col-lg-6 col-xl-5">
                 <div class="profile-card card shadow-lg border-0">
 
                     <!-- Header -->
@@ -25,7 +25,7 @@
 
                     <!-- Body -->
                     <div class="card-body p-4 p-md-5">
-                        <dl class="row">
+                        <dl class="row mb-4">
                             <dt class="col-sm-4">Transaction Type</dt>
                             <dd class="col-sm-8">@Model.TransactionType</dd>
 
@@ -38,24 +38,25 @@
                             <dt class="col-sm-4">Description</dt>
                             <dd class="col-sm-8">@Model.Description</dd>
 
-                            <dt class="col-sm-4">Reference Number</dt>
+                            <dt class="col-sm-4">Reference #</dt>
                             <dd class="col-sm-8">@Model.ReferenceNumber</dd>
 
                             <dt class="col-sm-4">Account</dt>
                             <dd class="col-sm-8">@Model.Accounts?.Id</dd>
                         </dl>
 
-                        <form asp-action="Delete" method="post">
-                            <input type="hidden" asp-for="Id" />
-                            <div class="d-flex gap-2">
-                                <button type="submit" class="btn btn-danger w-100">
+                        <div class="d-flex gap-2">
+                            <!-- ВАЖНО: бутонът вече е type="button", а формата има id -->
+                            <form asp-action="Delete" method="post" id="deleteForm" class="flex-fill">
+                                <input type="hidden" asp-for="Id" />
+                                <button type="button" id="confirmDeleteBtn" class="btn btn-danger w-100">
                                     <i class="fa-solid fa-trash me-1"></i> Delete
                                 </button>
-                                <a asp-action="Index" class="btn btn-outline-secondary w-100">
-                                    Cancel
-                                </a>
-                            </div>
-                        </form>
+                            </form>
+                            <a asp-action="Index" class="btn btn-outline-secondary flex-fill">
+                                <i class="fa-solid fa-arrow-left me-1"></i> Back to List
+                            </a>
+                        </div>
                     </div>
 
                 </div>
@@ -63,3 +64,36 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        (function () {
+            const btn = document.getElementById('confirmDeleteBtn');
+            const form = document.getElementById('deleteForm');
+
+            if (!btn || !form) return;
+
+            btn.addEventListener('click', function () {
+                // Ако SweetAlert2 е наличен – ползвай го; иначе резервен window.confirm
+                if (window.Swal) {
+                    Swal.fire({
+                        title: 'Delete this transaction?',
+                        text: 'This action cannot be undone.',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonText: 'Yes, delete',
+                        cancelButtonText: 'Cancel',
+                        reverseButtons: true,
+                        focusCancel: true
+                    }).then((res) => {
+                        if (res.isConfirmed) form.submit();
+                    });
+                } else {
+                    if (confirm('Delete this transaction? This action cannot be undone.')) {
+                        form.submit();
+                    }
+                }
+            });
+        })();
+    </script>
+}
