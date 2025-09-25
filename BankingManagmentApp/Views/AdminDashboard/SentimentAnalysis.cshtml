@@ -2,79 +2,99 @@
 
 @{
     ViewData["Title"] = "Sentiment Analysis";
+    ViewData["BodyClass"] = "profile-full-bg";  // purple gradient background
 }
+<link rel="stylesheet" href="~/css/profile.css" asp-append-version="true" />
 
-<div class="container mt-4">
-    <div class="card shadow-sm mb-4">
-        <div class="card-header">
-            <h3 class="mb-0">Customer Feedback Sentiment</h3>
-        </div>
+<div class="profile-page">
+    <div class="container-xxl">
+        <div class="row justify-content-center">
+            <div class="col-12 col-lg-10 col-xl-9">
+                <div class="profile-card card shadow-lg border-0">
 
-        <div class="card-body">
-            <p>
-                <span class="badge bg-success">Positive: @ViewBag.PositiveCount</span>
-                <span class="badge bg-danger">Negative: @ViewBag.NegativeCount</span>
-                <span class="badge bg-secondary">Neutral: @ViewBag.NeutralCount</span>
-            </p>
+                    <!-- Header -->
+                    <div class="profile-header d-flex align-items-center gap-3 p-4 border-bottom">
+                        <div class="profile-badge">
+                            <i class="fa-solid fa-comments"></i>
+                        </div>
+                        <div>
+                            <h3 class="mb-0">@ViewData["Title"]</h3>
+                            <small class="opacity-75">Customer Feedback Sentiment</small>
+                        </div>
+                    </div>
 
-            @if (!Model.Any())
-            {
-                <p class="text-muted">No feedback available.</p>
-            }
-            else
-            {
-                <div class="table-responsive">
-                    <table class="table table-striped align-middle">
-                        <thead>
-                            <tr>
-                                <th>Id</th>
-                                <th>Comment</th>
-                                <th>Sentiment</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var item in Model)
-                            {
-                                <tr>
-                                    <td>@item.Id</td>
-                                    <td>@item.Comment</td>
-                                    <td>
-                                        @if (item.Sentiment == "Positive")
+                    <!-- Body -->
+                    <div class="card-body p-4 p-md-5">
+                        <p class="mb-4">
+                            <span class="badge bg-success me-2">Positive: @ViewBag.PositiveCount</span>
+                            <span class="badge bg-danger me-2">Negative: @ViewBag.NegativeCount</span>
+                            <span class="badge bg-secondary">Neutral: @ViewBag.NeutralCount</span>
+                        </p>
+
+                        @if (!Model.Any())
+                        {
+                            <div class="text-muted text-center p-4">
+                                No feedback available.
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="table-responsive">
+                                <table class="table table-hover table-striped align-middle mb-0">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Id</th>
+                                            <th>Comment</th>
+                                            <th>Sentiment</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var item in Model)
                                         {
-                                            <span class="badge bg-success">Positive</span>
+                                            <tr>
+                                                <td>@item.Id</td>
+                                                <td>@item.Comment</td>
+                                                <td>
+                                                    @if (item.Sentiment == "Positive")
+                                                    {
+                                                        <span class="badge bg-success">Positive</span>
+                                                    }
+                                                    else if (item.Sentiment == "Negative")
+                                                    {
+                                                        <span class="badge bg-danger">Negative</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="badge bg-secondary">Neutral</span>
+                                                    }
+                                                </td>
+                                            </tr>
                                         }
-                                        else if (item.Sentiment == "Negative")
-                                        {
-                                            <span class="badge bg-danger">Negative</span>
-                                        }
-                                        else
-                                        {
-                                            <span class="badge bg-secondary">Neutral</span>
-                                        }
-                                    </td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+                    </div>
+
+                    <!-- Footer / Chart -->
+                    @if (Model.Any())
+                    {
+                        <div class="card-footer bg-white border-top-0">
+                            <h6 class="text-center mb-3">Sentiment Overview</h6>
+                            <canvas id="sentimentChart" height="140"></canvas>
+                        </div>
+                    }
+
                 </div>
-            }
-        </div>
-
-        @if (Model.Any())
-        {
-            <div class="card-footer bg-white border-top-0">
-                <canvas id="sentimentChart" height="140"></canvas>
             </div>
-        }
-
+        </div>
     </div>
 </div>
 
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        const ctx = document.getElementById('sentimentChart');
-        new Chart(ctx, {
+        new Chart(document.getElementById('sentimentChart'), {
             type: 'doughnut',
             data: {
                 labels: ['Positive', 'Negative', 'Neutral'],
