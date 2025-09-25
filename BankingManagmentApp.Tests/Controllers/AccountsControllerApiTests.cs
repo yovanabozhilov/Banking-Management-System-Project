@@ -36,13 +36,12 @@ namespace BankingManagmentApp.Tests.Controllers
             var model = result!.Model as List<Accounts>;
             model.Should().NotBeNull();
             model!.Count.Should().Be(2);
-            model.All(a => a.Customer != null).Should().BeTrue(); // Include(Customer)
+            model.All(a => a.Customer != null).Should().BeTrue();
         }
 
         [Fact]
         public async Task Create_Post_InvalidModel_Adds_Account_And_Redirects()
         {
-            // NOTE: Current controller adds only when ModelState is INVALID.
             using var ctx = CtxHelper.NewInMemoryContext();
 
             var user = new Customers { Id = "u1", Email = "u1@x.com" };
@@ -97,7 +96,7 @@ namespace BankingManagmentApp.Tests.Controllers
             }) as RedirectToActionResult;
 
             result.Should().NotBeNull();
-            ctx.Accounts.Count().Should().Be(0); // current code path does NOT add when model is valid
+            ctx.Accounts.Count().Should().Be(0); 
         }
 
         [Fact]

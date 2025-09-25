@@ -66,7 +66,6 @@ namespace BankingManagmentApp.Tests.Controllers
         {
             var context = GetDbContext();
 
-            // Seed accounts and transactions
             var acc = new Accounts { Id = 1, IBAN = "ACC1", Currency = "USD", AccountType = "Checking", CustomerId = "u1" };
             context.Accounts.Add(acc);
 
