@@ -5,10 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>@ViewData["Title"] - BankingManagmentApp</title>
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
     <link rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
-      referrerpolicy="no-referrer" />
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+          referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/chatbot.css" asp-append-version="true" />
@@ -18,7 +17,6 @@
     @await RenderSectionAsync("Head", required: false)
 
     <style>
-        /* Custom CSS for the sidebar */
         body {
             display: flex;
             min-height: 100vh;
@@ -43,10 +41,11 @@
         #wrapper.toggled #sidebar-wrapper {
             margin-left: 0;
         }
-            #sidebar-wrapper .sidebar-heading {
-                padding: 0.875rem 1.25rem;
-                font-size: 1.2rem;
-            }
+
+        #sidebar-wrapper .sidebar-heading {
+            padding: 0.875rem 1.25rem;
+            font-size: 1.2rem;
+        }
 
         #page-content-wrapper {
             width: 100%;
@@ -83,68 +82,164 @@
             margin-right: 1rem;
         }
 
+        .custom-navbar {
+            background: white;
+            padding: 0.75rem 1rem;
+        }
+
+            .custom-navbar .navbar-brand {
+                font-size: 1.25rem;
+                color: #6251DB;
+                font-weight: 800;
+            }
+
+        .navbar-toggle-btn {
+            cursor: pointer;
+            margin-right: 1rem;
+            border-color: steelblue;
+            color: #6251DB;
+        }
+
+        .custom-sidebar {
+            min-width: 250px;
+            max-width: 250px;
+            background: #6251DB;
+            color: #cbd5e1;
+            padding: 1.5rem 1rem;
+            border-right: 1px solid #1e293b;
+            transition: margin-left 0.25s ease-out;
+            margin-left: -250px;
+        }
+
+        #wrapper.toggled .custom-sidebar {
+            margin-left: 0;
+        }
+
+        .sidebar-brand {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: steelblue;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .sidebar-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .sidebar-section-title {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            color: #94a3b8;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            padding-left: 0.5rem;
+        }
+
+        .sidebar-nav-item .nav-link {
+            display: flex;
+            align-items: center;
+            font-weight: 600;
+            font-size: 16px;
+            color: #cbd5e1;
+            padding: 0.6rem 0.75rem;
+            border-radius: 0.5rem;
+            transition: all 0.2s ease-in-out;
+        }
+
+            .sidebar-nav-item .nav-link:hover {
+                background-color: rgba(70, 130, 180, 0.15);
+                color: #6251DB;
+                transform: translateX(5px);
+            }
     </style>
 </head>
 
 <body class="@ViewData["BodyClass"]">
-    <header class="navbar navbar-expand-lg navbar-light bg-light border-bottom box-shadow mb-3">
+    <header class="navbar navbar-expand-lg custom-navbar shadow-sm">
         <div class="container-fluid">
-            <button class="btn btn-outline-secondary navbar-toggle-btn" id="sidebarToggle">
+            <button class="btn btn-outline-light navbar-toggle-btn" id="sidebarToggle">
                 <i class="fa-solid fa-bars"></i>
             </button>
-            <a class="navbar-brand" style="color: steelblue;" asp-area="" asp-controller="Home" asp-action="Index"><i>GlowPay</i></a>
+            <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
+                GlowPay
+            </a>
             <div class="collapse navbar-collapse justify-content-end">
                 <partial name="_LoginPartial" />
             </div>
         </div>
     </header>
-
     <div id="wrapper">
-        <nav id="sidebar-wrapper">
-            <div class="sidebar-brand">
-                Menu
-            </div>
-            <ul class="list-unstyled components">
-                @if (User.IsInRole("Admin") || User.IsInRole("User"))
-                {
-                    <li class="sidebar-nav-item">
-                        <a class="nav-link" asp-area="" asp-controller="Profile" asp-action="Index">Your Profile</a>
-                    </li>
-                    <li class="sidebar-nav-item">
-                        <a class="nav-link" asp-area="" asp-controller="Loans" asp-action="Apply">Apply for credit</a>
-                    </li>
-                    <li class="sidebar-nav-item">
-                        <a class="nav-link" asp-area="" asp-controller="Accounts" asp-action="Create">New Card</a>
-                    </li>
-                    <li class="sidebar-nav-item">
-                        <a class="nav-link" asp-controller="AdminDashboard" asp-action="CategoryComparison">Category Comparison</a>
-                    </li>
-                }
-                @if (User.IsInRole("Admin"))
-                {
-                    <li class="sidebar-nav-item">
-                        <a class="nav-link" asp-area="" asp-controller="Loans" asp-action="Index">Pending Credits</a>
-                    </li>
-                    <li class="sidebar-nav-item">
-                        <a class="nav-link" asp-controller="AdminDashboard" asp-action="Benchmarking">Benchmarking</a>
-                    </li>
-                    <li class="sidebar-nav-item">
-                        <a class="nav-link" asp-controller="AdminDashboard" asp-action="SentimentAnalysis">Sentiment Analysis</a>
-                    </li>
-                    <li class="sidebar-nav-item">
-                        <a class="nav-link" asp-controller="Forecasting" asp-action="Index">Forecasting</a>
-                    </li>
-                    <li class="sidebar-nav-item">
-                        <a class="nav-link" asp-area="" asp-controller="AdminDashboard" asp-action="Index">Dashboard</a>
-                    </li>
-                }
-                @if (User.IsInRole("User"))
-                {
-                    <li class="sidebar-nav-item">
-                        <a class="nav-link" asp-area="" asp-controller="Loans" asp-action="Index">Your Credits</a>
-                    </li>
-                }
-            </ul>
+        <nav id="sidebar-wrapper" class="custom-sidebar">
+            @if (User.IsInRole("Admin") || User.IsInRole("User"))
+            {
+                <div class="sidebar-section">
+                    <p class="sidebar-section-title">User</p>
+                    <ul class="list-unstyled">
+                        <li class="sidebar-nav-item">
+                            <a class="nav-link" asp-area="" asp-controller="Profile" asp-action="Index">
+                                <i class="fa-solid fa-user me-2"></i> Your Profile
+                            </a>
+                        </li>
+                        <li class="sidebar-nav-item">
+                            <a class="nav-link" asp-area="" asp-controller="Loans" asp-action="Apply">
+                                <i class="fa-solid fa-file-signature me-2"></i> Apply for Credit
+                            </a>
+                        </li>
+                        <li class="sidebar-nav-item">
+                            <a class="nav-link" asp-area="" asp-controller="Accounts" asp-action="Create">
+                                <i class="fa-solid fa-credit-card me-2"></i> New Card
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            }
+            @if (User.IsInRole("Admin"))
+            {
+                <div class="sidebar-section">
+                    <p class="sidebar-section-title">Admin</p>
+                    <ul class="list-unstyled">
+                        <li class="sidebar-nav-item">
+                            <a class="nav-link" asp-area="" asp-controller="Loans" asp-action="Index">
+                                <i class="fa-solid fa-hourglass-half me-2"></i> Pending Credits
+                            </a>
+                        </li>
+                        <li class="sidebar-nav-item">
+                            <a class="nav-link" asp-controller="AdminDashboard" asp-action="Benchmarking">
+                                <i class="fa-solid fa-chart-line me-2"></i> Benchmarking
+                            </a>
+                        </li>
+                        <li class="sidebar-nav-item">
+                            <a class="nav-link" asp-controller="AdminDashboard" asp-action="SentimentAnalysis">
+                                <i class="fa-solid fa-comments me-2"></i> Sentiment Analysis
+                            </a>
+                        </li>
+                        <li class="sidebar-nav-item">
+                            <a class="nav-link" asp-controller="Forecasting" asp-action="Index">
+                                <i class="fa-solid fa-chart-pie me-2"></i> Forecasting
+                            </a>
+                        </li>
+                        <li class="sidebar-nav-item">
+                            <a class="nav-link" asp-area="" asp-controller="AdminDashboard" asp-action="Index">
+                                <i class="fa-solid fa-gauge-high me-2"></i> Dashboard
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            }
+            @if (User.IsInRole("User"))
+            {
+                <div class="sidebar-section">
+                    <p class="sidebar-section-title">My Loans</p>
+                    <ul class="list-unstyled">
+                        <li class="sidebar-nav-item">
+                            <a class="nav-link" asp-area="" asp-controller="Loans" asp-action="Index">
+                                <i class="fa-solid fa-hand-holding-dollar me-2"></i> Your Credits
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            }
         </nav>
 
         <div id="page-content-wrapper">
@@ -154,16 +249,14 @@
         </div>
     </div>
 
-    @if (User?.Identity?.IsAuthenticated == true)
-    {
-        <partial name="Chatbot" />
-    }
+    <partial name="Chatbot" />
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
 
     <script>
-        document.getElementById("sidebarToggle").addEventListener("click", function(e) {
+        document.getElementById("sidebarToggle").addEventListener("click", function (e) {
             e.preventDefault();
             document.getElementById("wrapper").classList.toggle("toggled");
         });
@@ -171,12 +264,10 @@
 
     <footer class="border-top footer text-body-secondary">
         <div class="container">
-            &copy; 2025 - BankingManagmentApp -
-            <a class="link-body-emphasis" style="color: steelblue; font-weight:800;font-size:18px;" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            &copy; 2025 - GlowPay - Experian Workshop
         </div>
     </footer>
 
     @await RenderSectionAsync("Scripts", required: false)
-
 </body>
 </html>
