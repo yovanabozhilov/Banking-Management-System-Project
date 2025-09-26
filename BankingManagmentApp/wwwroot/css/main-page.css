@@ -1,6 +1,10 @@
+/* ==========================
+   PROFILE FULL BACKGROUND
+========================== */
 body.profile-full-bg {
   position: relative;
 }
+
 body.profile-full-bg::before {
   content: "";
   position: fixed;
@@ -20,76 +24,244 @@ body.profile-full-bg::before {
     radial-gradient(1000px 600px at 120% 0%, rgba(142,109,253,.28), transparent 60%),
     linear-gradient(180deg, #533db3 0%, #8468ee 45%, #e9e6ff 85%, #ffffff 100%);
 }
-/* Base purple card styling from before */
-.account-card-purple {
-  background: linear-gradient(135deg, #6a4bcf, #8e6dfd);
+
+/* ==========================
+   PROFILE HEADER CARD
+========================== */
+.profile-header-card {
   border-radius: 1rem;
-  padding: 1.25rem;
-  color: #fff;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-  transition: transform .15s ease, box-shadow .15s ease;
+  overflow: hidden;
+  background: #fff;
+  border: none;
+  position: relative;
 }
+
+.profile-header-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, #6a4bcf, #8e6dfd);
+  opacity: 0.08;
+  z-index: 0;
+}
+
+.profile-header-card .card-body {
+  position: relative;
+  z-index: 1;
+}
+
+/* Avatar */
+.fancy-avatar {
+  background: linear-gradient(135deg, #6a4bcf, #8e6dfd);
+  color: #fff;
+  font-weight: bold;
+  font-size: 1.2rem;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(106, 75, 207, 0.4);
+}
+
+/* Gradient text */
+.text-gradient {
+  background: linear-gradient(135deg, #6a4bcf, #8e6dfd);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* ==========================
+   ACCOUNT CARDS
+========================== */
+.account-card-purple {
+  position: relative;
+  background: linear-gradient(145deg,#6a4bcf 0%,#8e6dfd 50%,#b49bff 100%);
+  border-radius: 1.25rem;
+  padding: 1.5rem;
+  color: #fff;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+  overflow: hidden;
+  transition: transform .25s ease, box-shadow .25s ease;
+  animation: fadeInUp .4s ease forwards;
+}
+
+@keyframes fadeInUp {
+  from { opacity:0; transform:translateY(20px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+
+.account-card-purple::before {
+  content:"";
+  position:absolute;
+  top:-40%;
+  left:-40%;
+  width:180%;
+  height:180%;
+  background: radial-gradient(circle at top left,rgba(255,255,255,.15),transparent 60%);
+  transform: rotate(25deg);
+  pointer-events:none;
+}
+
 .account-card-purple:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 16px rgba(0,0,0,0.25);
+  transform: translateY(-6px) scale(1.02);
+  box-shadow: 0 12px 30px rgba(0,0,0,0.3);
 }
 
-/* Status labels */
-.status-active {
-  background: #28a745;
+/* IBAN & copy button */
+.iban span {
+  font-weight:600;
+  letter-spacing:1px;
+}
+
+.btn-outline-light[data-copy-iban] {
+  border-radius: 2rem;
+  padding: 0.25rem 0.75rem;
+  backdrop-filter: blur(4px);
+  transition: all .2s ease;
+}
+
+.btn-outline-light[data-copy-iban]:hover {
+  background: rgba(255,255,255,0.2);
+  transform: translateY(-1px);
+}
+
+/* Balance */
+.fancy-balance .amount {
+  font-size: 1.8rem;
+  font-weight: 700;
+  text-shadow: 0 0 6px rgba(255,255,255,0.6);
+}
+
+.fancy-balance .currency {
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Status pills */
+.status-pill {
+  padding: 0.25rem 0.6rem;
+  font-size: 0.75rem;
+  border-radius: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
   color: #fff;
-  padding: 0.25rem 0.6rem;
-  border-radius: 12px;
-  font-weight: 600;
-}
-.status-inactive {
-  background: #ffc107;
-  color: #212529;
-  padding: 0.25rem 0.6rem;
-  border-radius: 12px;
-  font-weight: 600;
 }
 
-/* Action buttons */
+.status-active {
+  background: linear-gradient(90deg,#28a745 0%,#42d77d 100%);
+}
+
+.status-inactive {
+  background: linear-gradient(90deg,#ffc107 0%,#ffdb70 100%);
+  color: #212529;
+}
+
+/* Block & Export buttons */
+.btn-block-card,
+.btn-export-card {
+  border-radius: 2rem;
+  padding: 0.3rem 0.9rem;
+  font-weight: 500;
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+
+.btn-block-card:hover,
+.btn-export-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+}
+
 .btn-block-card {
-  background-color: #dc3545;      /* bright red */
+  background-color: #dc3545;
   color: #fff;
   border: none;
 }
+
 .btn-block-card:hover {
   background-color: #c82333;
 }
 
 .btn-export-card {
-  background-color: #0d6efd;      /* bootstrap primary blue */
+  background-color: #0d6efd;
   color: #fff;
   border: none;
 }
+
 .btn-export-card:hover {
   background-color: #0b5ed7;
 }
 
-/* Purple header with left accent line (same as Accounts) */
-.profile-card .profile-header {
-    background: linear-gradient(135deg, #6a4bcf, #8e6dfd);
-    color: #fff;
-    border-left: 4px solid #6a4bcf;
-    border-top-left-radius: 0.75rem;
-    border-top-right-radius: 0.75rem;
+/* ==========================
+   GRADIENT BUTTONS
+========================== */
+.btn-gradient {
+  background: linear-gradient(135deg, #6a4bcf, #8e6dfd);
+  color: #fff !important;
+  border: none;
+  border-radius: 0.6rem;
+  padding: 0.45rem 1rem;
+  font-weight: 600;
+  transition: 0.2s;
+  white-space: nowrap;
+  max-width: fit-content;
 }
 
-/* Icon circle on the left */
-.profile-card .profile-badge i {
-    font-size: 1.8rem;
-    color: #fff;
+.btn-gradient:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
 }
 
-/* Make outline-light buttons contrast well on purple */
-.profile-card .btn-outline-light {
-    color: #fff;
-    border-color: rgba(255, 255, 255, 0.6);
+/* ==========================
+   CHIPS / ACCOUNT TOTALS
+========================== */
+.chip-balance {
+  background: rgba(106, 75, 207, 0.1);
+  color: #6a4bcf;
+  border: 1px solid rgba(106, 75, 207, 0.3);
+  border-radius: 999px;
+  padding: .25rem .75rem;
+  font-size: .85rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
 }
-.profile-card .btn-outline-light:hover {
-    background: rgba(255, 255, 255, 0.15);
-    border-color: #fff;
+
+/* ==========================
+   TRANSACTIONS & REPAYMENTS
+========================== */
+.transactions-card .table-responsive,
+.repayments-card .table-responsive {
+  padding: 1rem 1.5rem;
+}
+
+.transactions-card .transactions-table,
+.repayments-table {
+  border-radius: 0.75rem;
+  overflow: hidden;
+}
+
+.transactions-card .btn-gradient {
+  margin-top: 1rem;
+}
+
+/* Scrollable repayments table */
+.repayments-card .card-body {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+/* Table hover */
+.table-hover tbody tr:hover td {
+  background: rgba(106,75,207,0.05);
+}
+
+.page-title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: #ffffff; /* white text */
+    text-align: center;
+    padding: 2rem 0 1rem;
 }
