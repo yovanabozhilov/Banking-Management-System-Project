@@ -1,0 +1,95 @@
+body.profile-full-bg {
+  position: relative;
+}
+body.profile-full-bg::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(1400px 700px at -10% -20%, rgba(106,75,207,.28), transparent 60%),
+    radial-gradient(1000px 600px at 120% 0%, rgba(142,109,253,.24), transparent 60%),
+    linear-gradient(180deg, #422897 0%, #8e6dfd 40%, #d7cffd 75%, #ffffff 100%);
+  background-attachment: fixed;
+}
+
+[data-bs-theme="dark"] body.profile-full-bg::before {
+  background:
+    radial-gradient(1400px 700px at -10% -20%, rgba(106,75,207,.32), transparent 60%),
+    radial-gradient(1000px 600px at 120% 0%, rgba(142,109,253,.28), transparent 60%),
+    linear-gradient(180deg, #533db3 0%, #8468ee 45%, #e9e6ff 85%, #ffffff 100%);
+}
+/* Base purple card styling from before */
+.account-card-purple {
+  background: linear-gradient(135deg, #6a4bcf, #8e6dfd);
+  border-radius: 1rem;
+  padding: 1.25rem;
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+.account-card-purple:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.25);
+}
+
+/* Status labels */
+.status-active {
+  background: #28a745;
+  color: #fff;
+  padding: 0.25rem 0.6rem;
+  border-radius: 12px;
+  font-weight: 600;
+}
+.status-inactive {
+  background: #ffc107;
+  color: #212529;
+  padding: 0.25rem 0.6rem;
+  border-radius: 12px;
+  font-weight: 600;
+}
+
+/* Action buttons */
+.btn-block-card {
+  background-color: #dc3545;      /* bright red */
+  color: #fff;
+  border: none;
+}
+.btn-block-card:hover {
+  background-color: #c82333;
+}
+
+.btn-export-card {
+  background-color: #0d6efd;      /* bootstrap primary blue */
+  color: #fff;
+  border: none;
+}
+.btn-export-card:hover {
+  background-color: #0b5ed7;
+}
+
+/* Purple header with left accent line (same as Accounts) */
+.profile-card .profile-header {
+    background: linear-gradient(135deg, #6a4bcf, #8e6dfd);
+    color: #fff;
+    border-left: 4px solid #6a4bcf;
+    border-top-left-radius: 0.75rem;
+    border-top-right-radius: 0.75rem;
+}
+
+/* Icon circle on the left */
+.profile-card .profile-badge i {
+    font-size: 1.8rem;
+    color: #fff;
+}
+
+/* Make outline-light buttons contrast well on purple */
+.profile-card .btn-outline-light {
+    color: #fff;
+    border-color: rgba(255, 255, 255, 0.6);
+}
+.profile-card .btn-outline-light:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: #fff;
+}

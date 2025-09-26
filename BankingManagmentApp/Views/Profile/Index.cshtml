@@ -4,6 +4,7 @@
 
 @{
     ViewData["Title"] = "My Profile";
+    ViewData["BodyClass"] = "profile-full-bg";
     var bg = CultureInfo.GetCultureInfo("bg-BG");
 
     string Initials(string first, string last)
@@ -13,6 +14,8 @@
         return (f + l);
     }
 }
+
+<link rel="stylesheet" href="~/css/main-page.css" asp-append-version="true" />
 
 @functions {
     string RiskLabel(int lvl) => lvl switch
@@ -116,53 +119,58 @@
                     @foreach (var a in Model.Accounts)
                     {
                         <div class="col-12 col-md-6">
-                            <div class="account-card h-100">
-                                <div class="d-flex justify-content-between align-items-start">
-                                    <div>
-                                        <div class="iban d-flex align-items-center gap-2">
-                                            <span>@a.IBAN.MaskIban()</span>
-                                            <button type="button" class="btn btn-sm btn-outline-secondary"
-                                                    data-copy-iban="@a.IBAN">
-                                                Copy IBAN
-                                            </button>
-                                        </div>
-                                        <div class="text-muted xsmall">
-                                            Opened: @a.CreateAt.ToString("dd.MM.yyyy")
-                                        </div>
-                                    </div>
-                                    <span class="badge rounded-pill chip-accent">
-                                        @a.AccountType
-                                    </span>
-                                </div>
+    <div class="account-card account-card-purple h-100">
+        <div class="d-flex justify-content-between align-items-start">
+            <div>
+                <div class="iban d-flex align-items-center gap-2">
+                    <span>@a.IBAN.MaskIban()</span>
+                    <button type="button" class="btn btn-sm btn-outline-light"
+                            data-copy-iban="@a.IBAN">
+                        Copy IBAN
+                    </button>
+                </div>
+                <div class="xsmall text-light">
+                    Opened: @a.CreateAt.ToString("dd.MM.yyyy")
+                </div>
+            </div>
+            <span class="badge rounded-pill chip-accent bg-white text-purple fw-semibold">
+                @a.AccountType
+            </span>
+        </div>
 
-                                <div class="balance mt-2">
-                                    <div class="amount text-mono">@a.Balance.ToString("N2", bg)</div>
-                                    <div class="currency">@a.Currency</div>
-                                </div>
+        <div class="balance mt-3 text-white">
+            <div class="amount text-mono fs-5">@a.Balance.ToString("N2", bg)</div>
+            <div class="currency text-light">@a.Currency</div>
+        </div>
 
-                                <div class="d-flex justify-content-between align-items-center mt-3 gap-2">
-                                    <span class="status-pill @(a.Status?.ToLower() == "active" ? "ok" : "warn")">
-                                        @a.Status
-                                    </span>
+        <div class="d-flex justify-content-between align-items-center mt-3 gap-2">
+            <!-- ACTIVE / INACTIVE label -->
+            <span class="status-pill @(a.Status?.ToLower() == "active" ? "status-active" : "status-inactive")">
+                @a.Status
+            </span>
 
-                                    <div class="ms-auto d-flex gap-2">
-                                        <a class="btn btn-sm btn-outline-danger d-inline-flex align-items-center gap-1"
-                                           asp-controller="Accounts"
-                                           asp-action="Delete"
-                                           asp-route-id="@a.Id"
-                                           title="Block this card">
-                                            <i class="fas fa-shield-alt"></i><span>Block</span>
-                                        </a>
+            <div class="ms-auto d-flex gap-2">
+                <!-- Block button red -->
+                <a class="btn btn-sm btn-block-card d-inline-flex align-items-center gap-1"
+                   asp-controller="Accounts"
+                   asp-action="Delete"
+                   asp-route-id="@a.Id"
+                   title="Block this card">
+                    <i class="fas fa-shield-alt"></i><span>Block</span>
+                </a>
 
-                                        <a class="btn btn-sm btn-outline-secondary"
-                                           asp-controller="Profile" asp-action="ExportAccounts"
-                                           asp-route-accountId="@a.Id">
-                                            Export CSV
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                <!-- Export button blue -->
+                <a class="btn btn-sm btn-export-card"
+                   asp-controller="Profile"
+                   asp-action="ExportAccounts"
+                   asp-route-accountId="@a.Id">
+                    Export CSV
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
                     }
                     <div class="text-nowrap">
                         <a class="btn btn-outline-primary btn-sm" asp-area="" asp-controller="Accounts" asp-action="Create">
