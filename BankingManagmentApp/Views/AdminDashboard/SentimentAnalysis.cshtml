@@ -1,9 +1,8 @@
-@model IEnumerable<BankingManagmentApp.ViewModels.FeedbackSentimentVm>
-
 @{
-    ViewData["Title"] = "Sentiment Analysis";
-    ViewData["BodyClass"] = "profile-full-bg";  // purple gradient background
+    ViewData["Title"] = "FAQ";
+    ViewData["BodyClass"] = "profile-full-bg"; // purple gradient background
 }
+
 <link rel="stylesheet" href="~/css/profile.css" asp-append-version="true" />
 
 <div class="profile-page">
@@ -15,100 +14,212 @@
                     <!-- Header -->
                     <div class="profile-header d-flex align-items-center gap-3 p-4 border-bottom">
                         <div class="profile-badge">
-                            <i class="fa-solid fa-comments"></i>
+                            <i class="fa-solid fa-circle-question"></i>
                         </div>
                         <div>
                             <h3 class="mb-0">@ViewData["Title"]</h3>
-                            <small class="opacity-75">Customer Feedback Sentiment</small>
+                            <small class="opacity-75">Frequently Asked Questions</small>
                         </div>
                     </div>
 
                     <!-- Body -->
                     <div class="card-body p-4 p-md-5">
-                        <p class="mb-4">
-                            <span class="badge bg-success me-2">Positive: @ViewBag.PositiveCount</span>
-                            <span class="badge bg-danger me-2">Negative: @ViewBag.NegativeCount</span>
-                            <span class="badge bg-secondary">Neutral: @ViewBag.NeutralCount</span>
-                        </p>
 
-                        @if (!Model.Any())
-                        {
-                            <div class="text-muted text-center p-4">
-                                No feedback available.
-                            </div>
-                        }
-                        else
-                        {
-                            <div class="table-responsive">
-                                <table class="table table-hover table-striped align-middle mb-0">
-                                    <thead class="table-light">
-                                        <tr>
-                                            <th>Id</th>
-                                            <th>Comment</th>
-                                            <th>Sentiment</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach (var item in Model)
-                                        {
-                                            <tr>
-                                                <td>@item.Id</td>
-                                                <td>@item.Comment</td>
-                                                <td>
-                                                    @if (item.Sentiment == "Positive")
-                                                    {
-                                                        <span class="badge bg-success">Positive</span>
-                                                    }
-                                                    else if (item.Sentiment == "Negative")
-                                                    {
-                                                        <span class="badge bg-danger">Negative</span>
-                                                    }
-                                                    else
-                                                    {
-                                                        <span class="badge bg-secondary">Neutral</span>
-                                                    }
-                                                </td>
-                                            </tr>
-                                        }
-                                    </tbody>
-                                </table>
-                            </div>
-                        }
-                    </div>
+                        <div class="accordion accordion-flush" id="faqAccordion">
 
-                    <!-- Footer / Chart -->
-                    @if (Model.Any())
-                    {
-                        <div class="card-footer bg-white border-top-0">
-                            <h6 class="text-center mb-3">Sentiment Overview</h6>
-                            <canvas id="sentimentChart" height="140"></canvas>
+                            <!-- FAQ Item 1 -->
+                            <div class="accordion-item mb-3 shadow-sm rounded-3 overflow-hidden">
+                                <h2 class="accordion-header" id="faqHeadingOne">
+                                    <button class="accordion-button collapsed fw-semibold" type="button"
+                                        data-bs-toggle="collapse" data-bs-target="#faqCollapseOne">
+                                        <i class="fa-solid fa-piggy-bank text-purple-600 me-2"></i> How do I open a new
+                                        savings account?
+                                    </button>
+                                </h2>
+                                <div id="faqCollapseOne" class="accordion-collapse collapse"
+                                    data-bs-parent="#faqAccordion">
+                                    <div class="accordion-body">
+                                        You can open a savings account online through our mobile app or by visiting your
+                                        nearest branch. You’ll need a valid ID and proof of address.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- FAQ Item 2 -->
+                            <div class="accordion-item mb-3 shadow-sm rounded-3 overflow-hidden">
+                                <h2 class="accordion-header" id="faqHeadingTwo">
+                                    <button class="accordion-button collapsed fw-semibold" type="button"
+                                        data-bs-toggle="collapse" data-bs-target="#faqCollapseTwo">
+                                        <i class="fa-solid fa-credit-card text-purple-600 me-2"></i> What should I do if
+                                        I lose my debit card?
+                                    </button>
+                                </h2>
+                                <div id="faqCollapseTwo" class="accordion-collapse collapse"
+                                    data-bs-parent="#faqAccordion">
+                                    <div class="accordion-body">
+                                        Immediately block your card through the mobile app or by calling our 24/7
+                                        helpline. A replacement card will be issued within 3–5 business days.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- FAQ Item 3 -->
+                            <div class="accordion-item mb-3 shadow-sm rounded-3 overflow-hidden">
+                                <h2 class="accordion-header" id="faqHeadingThree">
+                                    <button class="accordion-button collapsed fw-semibold" type="button"
+                                        data-bs-toggle="collapse" data-bs-target="#faqCollapseThree">
+                                        <i class="fa-solid fa-mobile-screen text-purple-600 me-2"></i> How secure is the
+                                        mobile banking app?
+                                    </button>
+                                </h2>
+                                <div id="faqCollapseThree" class="accordion-collapse collapse"
+                                    data-bs-parent="#faqAccordion">
+                                    <div class="accordion-body">
+                                        Our app uses multi-factor authentication, biometric login, and industry-grade
+                                        encryption to keep your data safe at all times.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- FAQ Item 4 -->
+                            <div class="accordion-item mb-3 shadow-sm rounded-3 overflow-hidden">
+                                <h2 class="accordion-header" id="faqHeadingFour">
+                                    <button class="accordion-button collapsed fw-semibold" type="button"
+                                        data-bs-toggle="collapse" data-bs-target="#faqCollapseFour">
+                                        <i class="fa-solid fa-coins text-purple-600 me-2"></i> Are there fees for
+                                        international transfers?
+                                    </button>
+                                </h2>
+                                <div id="faqCollapseFour" class="accordion-collapse collapse"
+                                    data-bs-parent="#faqAccordion">
+                                    <div class="accordion-body">
+                                        Yes, international transfers may incur a small fee depending on the destination
+                                        and currency. You can check the exact fees in our app before confirming a
+                                        transfer.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- FAQ Item 5 -->
+                            <div class="accordion-item mb-3 shadow-sm rounded-3 overflow-hidden">
+                                <h2 class="accordion-header" id="faqHeadingFive">
+                                    <button class="accordion-button collapsed fw-semibold" type="button"
+                                        data-bs-toggle="collapse" data-bs-target="#faqCollapseFive">
+                                        <i class="fa-solid fa-lock text-purple-600 me-2"></i> How can I reset my online
+                                        banking password?
+                                    </button>
+                                </h2>
+                                <div id="faqCollapseFive" class="accordion-collapse collapse"
+                                    data-bs-parent="#faqAccordion">
+                                    <div class="accordion-body">
+                                        You can reset your password from the login screen by selecting "Forgot
+                                        Password". A verification code will be sent to your registered email or phone
+                                        number.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- FAQ Item 6 -->
+                            <div class="accordion-item mb-3 shadow-sm rounded-3 overflow-hidden">
+                                <h2 class="accordion-header" id="faqHeadingSix">
+                                    <button class="accordion-button collapsed fw-semibold" type="button"
+                                        data-bs-toggle="collapse" data-bs-target="#faqCollapseSix">
+                                        <i class="fa-solid fa-building-columns text-purple-600 me-2"></i> Can I apply
+                                        for a loan online?
+                                    </button>
+                                </h2>
+                                <div id="faqCollapseSix" class="accordion-collapse collapse"
+                                    data-bs-parent="#faqAccordion">
+                                    <div class="accordion-body">
+                                        Yes, you can apply for personal and home loans directly through our online
+                                        banking platform. The application process typically takes less than 10 minutes.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- FAQ Item 7 -->
+                            <div class="accordion-item mb-3 shadow-sm rounded-3 overflow-hidden">
+                                <h2 class="accordion-header" id="faqHeadingSeven">
+                                    <button class="accordion-button collapsed fw-semibold" type="button"
+                                        data-bs-toggle="collapse" data-bs-target="#faqCollapseSeven">
+                                        <i class="fa-solid fa-wallet text-purple-600 me-2"></i> How do I increase my
+                                        credit card limit?
+                                    </button>
+                                </h2>
+                                <div id="faqCollapseSeven" class="accordion-collapse collapse"
+                                    data-bs-parent="#faqAccordion">
+                                    <div class="accordion-body">
+                                        You can request a credit limit increase in the app under "Card Services".
+                                        Approval is based on your credit history and account activity.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- FAQ Item 8 -->
+                            <div class="accordion-item mb-3 shadow-sm rounded-3 overflow-hidden">
+                                <h2 class="accordion-header" id="faqHeadingEight">
+                                    <button class="accordion-button collapsed fw-semibold" type="button"
+                                        data-bs-toggle="collapse" data-bs-target="#faqCollapseEight">
+                                        <i class="fa-solid fa-user-shield text-purple-600 me-2"></i> What security
+                                        measures do you use to protect accounts?
+                                    </button>
+                                </h2>
+                                <div id="faqCollapseEight" class="accordion-collapse collapse"
+                                    data-bs-parent="#faqAccordion">
+                                    <div class="accordion-body">
+                                        We use encryption, fraud detection systems, and regular monitoring to ensure
+                                        your accounts remain safe. Customers are also protected by multi-factor
+                                        authentication.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- FAQ Item 9 -->
+                            <div class="accordion-item mb-3 shadow-sm rounded-3 overflow-hidden">
+                                <h2 class="accordion-header" id="faqHeadingNine">
+                                    <button class="accordion-button collapsed fw-semibold" type="button"
+                                        data-bs-toggle="collapse" data-bs-target="#faqCollapseNine">
+                                        <i class="fa-solid fa-hand-holding-dollar text-purple-600 me-2"></i> How quickly
+                                        are deposits available in my account?
+                                    </button>
+                                </h2>
+                                <div id="faqCollapseNine" class="accordion-collapse collapse"
+                                    data-bs-parent="#faqAccordion">
+                                    <div class="accordion-body">
+                                        Most deposits are available instantly. However, larger checks and international
+                                        transfers may take 1–3 business days to clear.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- FAQ Item 10 -->
+                            <div class="accordion-item mb-3 shadow-sm rounded-3 overflow-hidden">
+                                <h2 class="accordion-header" id="faqHeadingTen">
+                                    <button class="accordion-button collapsed fw-semibold" type="button"
+                                        data-bs-toggle="collapse" data-bs-target="#faqCollapseTen">
+                                        <i class="fa-solid fa-envelope-open-text text-purple-600 me-2"></i> How do I
+                                        update my contact information?
+                                    </button>
+                                </h2>
+                                <div id="faqCollapseTen" class="accordion-collapse collapse"
+                                    data-bs-parent="#faqAccordion">
+                                    <div class="accordion-body">
+                                        You can update your phone number, email, and address directly in the app under
+                                        "Profile Settings", or by visiting any branch with valid identification.
+                                    </div>
+                                </div>
+                            </div>
+
                         </div>
-                    }
+                    </div>
 
                 </div>
             </div>
         </div>
     </div>
 </div>
+</div>
 
 @section Scripts {
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-        new Chart(document.getElementById('sentimentChart'), {
-            type: 'doughnut',
-            data: {
-                labels: ['Positive', 'Negative', 'Neutral'],
-                datasets: [{
-                    data: [@ViewBag.PositiveCount, @ViewBag.NegativeCount, @ViewBag.NeutralCount],
-                    backgroundColor: ['#198754', '#dc3545', '#6c757d']
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: { position: 'bottom' }
-                }
-            }
-        });
-    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 }
