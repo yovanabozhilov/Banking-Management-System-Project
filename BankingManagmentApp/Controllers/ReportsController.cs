@@ -60,14 +60,11 @@ namespace BankingManagmentApp.Controllers
             var vm = await BuildReport(filters);
             ViewBag.ShowResults = true;
 
-            // Ако идва от AdminDashboard през fetch – връщаме само таблицата
             if (Request.Headers.TryGetValue("X-Requested-With", out var xrw) &&
                 string.Equals(xrw, "XMLHttpRequest", StringComparison.OrdinalIgnoreCase))
             {
                 return PartialView("_ReportTable", vm);
             }
-
-            // Иначе цялата Reports страница
             return View(vm);
         }
 
@@ -101,14 +98,10 @@ namespace BankingManagmentApp.Controllers
             var vm = await BuildReport(filters);
 
             var fileName = $"FinancialReport_{DateTime.Now:yyyyMMdd_HHmm}.xlsx";
-
-            // Send the Excel file via email
             var emailSubject = $"Financial Report {fileName}";
             var emailBody = "Please find your requested financial report attached.";
-            // Get the recipient's email address
             var userEmail = User.Identity?.Name;
             var bytes = FinancialReportExcel.Build(vm);
-            //var fileName = $"FinancialReport_{DateTime.Now:yyyyMMdd_HHmm}.xlsx";
             if (!string.IsNullOrEmpty(userEmail))
             {
                 await _emailService.SendEmailWithAttachmentAsync(userEmail, emailSubject, emailBody, bytes, fileName);
@@ -118,14 +111,12 @@ namespace BankingManagmentApp.Controllers
 
         private static void NormalizeFilters(ReportFilterVm filters)
         {
-            // Попълваме разумни стойности и гарантираме валиден интервал
             var today = DateOnly.FromDateTime(DateTime.Today);
             filters.To ??= today;
             filters.From ??= new DateOnly(today.Year, today.Month, 1).AddMonths(-11);
 
             if (filters.From > filters.To)
             {
-                // разменяме ако са обърнати
                 var tmp = filters.From;
                 filters.From = filters.To;
                 filters.To = tmp;

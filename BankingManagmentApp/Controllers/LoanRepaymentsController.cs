@@ -27,7 +27,7 @@ namespace BankingManagmentApp.Controllers
             {
                 if (repayment.DueDate < DateOnly.FromDateTime(DateTime.Today))
                 {
-                    repayment.Status = "Overdue"; // или друг статус
+                    repayment.Status = "Overdue"; 
                     _context.Entry(repayment).Property(r => r.Status).IsModified = true;
                 }
             }

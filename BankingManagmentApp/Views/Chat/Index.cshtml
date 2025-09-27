@@ -2,8 +2,6 @@
     var isAuth = (bool?)ViewBag.IsAuthenticated == true;
     var name = ViewBag.DisplayName as string ?? "Customer";
 }
-
-@* Тази страница вече е защитена от [Authorize], така че това е само информативно *@
 @if (isAuth)
 {
     <div class="alert alert-success" role="alert" style="margin-bottom:12px;">

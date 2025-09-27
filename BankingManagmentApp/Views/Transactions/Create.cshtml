@@ -2,7 +2,7 @@
 
 @{
     ViewData["Title"] = "Create Transaction";
-    ViewData["BodyClass"] = "profile-full-bg"; // enable purple gradient background
+    ViewData["BodyClass"] = "profile-full-bg"; 
 }
 <link rel="stylesheet" href="~/css/profile.css" asp-append-version="true" />
 
@@ -11,8 +11,6 @@
         <div class="row justify-content-center">
             <div class="col-12 col-lg-6 col-xl-5">
                 <div class="profile-card card shadow-lg border-0">
-
-                    <!-- Header -->
                     <div class="profile-header d-flex align-items-center gap-3 p-4 border-bottom">
                         <div class="profile-badge">
                             <i class="fa-solid fa-money-bill-transfer"></i>
@@ -22,8 +20,6 @@
                             <small class="opacity-75">Fill in the transaction details</small>
                         </div>
                     </div>
-
-                    <!-- Body -->
                     <div class="card-body p-4 p-md-5">
                         <form asp-action="Create" onsubmit="return confirmPayment(this)" class="row g-3">
                             <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
@@ -32,8 +28,8 @@
                                 <label asp-for="TransactionType" class="form-label">Transaction Type</label>
                                 <select asp-for="TransactionType" class="form-select">
                                     <option value="">-- Select --</option>
-                                    <option value="Credit">Credit</option>
-                                    <option value="Debit">Debit</option>
+                                    <option value="Credit">Income</option>
+                                    <option value="Debit">Expense</option>
                                 </select>
                                 <span asp-validation-for="TransactionType" class="text-danger"></span>
                             </div>
@@ -56,10 +52,8 @@
                                 </button>
                             </div>
                         </form>
-
-                        <!-- Changed: Back to List is now a button, like in Accounts/Create -->
                         <div class="text-center mt-2">
-                            <a asp-action="Index" class="btn btn-outline-secondary w-100">
+                            <a asp-action="Index" asp-controller="Profile" class="btn btn-outline-secondary w-100">
                                 Back to List
                             </a>
                         </div>

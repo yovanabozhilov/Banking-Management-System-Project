@@ -2,23 +2,19 @@
 
 @{
     ViewData["Title"] = "Apply";
-    ViewData["BodyClass"] = "loans-full-bg"; // purple gradient bg за loans
+    ViewData["BodyClass"] = "loans-full-bg";
 }
 
 @section Head {
   <link rel="stylesheet" href="~/css/loans.css" asp-append-version="true" />
 }
-
-<!-- по-голямо разстояние от header/footer -->
 <div class="profile-page py-5">
   <div class="container-xxl pb-5">
     <div class="row justify-content-center">
-      <!-- същите ширини като при Accounts/Create -->
       <div class="col-12 col-lg-6 col-xl-5">
         <div class="loan-card card shadow-lg border-0">
           
-          <!-- Header -->
-          <div class="loan-header d-flex align-items-center gap-3 p-4 border-bottom-0">
+            <div class="loan-header d-flex align-items-center gap-3 p-4 border-bottom-0">
             <div class="loan-badge">
               <i class="fa-solid fa-file-signature"></i>
             </div>
@@ -27,15 +23,11 @@
               <small class="opacity-75">Fill the details below and attach your documents.</small>
             </div>
           </div>
-
-          <!-- Body -->
           <div class="card-body p-4 p-md-5">
             <form asp-action="Apply" method="post" enctype="multipart/form-data" class="loan-form">
               @Html.AntiForgeryToken()
 
               <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
-
-              <!-- Loan type -->
               <div class="mb-3">
                 <label asp-for="Type" class="form-label">
                   Loan type <span class="required-star">*</span>
@@ -50,8 +42,6 @@
                 </select>
                 <span asp-validation-for="Type" class="text-danger small"></span>
               </div>
-
-              <!-- Amount -->
               <div class="mb-3">
                 <label asp-for="Amount" class="form-label">
                   Amount <span class="required-star">*</span>
@@ -68,8 +58,6 @@
                 <div class="form-text">Approximate amount you wish to borrow.</div>
                 <span asp-validation-for="Amount" class="text-danger small"></span>
               </div>
-
-              <!-- Documents -->
               <div class="mb-4">
                 <label class="form-label d-flex align-items-center gap-2">
                   Upload documents
@@ -86,17 +74,13 @@
                        id="loanDocsInput" />
                 <ul id="loanDocsList" class="file-list mt-2 mb-0"></ul>
               </div>
-
-              <!-- Submit -->
               <div class="mb-3">
                 <button type="submit" class="btn btn-primary w-100">
                   <i class="fa-solid fa-paper-plane me-1"></i> Apply
                 </button>
               </div>
-
-              <!-- Back to list -->
               <div class="text-center mt-2">
-                <a asp-action="Index" class="btn btn-outline-secondary w-100">
+                <a asp-action="Index" asp-controller="Profile" class="btn btn-outline-secondary w-100">
                   Back to List
                 </a>
               </div>
@@ -114,7 +98,6 @@
   <partial name="_ValidationScriptsPartial" />
 
   <script>
-    // File list preview (frontend-only)
     (function () {
       const input = document.getElementById('loanDocsInput');
       const list  = document.getElementById('loanDocsList');
@@ -138,15 +121,11 @@
         });
       });
     })();
-
-    // Bootstrap tooltips (if loaded)
     (function () {
       if (window.bootstrap?.Tooltip) {
         document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => new bootstrap.Tooltip(el));
       }
     })();
-
-    // Fallback: ако layout-ът не добавя ViewData["BodyClass"] на <body>
     document.body.classList.add('loans-full-bg');
   </script>
 }

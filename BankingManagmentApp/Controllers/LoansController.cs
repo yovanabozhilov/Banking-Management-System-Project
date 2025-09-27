@@ -29,17 +29,11 @@ namespace BankingManagmentApp.Controllers
             _loanContractGenerator = loanContractGenerator;
         }
 
-
-        // КЛИЕНТСКИ ДЕЙСТВИЯ
-
-
-        // GET: Loans/Apply (форма за подаване на заявление)
         public IActionResult Apply()
         {
             return View();
         }
 
-        // POST: Loans/Apply (подава заявлението + стартира автоматичния workflow)
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Apply([Bind("Type,Amount,Term")] Loans loan,
@@ -51,21 +45,18 @@ namespace BankingManagmentApp.Controllers
 
             if (!ModelState.IsValid)
             {
-                // return View(loan);
                 loan.CustomerId = user.Id;
                 loan.Status = "Pending ";
                 loan.Date = DateTime.UtcNow;
 
-
                 if (loan.Term == default)
                     loan.Term = DateOnly.FromDateTime(DateTime.Today.AddMonths(12));
-
 
             }
             _context.Loans.Add(loan);
             await _context.SaveChangesAsync();
             var allowedExtensions = new[] { ".pdf", ".jpg", ".jpeg", ".png" };
-            const long maxFileSize = 10 * 1024 * 1024; // 10 MB
+            const long maxFileSize = 10 * 1024 * 1024; 
 
             foreach (var file in documents)
             {
@@ -116,8 +107,6 @@ namespace BankingManagmentApp.Controllers
 
             return File(doc.Data, doc.ContentType, doc.FileName);
         }
-
-        // GET: Loans/MyLoans (списък на моите кредити)
         public async Task<IActionResult> MyLoans()
         {
             var user = await _userManager.GetUserAsync(User);
@@ -141,10 +130,6 @@ namespace BankingManagmentApp.Controllers
                 return View(mine);
             }
         }
-
-
-        // АДМИН/ОБЩИ (преглед)
-
 
         public async Task<IActionResult> Index()
         {
@@ -170,7 +155,6 @@ namespace BankingManagmentApp.Controllers
                     .ToListAsync();
             }
 
-            // Изчисляване на риска за визуализация
             foreach (var loan in list)
             {
                 var accounts = await _context.Accounts
@@ -196,9 +180,6 @@ namespace BankingManagmentApp.Controllers
 
             return View(list);
         }
-
-
-        // GET: Loans/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null) return NotFound();
@@ -224,22 +205,14 @@ namespace BankingManagmentApp.Controllers
             return View(loan);
         }
 
-
-        // АДМИН ДЕЙСТВИЯ
-
-
-        // GET: Loans/Create (админ създава ръчно)
-        // [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
             ViewData["CustomerId"] = new SelectList(_context.Customers, "Id", "Email");
             return View();
         }
 
-        // POST: Loans/Create (админ създава ръчно)
         [HttpPost]
         [ValidateAntiForgeryToken]
-        // [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create([Bind("Type,Amount,Term")] Loans loan,
                                               [FromServices] ILoanWorkflow workflow, List<IFormFile> documents)
         {
@@ -249,7 +222,6 @@ namespace BankingManagmentApp.Controllers
 
             if (!ModelState.IsValid)
             {
-                // return View(loan);
                 loan.CustomerId = user.Id;
                 loan.Status = "Pending ";
                 loan.Date = DateTime.UtcNow;
@@ -263,7 +235,7 @@ namespace BankingManagmentApp.Controllers
             _context.Loans.Add(loan);
             await _context.SaveChangesAsync();
             var allowedExtensions = new[] { ".pdf", ".jpg", ".jpeg", ".png" };
-            const long maxFileSize = 10 * 1024 * 1024; // 10 MB
+            const long maxFileSize = 10 * 1024 * 1024; 
 
             foreach (var file in documents)
             {
@@ -307,7 +279,6 @@ namespace BankingManagmentApp.Controllers
             return RedirectToAction("Index", "Profile");
         }
 
-        // GET: Loans/Edit/5
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int? id)
         {
@@ -320,7 +291,6 @@ namespace BankingManagmentApp.Controllers
             return View(loans);
         }
 
-        // POST: Loans/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin")]
@@ -338,29 +308,24 @@ namespace BankingManagmentApp.Controllers
                 {
                     var existingLoan = await _context.Loans.AsNoTracking().FirstOrDefaultAsync(l => l.Id == id);
                     loans.CustomerId = existingLoan.CustomerId;
-                    //loans.CustomerId = _userManager.GetUserId(User);
 
                     if (existingLoan != null && existingLoan.Status != loans.Status)
                     {
                         var customer = await _userManager.FindByIdAsync(loans.CustomerId);
                         if (customer != null && !string.IsNullOrWhiteSpace(customer.Email))
                         {
-                            // NEW LOGIC
-                            // Generate the PDF contract only when the status becomes "Approved"
+                           
                             if (loans.Status == "Approved")
                             {
-                                // Ensure the ApprovedAmount and ApprovalDate are set before generating
                                 loans.ApprovedAmount = loans.ApprovedAmount > 0 ? loans.ApprovedAmount : loans.Amount;
                                 loans.ApprovalDate = DateTime.UtcNow;
 
                                 var pdfBytes = await _loanContractGenerator.GeneratePdfAsync(loans);
 
-                                // Pass the PDF bytes to the email service
                                 await _emailService.SendLoanStatusUpdateAsync(customer.Email, loans.Id, loans.Status, pdfBytes);
                             }
                             else
                             {
-                                // For other status changes, send an email without an attachment
                                 await _emailService.SendLoanStatusUpdateAsync(customer.Email, loans.Id, loans.Status, null);
                             }
                         }
@@ -461,7 +426,6 @@ namespace BankingManagmentApp.Controllers
             return File(pdfBytes, "application/pdf", fileName);
         }
 
-        // GET: Loans/Delete/5
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int? id)
         {
@@ -475,7 +439,6 @@ namespace BankingManagmentApp.Controllers
             return View(loans);
         }
 
-        // POST: Loans/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin")]

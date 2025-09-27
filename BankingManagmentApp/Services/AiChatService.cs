@@ -41,8 +41,6 @@ Capabilities:
 3) If neither applies, give a helpful, bounded, generic answer.
 
 Tone: friendly, precise, and compliant. Address the user by name if provided: {(userFirstName ?? "Customer")}.");
-
-        // ========== PUBLIC ==========
         public async Task<string> SendAsync(
             string userInput,
             string? userId,
@@ -52,12 +50,9 @@ Tone: friendly, precise, and compliant. Address the user by name if provided: {(
         {
             try
             {
-                // 1) Personal queries -> отговаряме през tools (без модел)
                 var toolAnswer = await TryAnswerWithToolsAsync(userInput, userId, ct);
                 if (toolAnswer is not null)
                     return toolAnswer;
-
-                // 2) Иначе питаме модела с KB, но с явен AuthStatus
                 var isAuthenticated = !string.IsNullOrWhiteSpace(userId);
                 var messages = await BuildMessagesAsync(userInput, userFirstName, isAuthenticated, prior, ct);
 
@@ -114,8 +109,6 @@ Tone: friendly, precise, and compliant. Address the user by name if provided: {(
             await foreach (var update in _chatClient.GetStreamingResponseAsync(history, cancellationToken: cancellationToken))
                 if (!string.IsNullOrEmpty(update.Text)) yield return update.Text;
         }
-
-        // ========== INTERNAL ==========
         private async Task<IList<ChatMessage>> BuildMessagesAsync(
             string userInput,
             string? userFirstName,
@@ -124,15 +117,11 @@ Tone: friendly, precise, and compliant. Address the user by name if provided: {(
             CancellationToken ct)
         {
             var history = prior ?? new List<ChatMessage>();
-
-            // RAG от TemplateAnswer
             var hits = await _kb.SearchAsync(userInput, top: 3, ct);
             var kbContext = string.Join(
                 "\n---\n",
                 hits.Select(h => $"Keyword(s): {h.Keyword}\nAnswer:\n{h.AnswerText}")
             );
-
-            // Ако е логнат, махаме от KB пасажи, които съветват "log in / sign in"
             if (isAuthenticated)
                 kbContext = StripLoginLines(kbContext);
 
@@ -152,13 +141,10 @@ Tone: friendly, precise, and compliant. Address the user by name if provided: {(
         private static string StripLoginLines(string text)
         {
             if (string.IsNullOrWhiteSpace(text)) return text;
-            // Премахваме редове от KB, които съдържат “log in / login / sign in”
             var lines = text.Split('\n')
                 .Where(l => !Regex.IsMatch(l, @"\b(log\s*in|login|sign\s*in)\b", RegexOptions.IgnoreCase));
             return string.Join('\n', lines);
         }
-
-        // ========== TOOL INTENTS ==========
         private enum Intent { None, Balance, RecentTransactions, LoanStatus }
 
         private static Intent ParseIntent(string text, out int n)
@@ -166,8 +152,6 @@ Tone: friendly, precise, and compliant. Address the user by name if provided: {(
             n = 0;
             if (string.IsNullOrWhiteSpace(text)) return Intent.None;
             var s = text.ToLowerInvariant();
-
-            // Recent transactions
             if (s.Contains("transaction"))
             {
                 var m = Regex.Match(s, @"\b(last|recent|past)\s+(\d+)\b");

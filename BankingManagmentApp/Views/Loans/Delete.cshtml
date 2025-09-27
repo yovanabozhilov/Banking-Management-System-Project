@@ -3,7 +3,7 @@
 
 @{
     ViewData["Title"] = "Cancel Loan";
-    ViewData["BodyClass"] = "loans-full-bg";   // purple → white gradient
+    ViewData["BodyClass"] = "loans-full-bg"; 
     var bg = CultureInfo.GetCultureInfo("bg-BG");
 }
 
@@ -25,14 +25,12 @@
     }
 }
 
-<!-- page spacing -->
 <div class="profile-page py-5">
   <div class="container-xxl pb-5">
     <div class="row justify-content-center">
       <div class="col-12 col-lg-6 col-xl-5">
         <div class="loan-card card shadow-lg border-0">
 
-          <!-- Header (PURPLE like other pages) -->
           <div class="loan-header p-4">
             <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
               <div class="d-flex align-items-center gap-3">
@@ -49,19 +47,13 @@
               </span>
             </div>
           </div>
-
-          <!-- Body -->
           <div class="card-body p-4 p-md-5">
-
-            <!-- Warning stays RED -->
             <div class="alert-danger-soft d-flex align-items-start gap-2 mb-4 rounded-3 p-3">
               <i class="fa-solid fa-triangle-exclamation mt-1" aria-hidden="true"></i>
               <div>
                 <strong>Warning:</strong> This action can’t be undone. Any attached documents will no longer be available.
               </div>
             </div>
-
-            <!-- Key facts -->
             <dl class="details-dl mb-4">
               <div class="details-row">
                 <dt>Type</dt>
@@ -114,15 +106,12 @@
                 <dd>@Model?.Customer?.FirstName @Model?.Customer?.LastName</dd>
               </div>
             </dl>
-
-            <!-- Confirm form -->
             <form asp-action="Delete" method="post" class="d-flex justify-content-between flex-wrap gap-2" id="loanDeleteForm">
               @Html.AntiForgeryToken()
               <input type="hidden" asp-for="Id" />
-              <a asp-action="Index" class="btn btn-outline-secondary">
+              <a asp-action="Index" asp-asp-controller="Profile" class="btn btn-outline-secondary">
                 <i class="fa-solid fa-arrow-left-long me-1"></i> Back to list
               </a>
-              <!-- Button is RED, but we intercept for confirm -->
               <button type="button" class="btn btn-danger" id="confirmDeleteLoanBtn">
                 <i class="fa-regular fa-trash-can me-1"></i> Delete
               </button>
@@ -137,10 +126,7 @@
 
 @section Scripts {
   <script>
-    // Fallback: apply gradient if Layout doesn’t read BodyClass
     document.body.classList.add('loans-full-bg');
-
-    // SweetAlert2 confirm (with graceful fallback)
     (function () {
       const btn = document.getElementById('confirmDeleteLoanBtn');
       const form = document.getElementById('loanDeleteForm');

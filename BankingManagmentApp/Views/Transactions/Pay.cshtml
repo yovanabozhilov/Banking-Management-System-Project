@@ -11,8 +11,6 @@
         <div class="row justify-content-center">
             <div class="col-12 col-lg-6 col-xl-5">
                 <div class="profile-card card shadow-lg border-0">
-
-                    <!-- Header -->
                     <div class="profile-header d-flex align-items-center gap-3 p-4 border-bottom">
                         <div class="profile-badge">
                             <i class="fa-solid fa-circle-plus"></i>
@@ -22,8 +20,6 @@
                             <small class="opacity-75">Add a new transaction</small>
                         </div>
                     </div>
-
-                    <!-- Body -->
                     <div class="card-body p-4 p-md-5">
                         <form asp-action="Create">
                             <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
@@ -55,7 +51,7 @@
                             </button>
 
                             <div class="text-center mt-2">
-                                <a asp-action="Index" class="btn btn-outline-secondary w-100">
+                                <a asp-action="Index" asp-controller="Profile" class="btn btn-outline-secondary w-100">
                                     Back to List
                                 </a>
                             </div>

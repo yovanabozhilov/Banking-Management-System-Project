@@ -20,7 +20,6 @@
     var newCustomers = (int)ViewData["NewCustomers"];
     var churnRate = (double)ViewData["ChurnRate"];
 
-    // Data for Chart.js from C#
     var volumeLabels = System.Text.Json.JsonSerializer.Serialize(volume.Keys);
     var volumeData = System.Text.Json.JsonSerializer.Serialize(volume.Values);
     var cashLabels = System.Text.Json.JsonSerializer.Serialize(cashFlows.Keys);
@@ -34,81 +33,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="~/css/main-page.css" asp-append-version="true" />
-
-    <style>
-        body {
-            background-color: #f4f7f9; /* Lighter background */
-            font-family: 'Inter', sans-serif;
-        }
-
-        /* Replicating the Card style from the example */
-        .card {
-            background-color: #ffffff;
-            border-radius: 1rem;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
-            padding: 1.5rem;
-            height: 100%; /* Ensure all cards in a row are the same height */
-        }
-
-            .card:hover {
-                transform: translateY(-4px);
-                box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-            }
-
-        /* Title style */
-        .page-title {
-            font-size: 2.5rem;
-            font-weight: 800;
-            color: #1f2937;
-            text-align: center;
-            padding: 2rem 0 1rem;
-        }
-
-        /* Section Title style */
-        .section-title {
-            font-size: 1.75rem;
-            font-weight: 700;
-            color: #374151;
-            margin-bottom: 1.5rem;
-            border-bottom: 2px solid #e5e7eb;
-            padding-bottom: 0.5rem;
-        }
-
-        /* Data display styles */
-        .stat-value {
-            font-size: 2rem;
-            font-weight: 700;
-            color: #111827;
-            line-height: 1.2;
-        }
-
-        .stat-label {
-            font-size: 0.875rem;
-            font-weight: 500;
-            color: #6b7280;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        /* Custom Gauge Positioning and Styling */
-        .gauge-container {
-            position: relative;
-            height: 180px;
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .gauge-percentage {
-            position: absolute;
-            font-size: 2.25rem; /* text-4xl */
-            font-weight: 800; /* font-extrabold */
-            color: #1f2937; /* Dark text */
-            z-index: 10;
-        }
-    </style>
+    <link rel="stylesheet" href="~/css/forecast.css" asp-append-version="true" />
 </head>
 
 <div class="container mx-auto px-4 py-8">
@@ -265,7 +190,6 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-        // Colors mapped to Tailwind
         const indigo = '#4f46e5';
         const green = '#10b981';
         const red = '#ef4444';
@@ -273,7 +197,6 @@
         const gray = '#6b7280';
         const blue = '#3B0270';
 
-        // Helper to format currency (BGN based on bg-BG culture info)
         const currencyFormatter = new Intl.NumberFormat('bg-BG', {
             style: 'currency',
             currency: 'BGN',
@@ -281,7 +204,6 @@
             maximumFractionDigits: 2,
         });
 
-        // --- 1. Transaction Volume Chart (Line) ---
         new Chart(document.getElementById("volumeChart"), {
             type: 'line',
             data: {
@@ -311,8 +233,6 @@
                 scales: { y: { beginAtZero: true } }
             }
         });
-
-        // --- 2. Cash Flow Chart (Bar) ---
         const cashData = @Html.Raw(cashData);
         new Chart(document.getElementById("cashFlowChart"), {
             type: 'bar',
@@ -339,8 +259,6 @@
                 scales: { y: { beginAtZero: true } }
             }
         });
-
-        // --- 3. Loans Bar Chart (New Loans vs. Overdue %) ---
         new Chart(document.getElementById("loansChart"), {
             type: 'bar',
             data: {
@@ -365,8 +283,6 @@
                 scales: { y: { beginAtZero: true } }
             }
         });
-
-        // --- 4. Customers Pie Chart ---
         new Chart(document.getElementById("customersChart"), {
             type: 'pie',
             data: {
@@ -390,15 +306,13 @@
                 }
             }
         });
-
-        // --- 5. Gauge Chart Function (Visual only - percentage displayed via HTML) ---
         function createGauge(elementId, value, color) {
             new Chart(document.getElementById(elementId), {
                 type: 'doughnut',
                 data: {
                     datasets: [{
                         data: [value, 100 - value],
-                        backgroundColor: [color, '#e5e7eb'], // Primary color and light gray background
+                        backgroundColor: [color, '#e5e7eb'],
                         borderWidth: 0
                     }]
                 },

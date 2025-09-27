@@ -1,327 +1,642 @@
 html {
-  font-size: 14px;
+    font-size: 14px;
 }
 
 @media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
+    html {
+        font-size: 16px;
+    }
 }
 
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
 }
 
 html {
-  position: relative;
-  min-height: 100%;
+    position: relative;
+    min-height: 100%;
 }
 
 body {
-  margin-bottom: 60px;
+    margin-bottom: 60px;
 }
 
 /* --- Profile page --- */
-.container-profile { max-width: 1100px; margin: 0 auto; }
-
-.profile-header { border-left: 4px solid #1b6ec2; }
-.avatar-circle {
-  width: 64px; height: 64px; border-radius: 50%;
-  display: inline-flex; align-items: center; justify-content: center;
-  background: linear-gradient(135deg, #1b6ec2, #258cfb);
-  color: #fff; font-weight: 700; font-size: 20px;
+.container-profile {
+    max-width: 1100px;
+    margin: 0 auto;
 }
+
+.profile-header {
+    border-left: 4px solid #1b6ec2;
+}
+
+.avatar-circle {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #1b6ec2, #258cfb);
+    color: #fff;
+    font-weight: 700;
+    font-size: 20px;
+}
+
 .stat-badge {
-  display: inline-block; padding: .25rem .5rem; border: 1px solid #e6e6e6;
-  border-radius: 999px; background: #f8f9fa; font-size: .8rem;
+    display: inline-block;
+    padding: .25rem .5rem;
+    border: 1px solid #e6e6e6;
+    border-radius: 999px;
+    background: #f8f9fa;
+    font-size: .8rem;
 }
 
 .account-card {
-  border: 1px solid #e9ecef; border-radius: 10px; padding: 14px;
-  transition: box-shadow .15s ease, transform .15s ease;
-  background: #fff;
+    border: 1px solid #e9ecef;
+    border-radius: 10px;
+    padding: 14px;
+    transition: box-shadow .15s ease, transform .15s ease;
+    background: #fff;
 }
-.account-card:hover { box-shadow: 0 .5rem 1rem rgba(0,0,0,.08); transform: translateY(-1px); }
 
-.iban { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; letter-spacing: .5px; }
-.balance .amount { font-size: 1.4rem; font-weight: 700; line-height: 1.1; }
-.balance .currency { font-size: .9rem; color: #6c757d; }
+    .account-card:hover {
+        box-shadow: 0 .5rem 1rem rgba(0,0,0,.08);
+        transform: translateY(-1px);
+    }
+
+.iban {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+    letter-spacing: .5px;
+}
+
+.balance .amount {
+    font-size: 1.4rem;
+    font-weight: 700;
+    line-height: 1.1;
+}
+
+.balance .currency {
+    font-size: .9rem;
+    color: #6c757d;
+}
 
 .status-pill {
-  border: 1px solid transparent; border-radius: 999px; padding: .15rem .6rem;
-  font-size: .8rem;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    padding: .15rem .6rem;
+    font-size: .8rem;
 }
-.status-pill.ok { background: #e9f7ef; color: #1e7e34; border-color: #cfe9d8; }
-.status-pill.warn { background: #fff4e5; color: #b35c00; border-color: #ffe0b2; }
 
-.amount-positive { color: #5cbe7d; font-weight: 600; }
-.amount-negative { color: #974444; font-weight: 600; }
+    .status-pill.ok {
+        background: #e9f7ef;
+        color: #1e7e34;
+        border-color: #cfe9d8;
+    }
 
-.xsmall { font-size: .75rem; }
+    .status-pill.warn {
+        background: #fff4e5;
+        color: #b35c00;
+        border-color: #ffe0b2;
+    }
 
-.table thead th { font-weight: 600; }
-.badge { font-weight: 500; letter-spacing: .2px; }
+.amount-positive {
+    color: #5cbe7d;
+    font-weight: 600;
+}
 
-.container-profile .card { border-radius: .5rem; }
-.container-profile .card .table { width: 100%; }
+.amount-negative {
+    color: #974444;
+    font-weight: 600;
+}
+
+.xsmall {
+    font-size: .75rem;
+}
+
+.table thead th {
+    font-weight: 600;
+}
+
+.badge {
+    font-weight: 500;
+    letter-spacing: .2px;
+}
+
+.container-profile .card {
+    border-radius: .5rem;
+}
+
+    .container-profile .card .table {
+        width: 100%;
+    }
 
 @media (min-width: 992px) {
-  .container-profile .card + .card { margin-top: .85rem; }
+    .container-profile .card + .card {
+        margin-top: .85rem;
+    }
 }
 
-.container-profile .row.g-3.mt-2 { margin-top: .75rem !important; }
+.container-profile .row.g-3.mt-2 {
+    margin-top: .75rem !important;
+}
 
 
 /* gradient colors */
 .account-card {
-  background: linear-gradient(180deg, #2f158d 0%, #6a50ca 100%); 
-  border-color: #0a145f;
+    background: linear-gradient(180deg, #2f158d 0%, #6a50ca 100%);
+    border-color: #0a145f;
 }
 
 /* Settings polish */
-.settings .card { border-radius: 1rem; }
-.settings .nav-pills .nav-link { border-radius: .75rem; }
-.settings .nav-pills .nav-link.active { color: #fff; }
+.settings .card {
+    border-radius: 1rem;
+}
+
+.settings .nav-pills .nav-link {
+    border-radius: .75rem;
+}
+
+    .settings .nav-pills .nav-link.active {
+        color: #fff;
+    }
 
 
 /* Fallback ако не ползваш Bootstrap 5.3 */
-.dark body { background-color: #121212; color: #e9ecef; }
-.dark .card { background-color: #1e1e1e; color: #e9ecef; }
-.dark .btn-primary { background-color: #3b82f6; border-color: #3b82f6; }
+.dark body {
+    background-color: #121212;
+    color: #e9ecef;
+}
+
+.dark .card {
+    background-color: #1e1e1e;
+    color: #e9ecef;
+}
+
+.dark .btn-primary {
+    background-color: #3b82f6;
+    border-color: #3b82f6;
+}
 
 
 /* ===== Dark theme polishing (Bootstrap 5.3 with data-bs-theme) ===== */
 /* Основни цветове за тъмна тема */
 [data-bs-theme="dark"] {
-  --bs-body-bg: #121212;
-  --bs-body-color: #e9ecef;
-  --bs-border-color: #2b2f32;
-
-  /* По-приятни линкове в тъмно */
-  --bs-link-color: #8ab4f8;
-  --bs-link-hover-color: #a8c7fa;
-
-  /* Карти, навбар, дропдауни */
-  --bs-card-bg: #1b1f22;
-  --bs-card-border-color: #2b2f32;
-  --bs-dropdown-bg: #1b1f22;
-  --bs-dropdown-link-color: var(--bs-body-color);
-  --bs-dropdown-link-hover-bg: #23272a;
+    --bs-body-bg: #121212;
+    --bs-body-color: #e9ecef;
+    --bs-border-color: #2b2f32;
+    /* По-приятни линкове в тъмно */
+    --bs-link-color: #8ab4f8;
+    --bs-link-hover-color: #a8c7fa;
+    /* Карти, навбар, дропдауни */
+    --bs-card-bg: #1b1f22;
+    --bs-card-border-color: #2b2f32;
+    --bs-dropdown-bg: #1b1f22;
+    --bs-dropdown-link-color: var(--bs-body-color);
+    --bs-dropdown-link-hover-bg: #23272a;
 }
 
-/* Ако някъде е останало text-dark/bg-white – направи ги видими в dark */
-[data-bs-theme="dark"] .text-dark {
-  color: var(--bs-body-color) !important;
-}
-[data-bs-theme="dark"] .bg-white {
-  background-color: var(--bs-card-bg) !important;
-}
+    /* Ако някъде е останало text-dark/bg-white – направи ги видими в dark */
+    [data-bs-theme="dark"] .text-dark {
+        color: var(--bs-body-color) !important;
+    }
 
-/* Формови полета да изглеждат четимо в тъмно */
-[data-bs-theme="dark"] .form-control,
-[data-bs-theme="dark"] .form-select,
-[data-bs-theme="dark"] .input-group-text {
-  background-color: #1e1f22;
-  color: var(--bs-body-color);
-  border-color: #2b2f32;
-}
-[data-bs-theme="dark"] .form-control:focus,
-[data-bs-theme="dark"] .form-select:focus {
-  background-color: #202327;
-  color: var(--bs-body-color);
-  border-color: #3a3f44;
-  box-shadow: 0 0 0 .25rem rgba(138,180,248,.15);
-}
+    [data-bs-theme="dark"] .bg-white {
+        background-color: var(--bs-card-bg) !important;
+    }
 
-/* Таблици */
-[data-bs-theme="dark"] .table {
-  color: var(--bs-body-color);
-}
-[data-bs-theme="dark"] .table-striped > tbody > tr:nth-of-type(odd) {
-  --bs-table-bg-type: #16181a;
-}
+    /* Формови полета да изглеждат четимо в тъмно */
+    [data-bs-theme="dark"] .form-control,
+    [data-bs-theme="dark"] .form-select,
+    [data-bs-theme="dark"] .input-group-text {
+        background-color: #1e1f22;
+        color: var(--bs-body-color);
+        border-color: #2b2f32;
+    }
 
-/* Навигация */
-[data-bs-theme="dark"] .navbar,
-[data-bs-theme="dark"] .dropdown-menu {
-  background-color: var(--bs-body-bg);
-}
+        [data-bs-theme="dark"] .form-control:focus,
+        [data-bs-theme="dark"] .form-select:focus {
+            background-color: #202327;
+            color: var(--bs-body-color);
+            border-color: #3a3f44;
+            box-shadow: 0 0 0 .25rem rgba(138,180,248,.15);
+        }
 
-/* Карти */
-[data-bs-theme="dark"] .card {
-  background-color: var(--bs-card-bg);
-  border-color: var(--bs-card-border-color);
-}
+    /* Таблици */
+    [data-bs-theme="dark"] .table {
+        color: var(--bs-body-color);
+    }
+
+    [data-bs-theme="dark"] .table-striped > tbody > tr:nth-of-type(odd) {
+        --bs-table-bg-type: #16181a;
+    }
+
+    /* Навигация */
+    [data-bs-theme="dark"] .navbar,
+    [data-bs-theme="dark"] .dropdown-menu {
+        background-color: var(--bs-body-bg);
+    }
+
+    /* Карти */
+    [data-bs-theme="dark"] .card {
+        background-color: var(--bs-card-bg);
+        border-color: var(--bs-card-border-color);
+    }
 
 /* ===== Accent chip/pill ===== */
-:root{
-  --chip-accent-bg: #0b5ed7;  
-  --chip-accent-fg: #ffffff;   
-  --chip-accent-border: #0a58ca;
-}
-[data-bs-theme="dark"]{
-  --chip-accent-bg: #0a58ca;   
-  --chip-accent-border: #084298;
+:root {
+    --chip-accent-bg: #0b5ed7;
+    --chip-accent-fg: #ffffff;
+    --chip-accent-border: #0a58ca;
 }
 
-.stat-badge.chip-accent{
-  background: var(--chip-accent-bg) !important;
-  color: var(--chip-accent-fg) !important;
-  border-color: var(--chip-accent-border) !important;
+[data-bs-theme="dark"] {
+    --chip-accent-bg: #0a58ca;
+    --chip-accent-border: #084298;
+}
+
+.stat-badge.chip-accent {
+    background: var(--chip-accent-bg) !important;
+    color: var(--chip-accent-fg) !important;
+    border-color: var(--chip-accent-border) !important;
 }
 
 /* За Bootstrap badges */
-.badge.chip-accent{
-  background-color: var(--chip-accent-bg) !important;
-  color: var(--chip-accent-fg) !important;
-  border: 1px solid var(--chip-accent-border) !important;
+.badge.chip-accent {
+    background-color: var(--chip-accent-bg) !important;
+    color: var(--chip-accent-fg) !important;
+    border: 1px solid var(--chip-accent-border) !important;
 }
 
 
 /* --- Account "credit card" sizing & layout --- */
-.account-card{
-  /* по-дебела вертикално */
-  padding: 22px 20px;
-  border-radius: 16px;
-  min-height: 190px;            /* ↑ височина */
-
-  /* леко по-тясна хоризонтално и центрирана в колоната */
-  width: 100%;
-  max-width: 420px;             /* ← направи я по-тясна */
-  margin-left: 0 !important;
-  margin-right: auto !important;  /* лепи се вляво, без да се центрира */
+.account-card {
+    /* по-дебела вертикално */
+    padding: 22px 20px;
+    border-radius: 16px;
+    min-height: 190px; /* ↑ височина */
+    /* леко по-тясна хоризонтално и центрирана в колоната */
+    width: 100%;
+    max-width: 420px; /* ← направи я по-тясна */
+    margin-left: 0 !important;
+    margin-right: auto !important; /* лепи се вляво, без да се центрира */
 }
 
-@media (min-width: 992px){
-  .account-card{
-    /* на по-широки екрани още една щипка компактност */
-    max-width: 400px;
-  }
+@media (min-width: 992px) {
+    .account-card {
+        /* на по-широки екрани още една щипка компактност */
+        max-width: 400px;
+    }
 }
 
 /* малко по-„картично“ усещане за числата/текстовете */
-.account-card .iban{ font-size: .95rem; }
-.account-card .balance .amount{ font-size: 1.75rem; line-height: 1.05; }
-.account-card .balance .currency{ font-size: .85rem; opacity: .9; }
+.account-card .iban {
+    font-size: .95rem;
+}
+
+.account-card .balance .amount {
+    font-size: 1.75rem;
+    line-height: 1.05;
+}
+
+.account-card .balance .currency {
+    font-size: .85rem;
+    opacity: .9;
+}
 
 /* по-плътни контроли вътре, за да изглежда административно и стегнато */
-.account-card .btn.btn-sm{ padding: .3rem .5rem; }
+.account-card .btn.btn-sm {
+    padding: .3rem .5rem;
+}
 
 /* ===== Profile polish: hierarchy, density, tables ===== */
 
 /* по-лек фон за цялата секция, без да засяга други страници */
-.container-profile { padding-top: .5rem; }
-.container-profile .card { border-radius: .75rem; }
+.container-profile {
+    padding-top: .5rem;
+}
 
-/* card headers: по-ясна йерархия */
-.container-profile .card-header{
-  background: linear-gradient(180deg, rgba(0,0,0,.02), rgba(0,0,0,0));
-  border-bottom: 1px solid var(--bs-border-color);
-  padding: .6rem .9rem;
-}
-.container-profile .card-header strong{
-  font-size: .85rem;
-  letter-spacing: .06em;
-  text-transform: uppercase;
-  color: #495057;
-}
+    .container-profile .card {
+        border-radius: .75rem;
+    }
+
+    /* card headers: по-ясна йерархия */
+    .container-profile .card-header {
+        background: linear-gradient(180deg, rgba(0,0,0,.02), rgba(0,0,0,0));
+        border-bottom: 1px solid var(--bs-border-color);
+        padding: .6rem .9rem;
+    }
+
+        .container-profile .card-header strong {
+            font-size: .85rem;
+            letter-spacing: .06em;
+            text-transform: uppercase;
+            color: #495057;
+        }
 
 /* „кредитната карта“ (account-card) – по-висока и по-тясна, лява подредба */
-.account-card{
-  padding: 22px 20px;
-  border-radius: 16px;
-  min-height: 190px;
-  width: 100%;
-  max-width: 420px;
-  margin-left: 0 !important;
-  margin-right: auto !important;
+.account-card {
+    padding: 22px 20px;
+    border-radius: 16px;
+    min-height: 190px;
+    width: 100%;
+    max-width: 420px;
+    margin-left: 0 !important;
+    margin-right: auto !important;
 }
-@media (min-width: 992px){
-  .account-card{ max-width: 400px; }
+
+@media (min-width: 992px) {
+    .account-card {
+        max-width: 400px;
+    }
 }
-.account-card .iban{ font-size: .95rem; }
-.account-card .balance .amount{ font-size: 1.75rem; line-height: 1.05; }
-.account-card .balance .currency{ font-size: .85rem; opacity: .9; }
-.account-card .btn.btn-sm{ padding: .3rem .5rem; }
+
+.account-card .iban {
+    font-size: .95rem;
+}
+
+.account-card .balance .amount {
+    font-size: 1.75rem;
+    line-height: 1.05;
+}
+
+.account-card .balance .currency {
+    font-size: .85rem;
+    opacity: .9;
+}
+
+.account-card .btn.btn-sm {
+    padding: .3rem .5rem;
+}
 
 /* компактни таблици навсякъде в профила */
-.container-profile .table thead th{
-  text-transform: uppercase;
-  letter-spacing: .06em;
-  font-size: .72rem;
-  color: #6c757d;
-  border-bottom-color: var(--bs-border-color);
+.container-profile .table thead th {
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    font-size: .72rem;
+    color: #6c757d;
+    border-bottom-color: var(--bs-border-color);
 }
-.container-profile .table tbody td{
-  vertical-align: middle;
-  padding-top: .45rem;
-  padding-bottom: .45rem;
+
+.container-profile .table tbody td {
+    vertical-align: middle;
+    padding-top: .45rem;
+    padding-bottom: .45rem;
 }
 
 /* по-плътни таблици (използва се вече .table-compact – тук я дефинираме) */
-.table-compact thead th{ padding: .45rem .6rem; }
-.table-compact tbody td{ padding: .4rem .6rem; }
+.table-compact thead th {
+    padding: .45rem .6rem;
+}
+
+.table-compact tbody td {
+    padding: .4rem .6rem;
+}
 
 /* sticky thead да „виси“ красиво над редовете */
-.table .sticky-top{
-  box-shadow: 0 2px 0 rgba(0,0,0,.03);
-  z-index: 1;
+.table .sticky-top {
+    box-shadow: 0 2px 0 rgba(0,0,0,.03);
+    z-index: 1;
 }
 
 /* по-елегантен hover, тон към primary */
-.table-hover tbody tr:hover > *{
-  background-color: rgba(13,110,253,.06);
+.table-hover tbody tr:hover > * {
+    background-color: rgba(13,110,253,.06);
 }
 
 /* моноширинни числа и no-wrap помощни класове */
-.text-mono{
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
-  letter-spacing: .3px;
+.text-mono {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+    letter-spacing: .3px;
 }
-.nowrap{ white-space: nowrap; }
+
+.nowrap {
+    white-space: nowrap;
+}
 
 /* малко по-компактни badges */
-.badge-tight{ padding: .35em .5em; font-weight: 600; }
+.badge-tight {
+    padding: .35em .5em;
+    font-weight: 600;
+}
 
 /* amount цветове – по-четливи и в тъмно */
-:root{
-  --amount-pos: #18a957;
-  --amount-neg: #c0392b;
+:root {
+    --amount-pos: #18a957;
+    --amount-neg: #c0392b;
 }
-[data-bs-theme="dark"]{
-  --amount-pos: #4cd17a;
-  --amount-neg: #ff6b6b;
+
+[data-bs-theme="dark"] {
+    --amount-pos: #4cd17a;
+    --amount-neg: #ff6b6b;
 }
-.amount-positive{ color: var(--amount-pos); font-weight: 600; }
-.amount-negative{ color: var(--amount-neg); font-weight: 600; }
+
+.amount-positive {
+    color: var(--amount-pos);
+    font-weight: 600;
+}
+
+.amount-negative {
+    color: var(--amount-neg);
+    font-weight: 600;
+}
 
 /* филтърната лента при Transactions — по-стегната */
-.container-profile .card-header form .form-label{
-  font-size: .7rem; text-transform: uppercase; letter-spacing: .06em; color:#6c757d;
+.container-profile .card-header form .form-label {
+    font-size: .7rem;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    color: #6c757d;
 }
+
 .container-profile .card-header .form-select-sm,
-.container-profile .card-header .form-control-sm{
-  min-height: calc(1.5em + .5rem + 2px);
+.container-profile .card-header .form-control-sm {
+    min-height: calc(1.5em + .5rem + 2px);
 }
 
 /* „Note“ под кредитния скор – по-умерено и четимо */
-.container-profile .alert-info{
-  background: rgba(13,110,253,.06);
-  border-color: rgba(13,110,253,.12);
-  color: inherit;
+.container-profile .alert-info {
+    background: rgba(13,110,253,.06);
+    border-color: rgba(13,110,253,.12);
+    color: inherit;
 }
 
 /* Еднакво вертикално разстояние между всички секции (таблици) в профила */
-.profile-section { margin-bottom: 1rem; }            /* мобилно */
-@media (min-width: 768px)  { .profile-section { margin-bottom: 1.25rem; } }
-@media (min-width: 1200px) { .profile-section { margin-bottom: 1.5rem; } }
+.profile-section {
+    margin-bottom: 1rem;
+}
+/* мобилно */
+@media (min-width: 768px) {
+    .profile-section {
+        margin-bottom: 1.25rem;
+    }
+}
+
+@media (min-width: 1200px) {
+    .profile-section {
+        margin-bottom: 1.5rem;
+    }
+}
 
 /* Помощни класове, използвани в таблиците */
-.text-mono{
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+.text-mono {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
 }
-.table-compact > :not(caption) > * > *{
-  padding: .4rem .5rem;
+
+.table-compact > :not(caption) > * > * {
+    padding: .4rem .5rem;
 }
-.nowrap{ white-space: nowrap; }
-.badge-tight{ padding: .35em .55em; font-weight: 600; border-radius: .4rem; }
+
+.nowrap {
+    white-space: nowrap;
+}
+
+.badge-tight {
+    padding: .35em .55em;
+    font-weight: 600;
+    border-radius: .4rem;
+}
+
+.navbar-nav .nav-item:hover {
+    background-color: rgba(70, 130, 180, 0.15);
+    color: #6251DB;
+    transform: translateX(3px);
+    border-radius: 6px 6px;
+}
+
+body {
+    display: flex;
+    min-height: 100vh;
+    flex-direction: column;
+}
+
+#wrapper {
+    display: flex;
+    flex: 1;
+}
+
+#sidebar-wrapper {
+    min-width: 250px;
+    max-width: 250px;
+    transition: margin-left .25s ease-out;
+    background-color: #f8f9fa;
+    border-right: 1px solid #dee2e6;
+    padding: 1.5rem;
+    margin-left: -250px;
+}
+
+#wrapper.toggled #sidebar-wrapper {
+    margin-left: 0;
+}
+
+#sidebar-wrapper .sidebar-heading {
+    padding: 0.875rem 1.25rem;
+    font-size: 1.2rem;
+}
+
+#page-content-wrapper {
+    width: 100%;
+    padding: 20px;
+}
+
+#wrapper.toggled #sidebar-wrapper {
+    margin-left: 0px;
+}
+
+.sidebar-brand {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: steelblue;
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.sidebar-nav-item .nav-link {
+    font-weight: 800;
+    font-size: 18px;
+    color: steelblue;
+    transition: background-color 0.2s ease-in-out;
+    border-radius: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+    .sidebar-nav-item .nav-link:hover {
+        background-color: rgba(70, 130, 180, 0.1);
+    }
+
+.navbar-toggle-btn {
+    cursor: pointer;
+    margin-right: 1rem;
+}
+
+.custom-navbar {
+    background: white;
+    padding: 0.75rem 1rem;
+}
+
+    .custom-navbar .navbar-brand {
+        font-size: 1.25rem;
+        color: #6251DB;
+        font-weight: 800;
+    }
+
+.navbar-toggle-btn {
+    cursor: pointer;
+    margin-right: 1rem;
+    border-color: steelblue;
+    color: #6251DB;
+}
+
+.custom-sidebar {
+    min-width: 250px;
+    max-width: 250px;
+    background: #6251DB;
+    color: #cbd5e1;
+    padding: 1.5rem 1rem;
+    border-right: 1px solid #1e293b;
+    transition: margin-left 0.25s ease-out;
+    margin-left: -250px;
+}
+
+#wrapper.toggled .custom-sidebar {
+    margin-left: 0;
+}
+
+.sidebar-brand {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: steelblue;
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.sidebar-section {
+    margin-bottom: 1.5rem;
+}
+
+.sidebar-section-title {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    color: #94a3b8;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    padding-left: 0.5rem;
+}
+
+.sidebar-nav-item .nav-link {
+    display: flex;
+    align-items: center;
+    font-weight: 600;
+    font-size: 16px;
+    color: #cbd5e1;
+    padding: 0.6rem 0.75rem;
+    border-radius: 0.5rem;
+    transition: all 0.2s ease-in-out;
+}
+
+    .sidebar-nav-item .nav-link:hover {
+        background-color: rgba(70, 130, 180, 0.15);
+        color: #6251DB;
+        transform: translateX(5px);
+    }

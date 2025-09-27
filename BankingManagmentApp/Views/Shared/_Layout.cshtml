@@ -15,144 +15,6 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     @await RenderSectionAsync("Head", required: false)
-
-    <style>
-        body {
-            display: flex;
-            min-height: 100vh;
-            flex-direction: column;
-        }
-
-        #wrapper {
-            display: flex;
-            flex: 1;
-        }
-
-        #sidebar-wrapper {
-            min-width: 250px;
-            max-width: 250px;
-            transition: margin-left .25s ease-out;
-            background-color: #f8f9fa;
-            border-right: 1px solid #dee2e6;
-            padding: 1.5rem;
-            margin-left: -250px;
-        }
-
-        #wrapper.toggled #sidebar-wrapper {
-            margin-left: 0;
-        }
-
-        #sidebar-wrapper .sidebar-heading {
-            padding: 0.875rem 1.25rem;
-            font-size: 1.2rem;
-        }
-
-        #page-content-wrapper {
-            width: 100%;
-            padding: 20px;
-        }
-
-        #wrapper.toggled #sidebar-wrapper {
-            margin-left: 0px;
-        }
-
-        .sidebar-brand {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: steelblue;
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-
-        .sidebar-nav-item .nav-link {
-            font-weight: 800;
-            font-size: 18px;
-            color: steelblue;
-            transition: background-color 0.2s ease-in-out;
-            border-radius: 0.5rem;
-            margin-bottom: 0.5rem;
-        }
-
-            .sidebar-nav-item .nav-link:hover {
-                background-color: rgba(70, 130, 180, 0.1);
-            }
-
-        .navbar-toggle-btn {
-            cursor: pointer;
-            margin-right: 1rem;
-        }
-
-        .custom-navbar {
-            background: white;
-            padding: 0.75rem 1rem;
-        }
-
-            .custom-navbar .navbar-brand {
-                font-size: 1.25rem;
-                color: #6251DB;
-                font-weight: 800;
-            }
-
-        .navbar-toggle-btn {
-            cursor: pointer;
-            margin-right: 1rem;
-            border-color: steelblue;
-            color: #6251DB;
-        }
-
-        .custom-sidebar {
-            min-width: 250px;
-            max-width: 250px;
-            background: #6251DB;
-            color: #cbd5e1;
-            padding: 1.5rem 1rem;
-            border-right: 1px solid #1e293b;
-            transition: margin-left 0.25s ease-out;
-            margin-left: -250px;
-        }
-
-        #wrapper.toggled .custom-sidebar {
-            margin-left: 0;
-        }
-
-        .sidebar-brand {
-            font-size: 1.4rem;
-            font-weight: 800;
-            color: steelblue;
-            margin-bottom: 1.5rem;
-            text-align: center;
-        }
-
-        .sidebar-section {
-            margin-bottom: 1.5rem;
-        }
-
-        .sidebar-section-title {
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            color: #94a3b8;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-            padding-left: 0.5rem;
-        }
-
-        .sidebar-nav-item .nav-link {
-            display: flex;
-            align-items: center;
-            font-weight: 600;
-            font-size: 16px;
-            color: #cbd5e1;
-            padding: 0.6rem 0.75rem;
-            border-radius: 0.5rem;
-            transition: all 0.2s ease-in-out;
-        }
-
-            .sidebar-nav-item .nav-link:hover {
-                background-color: rgba(70, 130, 180, 0.15);
-                color: #6251DB;
-                transform: translateX(5px);
-            }
-    </style>
 </head>
 
 <body class="@ViewData["BodyClass"]">
@@ -211,7 +73,7 @@
                         </li>
                         <li class="sidebar-nav-item">
                             <a class="nav-link" asp-controller="AdminDashboard" asp-action="SentimentAnalysis">
-                                <i class="fa-solid fa-comments me-2"></i> FQA
+                                <i class="fa-solid fa-comments me-2"></i> Sentiment Analysis
                             </a>
                         </li>
                         <li class="sidebar-nav-item">
@@ -261,12 +123,13 @@
             document.getElementById("wrapper").classList.toggle("toggled");
         });
     </script>
-
-    <footer class="border-top footer text-body-secondary">
+    <footer class="app-footer border-top text-body-secondary"
+    style="text-align:center">
         <div class="container">
             &copy; 2025 - GlowPay - Experian Workshop
         </div>
     </footer>
+
 
     @await RenderSectionAsync("Scripts", required: false)
 </body>

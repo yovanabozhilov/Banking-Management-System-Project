@@ -2,21 +2,18 @@
 
 @{
     ViewData["Title"] = "Edit Loan";
-    ViewData["BodyClass"] = "loans-full-bg";   // apply the purple→white gradient
+    ViewData["BodyClass"] = "loans-full-bg";  
 }
 
 @section Head {
   <link rel="stylesheet" href="~/css/loans.css" asp-append-version="true" />
 }
 
-<!-- по-голямо разстояние от header/footer -->
 <div class="profile-page py-5">
   <div class="container-xxl pb-5">
     <div class="row justify-content-center">
       <div class="col-12 col-lg-6 col-xl-5">
         <div class="loan-card card shadow-lg border-0">
-
-          <!-- Header -->
           <div class="loan-header p-4">
             <div class="d-flex align-items-center gap-3">
               <div class="loan-badge">
@@ -29,23 +26,17 @@
             </div>
           </div>
 
-          <!-- Body -->
           <div class="loan-body card-body p-4 p-md-5">
             <form asp-action="Edit" method="post" class="loan-form">
               @Html.AntiForgeryToken()
               <input type="hidden" asp-for="Id" />
               
-              <!-- По-четимо summary (без alert кутия) -->
               <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
-
-              <!-- Type -->
               <div class="mb-3">
                 <label asp-for="Type" class="form-label">Type</label>
                 <input asp-for="Type" class="form-control" placeholder="e.g. Personal Loan" />
                 <span asp-validation-for="Type" class="text-danger small"></span>
               </div>
-
-              <!-- Amount -->
               <div class="mb-3">
                 <label asp-for="Amount" class="form-label">Amount</label>
                 <div class="input-group">
@@ -59,8 +50,6 @@
                 </div>
                 <span asp-validation-for="Amount" class="text-danger small"></span>
               </div>
-
-              <!-- Status -->
               <div class="mb-3">
                 <label asp-for="Status" class="form-label">Status</label>
                 <select asp-for="Status" class="form-select">
@@ -70,8 +59,6 @@
                 </select>
                 <span asp-validation-for="Status" class="text-danger small"></span>
               </div>
-
-              <!-- Approved Amount -->
               <div class="mb-2">
                 <label asp-for="ApprovedAmount" class="form-label">Approved Amount</label>
                 <div class="input-group">
@@ -85,10 +72,8 @@
                 </div>
                 <span asp-validation-for="ApprovedAmount" class="text-danger small"></span>
               </div>
-
-              <!-- Actions -->
               <div class="d-flex justify-content-between align-items-center mt-4">
-                <a asp-action="Index" class="btn btn-outline-secondary">
+                <a asp-action="Index" asp-asp-controller="Profile" class="btn btn-outline-secondary">
                   <i class="fa-solid fa-arrow-left-long me-1"></i> Back to list
                 </a>
                 <button type="submit" class="btn btn-primary">
@@ -107,7 +92,6 @@
 @section Scripts {
   <partial name="_ValidationScriptsPartial" />
   <script>
-    // Ensure gradient if Layout doesn't apply BodyClass
     document.body.classList.add('loans-full-bg');
   </script>
 }

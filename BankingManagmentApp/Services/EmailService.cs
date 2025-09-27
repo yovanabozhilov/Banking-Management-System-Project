@@ -14,8 +14,6 @@ public class EmailService : IEmailService
     {
         _config = config;
     }
-
-    // ==== ДОБАВЕНО САМО ЗА ТЕСТОВЕ (без да променя поведението) ====
     protected virtual SmtpClient CreateClient() => new SmtpClient();
 
     protected virtual Task ConnectAsync(SmtpClient client, string host, int port, SecureSocketOptions options)
@@ -29,8 +27,6 @@ public class EmailService : IEmailService
 
     protected virtual Task DisconnectAsync(SmtpClient client, bool quit)
         => client.DisconnectAsync(quit);
-    // ================================================================
-
     public async Task SendLoanStatusUpdateAsync(string customerEmail, int loanId, string newStatus, byte[] attachmentBytes)
     {
         var smtpServer = _config["SmtpSettings:Server"];
@@ -46,7 +42,6 @@ public class EmailService : IEmailService
         var bodyBuilder = new BodyBuilder();
         bodyBuilder.TextBody = $"Dear Customer,\n\nYour loan status with ID {loanId} was changed to: {newStatus}.";
 
-        // Прикачи файла, ако е подаден
         if (attachmentBytes != null && attachmentBytes.Length > 0)
         {
             bodyBuilder.Attachments.Add($"Loan_Contract{loanId}.pdf", attachmentBytes, ContentType.Parse("application/pdf"));
@@ -99,13 +94,10 @@ public class EmailService : IEmailService
         var email = new MimeMessage();
         email.From.Add(new MailboxAddress("GlowPay", "noreply@bank.com"));
         email.To.Add(new MailboxAddress("Client", toEmail));
-        // Оригинално поведение: игнорира параметрите и ползва фиксирани стойности
         email.Subject = "Financial Reports";
 
         var bodyBuilder = new BodyBuilder();
         bodyBuilder.TextBody = "Dear admin, we are sending you an attachment with the reports";
-
-        // Прикачи файла, ако е подаден
         if (attachmentBytes != null && attachmentBytes.Length > 0)
         {
             bodyBuilder.Attachments.Add(attachmentFileName, attachmentBytes);
@@ -115,7 +107,6 @@ public class EmailService : IEmailService
 
         using (var client = CreateClient())
         {
-            // Use the variables read from configuration for both connection and authentication
             await ConnectAsync(client, smtpServer, smtpPort, SecureSocketOptions.StartTls);
             await AuthenticateAsync(client, smtpUser, smtpPass);
             await SendAsync(client, email);

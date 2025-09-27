@@ -107,7 +107,7 @@ namespace BankingManagmentApp.Controllers
             if (transaction == null) return NotFound();
 
             ViewData["AccountsId"] = new SelectList(_context.Accounts, "Id", "Id", transaction.AccountsId);
-            return View(transaction); // <-- важно!
+            return View(transaction);
         }
 
         [HttpPost]

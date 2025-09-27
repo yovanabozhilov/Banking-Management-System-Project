@@ -12,7 +12,7 @@ namespace BankingManagmentApp.Services.Pdf
     public class TransactionsStatementPdf : IDocument
     {
         private readonly Customers _user;
-        private readonly Accounts? _account; // null => всички сметки
+        private readonly Accounts? _account; 
         private readonly IReadOnlyList<Transactions> _items;
         private readonly DateOnly? _from, _to;
         private readonly CultureInfo _ci;
@@ -63,7 +63,6 @@ namespace BankingManagmentApp.Services.Pdf
         {
             container.Column(col =>
             {
-                // 1) заглавната редица
                 col.Item().Row(row =>
                 {
                     row.RelativeItem().Column(c =>
@@ -111,8 +110,6 @@ namespace BankingManagmentApp.Services.Pdf
                         }
                     });
                 });
-
-                // 2) разделителна линия под заглавието
                 col.Item().PaddingTop(8).LineHorizontal(1).LineColor(Colors.Grey.Lighten2);
             });
         }
@@ -121,7 +118,6 @@ namespace BankingManagmentApp.Services.Pdf
         {
             container.PaddingTop(10).Column(col =>
             {
-                // кратко резюме
                 col.Item().Row(r =>
                 {
                     var credits = _items
@@ -155,14 +151,12 @@ namespace BankingManagmentApp.Services.Pdf
 
                 col.Item().PaddingTop(8).Element(TransactionsTable);
 
-                // ↓↓ ТУК БЕШЕ ГРЕШКАТА — стилът е вътре в Text(..)
                 col.Item().PaddingTop(8).Text(txt =>
                 {
                     txt.Span("Generated for: ").SemiBold().FontSize(9).FontColor(Colors.Grey.Darken1);
                     txt.Span($" {_user.FirstName} {_user.LastName} · {_user.Email}").FontSize(9).FontColor(Colors.Grey.Darken1);
                 });
 
-                // ↓↓ И ТУК — пак стил вътре в Text(..)
                 col.Item().PaddingTop(2).Text(t =>
                 {
                     t.Span("This statement is generated electronically and is valid without signature.")
@@ -186,7 +180,6 @@ namespace BankingManagmentApp.Services.Pdf
                     cols.RelativeColumn();     // IBAN
                 });
 
-                // Header
                 table.Header(h =>
                 {
                     h.Cell().Element(Th).Text(t => t.Span("Date").SemiBold());
@@ -204,7 +197,6 @@ namespace BankingManagmentApp.Services.Pdf
                     .BorderBottom(1)
                     .BorderColor(Colors.Grey.Lighten1);
 
-                // Rows
                 var zebra = false;
                 foreach (var t in _items)
                 {

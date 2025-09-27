@@ -79,8 +79,6 @@ namespace BankingManagmentApp.Services
             _modelPath      = Path.Combine(_modelDir, "credit_kmeans.zip");
             _clusterMapPath = Path.Combine(_modelDir, "cluster_map.json");
         }
-
-        // ---------- Вътрешни модели за live snapshot ----------
         private class LiveSnapshot
         {
             public decimal TotalBalance { get; set; }
@@ -92,21 +90,15 @@ namespace BankingManagmentApp.Services
             public decimal AvgMonthlyInflow  { get; set; }
             public decimal AvgMonthlyOutflow { get; set; }
         }
-
-        // ---------- Публични методи ----------
-
         public async Task<CreditScoreResult?> ComputeAsync(string userId)
         {
             await TrainIfNeededAsync();
 
-            // НОВО: ако няма никакви данни за този user -> null
             if (!await HasAnyUserDataAsync(userId))
                 return null;
 
-            // Жив snapshot от текущото състояние в БД
             var snap = await GetLiveSnapshotAsync(userId);
 
-            // Изграждаме ML ред от живите данни
             var row = new MlRow
             {
                 UserId            = userId,
@@ -121,11 +113,9 @@ namespace BankingManagmentApp.Services
             };
             Sanitize(row);
 
-            // Ако моделът липсва – heuristic fallback
             if (_model is null || _clusterToRisk is null || _clusterToRisk.Count == 0)
                 return HeuristicFallback(row, snap);
 
-            // Има модел -> предикт + Cluster в бележките
             var engine  = _ml.Model.CreatePredictionEngine<MlRow, MlPrediction>(_model);
             var pred    = engine.Predict(row);
             var cluster = (int)pred.PredictedClusterId;
@@ -148,7 +138,7 @@ namespace BankingManagmentApp.Services
             var net = snap.AvgMonthlyInflow - snap.AvgMonthlyOutflow;
 
             var notes =
-                $"Cluster: {cluster}. " +  // НОВО: винаги показваме клъстера при ML модел
+                $"Cluster: {cluster}. " + 
                 $"Risk: {riskLabel}. " +
                 $"You have {snap.NumLoans} loan{(snap.NumLoans == 1 ? "" : "s")} and {snap.NumAccounts} account{(snap.NumAccounts == 1 ? "" : "s")}. " +
                 $"On-time payments: {snap.OnTimeRatio.ToString("P0", inv)}, overdue: {snap.OverdueRatio.ToString("P0", inv)}. " +
@@ -166,8 +156,6 @@ namespace BankingManagmentApp.Services
         {
             var baseRes = await ComputeAsync(userId);
             if (baseRes is null) return null;
-
-            // Използваме живия нетен поток, за да реагира веднага след плащане/постъпление
             var snap = await GetLiveSnapshotAsync(userId);
             decimal netFlow = snap.AvgMonthlyInflow - snap.AvgMonthlyOutflow;
             if (netFlow < 0) netFlow = 0;
@@ -252,9 +240,6 @@ namespace BankingManagmentApp.Services
                 _lock.Release();
             }
         }
-
-        // ---------- Вътрешно: тренировка ----------
-
         private async Task TrainInternalAsync(CancellationToken ct)
         {
             var feats = await _db.Set<CreditFeatures>()
@@ -343,24 +328,18 @@ namespace BankingManagmentApp.Services
             _model = model;
             _clusterToRisk = mapping;
         }
-
-        // ---------- Live snapshot от БД ----------
-
         private async Task<LiveSnapshot> GetLiveSnapshotAsync(string userId, int lookbackDays = 90)
         {
-            // Accounts
             var accountsQ = _db.Accounts.Where(a => a.CustomerId == userId);
             var totalBalance = await accountsQ.SumAsync(a => (decimal?)a.Balance) ?? 0m;
             var numAccounts  = await accountsQ.CountAsync();
 
-            // Loans
             var loans = await _db.Loans.Where(l => l.CustomerId == userId).ToListAsync();
             var numLoans = loans.Count;
             double loanAgeDaysAvg = numLoans > 0
                 ? loans.Average(l => (DateTime.UtcNow - l.Date).TotalDays)
                 : 0.0;
 
-            // Repayments
             double onTimeRatio = 0.0, overdueRatio = 0.0;
             if (numLoans > 0)
             {
@@ -388,7 +367,6 @@ namespace BankingManagmentApp.Services
                 }
             }
 
-            // Transactions (последни lookbackDays дни) -> средни месечни вход/изход
             var since = DateOnly.FromDateTime(DateTime.UtcNow.Date.AddDays(-lookbackDays));
             var tx = await _db.Transactions
                 .Include(t => t.Accounts)
@@ -406,8 +384,6 @@ namespace BankingManagmentApp.Services
             {
                 var type = t.TransactionType ?? "";
 
-                // Приоритизираме дебит/плащания/погасяване като outflow;
-                // credit/disbursement -> inflow
                 if (Has(type, "debit") || Has(type, "repay") || Has(type, "payment"))
                     outflowTotal += t.Amount;
                 else if (Has(type, "credit") || Has(type, "disbursement"))
@@ -430,9 +406,6 @@ namespace BankingManagmentApp.Services
                 AvgMonthlyOutflow = avgOut
             };
         }
-
-        // ---------- Помощни ----------
-
         private static MlRow ToMlRow(CreditFeatures f) => new()
         {
             UserId           = f.UserId,
@@ -479,8 +452,6 @@ namespace BankingManagmentApp.Services
 
             return ClampScore(@base + delta);
         }
-
-        // Fallback, ако моделът още не е наличен
         private static CreditScoreResult HeuristicFallback(MlRow r, LiveSnapshot s)
         {
             var baseScore = 650.0;
@@ -523,8 +494,6 @@ namespace BankingManagmentApp.Services
                 Notes     = notes
             };
         }
-
-        // НОВО: проверка дали user има каквито и да е данни
         private async Task<bool> HasAnyUserDataAsync(string userId, int lookbackDays = 90)
         {
             if (await _db.Accounts.AnyAsync(a => a.CustomerId == userId)) return true;
@@ -537,7 +506,6 @@ namespace BankingManagmentApp.Services
                                    t.Accounts.CustomerId == userId &&
                                    t.Date >= since)) return true;
 
-            // ако имаш материализиран ред и във vw_CreditFeatures
             if (await _db.Set<CreditFeatures>().AnyAsync(cf => cf.UserId == userId)) return true;
 
             return false;

@@ -29,9 +29,6 @@ namespace BankingManagmentApp.Controllers
             _scoring = scoring;
         }
 
-        // ------------------------------------------------------------------------------------
-        // Единна логика за филтриране на транзакции: ползва се от Search + Export (CSV/PDF)
-        // ------------------------------------------------------------------------------------
         private IQueryable<Transactions> ApplyTxFilters(
             string userId,
             int? accountId, DateTime? from, DateTime? to, string? q, string? type)
@@ -44,7 +41,6 @@ namespace BankingManagmentApp.Controllers
             if (accountId.HasValue)
                 query = query.Where(t => t.AccountsId == accountId.Value);
 
-            // DateOnly граници (включително до)
             DateOnly? fromD = from.HasValue ? DateOnly.FromDateTime(from.Value.Date) : (DateOnly?)null;
             DateOnly? toD   = to.HasValue   ? DateOnly.FromDateTime(to.Value.Date)   : (DateOnly?)null;
 
@@ -66,14 +62,11 @@ namespace BankingManagmentApp.Controllers
 
             return query;
         }
-
-        // PROFILE DASHBOARD
         public async Task<IActionResult> Index()
         {
             var user = await _userManager.GetUserAsync(User);
             if (user == null) return Challenge();
 
-            // Accounts на текущия user
             var accounts = await _db.Accounts
                 .Where(a => a.CustomerId == user.Id)
                 .OrderByDescending(a => a.CreateAt)
@@ -87,7 +80,6 @@ namespace BankingManagmentApp.Controllers
                 .Take(10)
                 .ToListAsync();
 
-            // Loans на текущия user
             var loans = await _db.Loans
                 .Where(l => l.CustomerId == user.Id)
                 .OrderByDescending(l => l.Date)
@@ -101,7 +93,6 @@ namespace BankingManagmentApp.Controllers
                 .Take(5)
                 .ToListAsync();
 
-            // Реално изчисление на кредитния скор (без запис в БД)
             CreditAssessments? credit = null;
             var computed = await _scoring.ComputeAsync(user.Id);
             if (computed is not null)
@@ -114,7 +105,6 @@ namespace BankingManagmentApp.Controllers
                 };
             }
 
-            // Налични типове за падащото меню (спрямо потребителя)
             var availableTypes = await _db.Transactions
                 .Where(t => t.Accounts != null && t.Accounts.CustomerId == user.Id)
                 .Select(t => t.TransactionType)
@@ -134,8 +124,6 @@ namespace BankingManagmentApp.Controllers
 
             return View(vm);
         }
-
-        // ---- CSV EXPORTS ----
 
         [HttpGet]
         public async Task<IActionResult> ExportAccounts(int? accountId)
@@ -157,7 +145,7 @@ namespace BankingManagmentApp.Controllers
             var accounts = await query.OrderBy(a => a.CreateAt).ToListAsync();
 
             var sb = new StringBuilder();
-            sb.Append('\uFEFF'); // BOM за Excel
+            sb.Append('\uFEFF');
             sb.AppendLine("IBAN,Type,Currency,Balance,Status,Created");
 
             var inv = CultureInfo.InvariantCulture;
@@ -188,7 +176,6 @@ namespace BankingManagmentApp.Controllers
             return File(bytes, "text/csv", fname);
         }
 
-        // ---- TRANSACTIONS EXPORT CSV (уважава type, account, period, q) ----
         [HttpGet]
         public async Task<IActionResult> ExportTransactions(int? accountId, DateTime? from, DateTime? to, string? q, string? type)
         {
@@ -207,7 +194,7 @@ namespace BankingManagmentApp.Controllers
                 .ToListAsync();
 
             var sb = new StringBuilder();
-            sb.Append('\uFEFF'); // BOM за Excel
+            sb.Append('\uFEFF');
             sb.AppendLine("Date,Type,Amount,Description,Reference,IBAN,Currency");
 
             var inv = CultureInfo.InvariantCulture;
@@ -220,7 +207,6 @@ namespace BankingManagmentApp.Controllers
 
             foreach (var t in list)
             {
-                // ReferenceNumber: безопасно към текст и за int, и за int?
                 var refText = (t.ReferenceNumber is int rn) ? rn.ToString(inv) : "";
 
                 sb.AppendLine(string.Join(",",
@@ -250,7 +236,6 @@ namespace BankingManagmentApp.Controllers
             return File(bytes, "text/csv", fname);
         }
 
-        // ---- TRANSACTIONS EXPORT PDF (уважава type, account, period, q) ----
         [HttpGet]
         public async Task<IActionResult> ExportTransactionsPdf(int? accountId, DateTime? from, DateTime? to, string? q, string? type)
         {
@@ -274,7 +259,7 @@ namespace BankingManagmentApp.Controllers
             DateOnly? toD   = to.HasValue   ? DateOnly.FromDateTime(to.Value.Date)   : (DateOnly?)null;
 
             var doc = new TransactionsStatementPdf(user, account, list, fromD, toD);
-            var bytes = doc.GeneratePdf(); // extension метод от QuestPDF.Fluent
+            var bytes = doc.GeneratePdf(); 
 
             var fname = "transactions";
             if (accountId.HasValue) fname += $"_acc{accountId.Value}";
@@ -291,26 +276,22 @@ namespace BankingManagmentApp.Controllers
             return File(bytes, "application/pdf", fname);
         }
 
-        // ---- SEARCH (уважава type + всички останали филтри) ----
         [HttpGet]
         public async Task<IActionResult> SearchTransactions(int? accountId, DateTime? from, DateTime? to, string? q, string? type)
         {
             var user = await _userManager.GetUserAsync(User);
             if (user == null) return Challenge();
 
-            // Accounts за филтрите
             var accounts = await _db.Accounts
                 .Where(a => a.CustomerId == user.Id)
                 .OrderByDescending(a => a.CreateAt)
                 .ToListAsync();
 
-            // Филтрирани транзакции (единна логика)
             var filteredTx = await ApplyTxFilters(user.Id, accountId, from, to, q, type)
                 .OrderByDescending(t => t.Id)
                 .Take(200)
                 .ToListAsync();
 
-            // Loans / Repayments / Credit – както при Index
             var loans = await _db.Loans
                 .Where(l => l.CustomerId == user.Id)
                 .OrderByDescending(l => l.Date)
@@ -347,10 +328,8 @@ namespace BankingManagmentApp.Controllers
                 User = user,
                 Accounts = accounts,
 
-                // За обединената таблица – подаваме резултатите тук
                 TransactionType = filteredTx,
 
-                // fallback „скорошни“
                 LastTransactions = await _db.Transactions
                     .Where(t => t.Accounts != null && t.Accounts.CustomerId == user.Id)
                     .OrderByDescending(t => t.Id)
@@ -366,7 +345,6 @@ namespace BankingManagmentApp.Controllers
             return View("Index", vm);
         }
 
-        // ---- Back-compat: старият TransactionType екшън пренасочва към SearchTransactions ----
         [HttpGet]
         public IActionResult TransactionType(int? accountId, DateTime? from, DateTime? to, string type)
         {

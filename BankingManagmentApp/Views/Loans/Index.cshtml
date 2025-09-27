@@ -3,7 +3,7 @@
 
 @{
     ViewData["Title"] = "Loans";
-    ViewData["BodyClass"] = "profile-full-bg"; // същият градиент като при Transactions
+    ViewData["BodyClass"] = "profile-full-bg"; 
     var bg = CultureInfo.GetCultureInfo("bg-BG");
 }
 
@@ -28,11 +28,8 @@
 <div class="profile-page">
     <div class="container-xxl">
         <div class="row justify-content-center">
-            <!-- по-широко -->
             <div class="col-12 col-lg-12 col-xl-11 col-xxl-11">
                 <div class="profile-card card shadow-lg border-0">
-
-                    <!-- Header -->
                     <div class="profile-header d-flex align-items-center gap-3 p-4 border-bottom">
                         <div class="profile-badge">
                             <i class="fa-solid fa-sack-dollar"></i>
@@ -42,8 +39,6 @@
                             <small class="opacity-75">Overview of all loan applications</small>
                         </div>
                     </div>
-
-                    <!-- Body -->
                     <div class="card-body p-4 p-md-5">
                         <div class="mb-3 text-end">
                             <a asp-action="Create" class="btn btn-primary">
@@ -77,8 +72,6 @@
                                         {
                                             var st = item.Status?.ToLower();
                                             var isApproved = st == "approved" || st == "autoapproved";
-
-                                            <!-- БЕЗ жълто подчертаване -->
                                             <tr>
                                                 <td>@item.Type</td>
                                                 <td class="text-end text-mono">@item.Amount.ToString("N2", bg)</td>

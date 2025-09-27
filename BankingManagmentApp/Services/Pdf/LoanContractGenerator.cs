@@ -37,8 +37,6 @@ public class LoanContractGenerator
             document.Add(new Paragraph("1. The Client undertakes to repay the loan according to the attached repayment schedule."));
             document.Add(new Paragraph("2. All payments shall be made via bank transfer."));
 
-            // Here you can add more information, such as a repayment schedule table, if available
-
             document.Add(new Paragraph(" "));
             document.Add(new Paragraph("Signatures:"));
             document.Add(new Paragraph("_________________________")

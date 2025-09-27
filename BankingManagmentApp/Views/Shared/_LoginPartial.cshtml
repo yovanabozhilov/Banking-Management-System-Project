@@ -2,12 +2,14 @@
 @inject SignInManager<Customers> SignInManager
 @inject UserManager<Customers> UserManager
 
+<link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+
 <ul class="navbar-nav">
     @if (SignInManager.IsSignedIn(User))
     {
         <li class="nav-item">
             <a class="nav-link text-dark" asp-area="" asp-controller="Profile" asp-action="Index" title="Profile">
-                Hello @User.Identity?.Name!
+                Hello, @User.Identity?.Name!
             </a>
         </li>
         <li class="nav-item">

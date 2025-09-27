@@ -15,8 +15,6 @@ namespace BankingManagmentApp.Data
         public DbSet<CreditAssessments> CreditAssessments { get; set; }
         public DbSet<TemplateAnswer> TemplateAnswer { get; set; }
         public DbSet<ChatHistory> ChatHistory { get; set; }
-
-        // Използваме това име и в тестовете
         public DbSet<LoanApplication> LoanApplication { get; set; } 
         public DbSet<CreditFeatures> CreditFeaturesView => Set<CreditFeatures>();
 
@@ -28,13 +26,12 @@ namespace BankingManagmentApp.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            // ---- CreditFeatures: View в нормална БД, "таблица" с ключ в InMemory за тестове ----
             if (Database.IsInMemory())
             {
                 modelBuilder.Entity<CreditFeatures>(eb =>
                 {
                     eb.HasKey(x => x.UserId);
-                    eb.ToTable("CreditFeatures"); // логическа таблица за InMemory provider
+                    eb.ToTable("CreditFeatures"); 
                     eb.Property(p => p.TotalBalance).HasColumnType("decimal(18,2)");
                     eb.Property(p => p.AvgMonthlyInflow).HasColumnType("decimal(18,2)");
                     eb.Property(p => p.AvgMonthlyOutflow).HasColumnType("decimal(18,2)");
@@ -42,7 +39,6 @@ namespace BankingManagmentApp.Data
             }
             else
             {
-                // В реалната БД това е VIEW
                 modelBuilder.Entity<CreditFeatures>(eb =>
                 {
                     eb.HasNoKey();
@@ -55,7 +51,6 @@ namespace BankingManagmentApp.Data
                 });
             }
 
-            // ---- Precision за парични полета ----
             modelBuilder.Entity<Accounts>().Property(p => p.Balance).HasColumnType("decimal(18,2)");
             modelBuilder.Entity<Loans>().Property(p => p.Amount).HasColumnType("decimal(18,2)");
             modelBuilder.Entity<Loans>().Property(p => p.ApprovedAmount).HasColumnType("decimal(18,2)");
@@ -63,7 +58,6 @@ namespace BankingManagmentApp.Data
             modelBuilder.Entity<LoanRepayments>().Property(p => p.AmountPaid).HasColumnType("decimal(18,2)");
             modelBuilder.Entity<Transactions>().Property(p => p.Amount).HasColumnType("decimal(18,2)");
 
-            // ---- TemplateAnswer ----
             modelBuilder.Entity<TemplateAnswer>()
                 .Property(t => t.Keyword).IsRequired();
 

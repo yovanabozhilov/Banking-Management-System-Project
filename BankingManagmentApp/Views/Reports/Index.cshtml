@@ -4,38 +4,8 @@
 @{
     ViewData["Title"] = "Reports";
     bool show = (ViewBag.ShowResults as bool?) ?? false;
+    <link rel="stylesheet" href="~/css/reports.css" asp-append-version="true" />
 }
-
-<style>
-    .page-header {
-        border-bottom: 1px solid rgba(0,0,0,.06);
-        margin-bottom: 1rem;
-        padding-bottom: .75rem;
-    }
-    .card-elevated {
-        border: 1px solid rgba(0,0,0,.08);
-        box-shadow: 0 2px 8px rgba(0,0,0,.04);
-        border-radius: .75rem;
-    }
-    .table-responsive {
-        max-height: 60vh; 
-    }
-    .table thead th {
-        position: sticky;
-        top: 0;
-        background: #fff;
-        z-index: 1;
-        border-bottom: 1px solid rgba(0,0,0,.08);
-    }
-    .filters-row .form-label {
-        font-size: .85rem;
-        color: #6c757d;
-        margin-bottom: .35rem;
-    }
-    .btn-bar .btn {
-        min-width: 120px;
-    }
-</style>
 
 <div class="container-xl py-3">
     <div class="page-header d-flex align-items-center justify-content-between flex-wrap gap-2">

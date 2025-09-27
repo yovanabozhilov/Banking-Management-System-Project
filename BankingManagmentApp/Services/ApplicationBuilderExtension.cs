@@ -1,5 +1,4 @@
-﻿// Services/ApplicationBuilderExtension.cs
-using BankingManagmentApp.Data;
+﻿using BankingManagmentApp.Data;
 using BankingManagmentApp.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -74,8 +73,6 @@ namespace BankingManagmentApp.Services
             var err = string.Join("; ", result.Errors.Select(e => e.Description));
             throw new InvalidOperationException("Failed to seed super admin: " + err);
         }
-
-        // локален helper за статус (копие на този от LoansService)
         private static string CalcStatus(DateOnly due, decimal dueAmt, decimal paidAmt, DateOnly today)
         {
             if (paidAmt >= dueAmt && dueAmt > 0) return "Paid";
@@ -86,7 +83,6 @@ namespace BankingManagmentApp.Services
 
         private static async Task SeedBankDataForUserAsync(ApplicationDbContext db, Customers user)
         {
-            // 1) Account + transactions
             var hasAccount = await db.Accounts.AnyAsync(a => a.CustomerId == user.Id);
             if (!hasAccount)
             {
@@ -126,8 +122,6 @@ namespace BankingManagmentApp.Services
                 );
                 await db.SaveChangesAsync();
             }
-
-            // 2) One loan
             var loan = await db.Loans.FirstOrDefaultAsync(l => l.CustomerId == user.Id);
 
             if (loan == null)
@@ -147,8 +141,6 @@ namespace BankingManagmentApp.Services
                 db.Loans.Add(loan);
                 await db.SaveChangesAsync();
             }
-
-            // 3) Repayments (статусите се изчисляват, не се хардкодират)
             var hasRepayments = await db.LoanRepayments.AnyAsync(r => r.LoanId == loan.Id);
             if (!hasRepayments)
             {
@@ -161,7 +153,7 @@ namespace BankingManagmentApp.Services
                     AmountDue = 420.00m,
                     AmountPaid = 0m,
                     PaymentDate = null,
-                    Status = "" // ще се изчисли
+                    Status = "" 
                 };
                 r1.Status = CalcStatus(r1.DueDate, r1.AmountDue, r1.AmountPaid, today);
 

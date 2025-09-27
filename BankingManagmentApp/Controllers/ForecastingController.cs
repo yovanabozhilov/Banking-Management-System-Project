@@ -33,7 +33,6 @@ namespace BankingManagmentApp.Controllers
             // ================= CUSTOMERS =================
             ViewData["NewCustomers"] = _forecastService.ForecastNewCustomers();
             ViewData["ChurnRate"] = _forecastService.ForecastChurnRate();
-            //ViewData["HighRiskCustomers"] = _forecastService.DetectHighRiskCustomers();
 
             return View();
         }

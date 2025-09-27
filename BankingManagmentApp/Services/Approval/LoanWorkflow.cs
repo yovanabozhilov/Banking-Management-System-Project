@@ -155,7 +155,6 @@ namespace BankingManagmentApp.Services.Approval
 
             bool isLargeLoan = loan.Amount >= 1000000;
 
-            // Рисков само ако имаш малко пари и имаш активен заем или е голям заем
             if ((totalBalance < loan.Amount && loan.Amount < 1000000) || hasActiveLoan || isLargeLoan)
             {
                 loan.IsRisky = true;

@@ -12,8 +12,6 @@ namespace BankingManagmentApp.Services.Forecasting
         {
             _context = context;
         }
-
-        // ================= TRANSACTIONS =================
         public Dictionary<string, int> ForecastTransactionVolumeMonthly()
         {
             return _context.Transactions
@@ -44,8 +42,6 @@ namespace BankingManagmentApp.Services.Forecasting
                 .Where(t => t.Amount > avg * 3)
                 .ToList();
         }
-
-        // ================= CARDS (Accounts) =================
         public decimal ForecastCardExpenses()
         {
             return _context.Accounts
@@ -71,8 +67,6 @@ namespace BankingManagmentApp.Services.Forecasting
             int overdue = cardTx.Count(t => t.Amount < 0); 
             return (double)overdue / cardTx.Count();
         }
-
-        // ================= LOANS =================
         public double ForecastOverdueLoansRate()
         {
             var allRepayments = _context.LoanRepayments.ToList();
@@ -98,8 +92,6 @@ namespace BankingManagmentApp.Services.Forecasting
 
             return overdueRate < 0.1 ? "Clients are repaying on time" : "Delay increasing";
         }
-
-        // ================= CUSTOMERS =================
         public int ForecastNewCustomers()
         {
             var oneMonthAgo = DateTime.Now.AddMonths(-1);

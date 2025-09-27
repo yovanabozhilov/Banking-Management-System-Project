@@ -1,7 +1,7 @@
 @model IEnumerable<BankingManagmentApp.ViewModels.CategoryComparisonVm>
 @{
     ViewData["Title"] = "Category Comparison";
-    ViewData["BodyClass"] = "profile-full-bg"; // optional purple gradient background
+    ViewData["BodyClass"] = "profile-full-bg";
 }
 <link rel="stylesheet" href="~/css/profile.css" asp-append-version="true" />
 
@@ -10,25 +10,20 @@
         <div class="row justify-content-center">
             <div class="col-12 col-lg-10 col-xl-9">
                 <div class="profile-card card shadow-lg border-0">
-
-                    <!-- Header -->
-<div class="profile-header d-flex align-items-center gap-3 p-4 border-bottom">
-    <div class="profile-badge">
-        <i class="fa-solid fa-chart-simple"></i>
-    </div>
-    <div>
-        <h3 class="mb-0">@ViewData["Title"]</h3>
-        <small class="opacity-75">Comparison of Expenses/Income by Category</small>
-    </div>
-    <div class="ms-auto">
-        <a asp-controller="Transactions" asp-action="Create" class="btn btn-custom-purple">
-            + New Transaction
-        </a>
-    </div>
-</div>
-
-
-                    <!-- Body -->
+                    <div class="profile-header d-flex align-items-center gap-3 p-4 border-bottom">
+                        <div class="profile-badge">
+                            <i class="fa-solid fa-chart-simple"></i>
+                        </div>
+                        <div>
+                            <h3 class="mb-0">@ViewData["Title"]</h3>
+                            <small class="opacity-75">Comparison of Expenses/Income by Category</small>
+                        </div>
+                        <div class="ms-auto">
+                            <a asp-controller="Transactions" asp-action="Create" class="btn btn-custom-purple">
+                                + New Transaction
+                            </a>
+                        </div>
+                    </div>
                     <div class="card-body p-4 p-md-5">
                         @if (!Model.Any())
                         {
@@ -62,8 +57,6 @@
                             </div>
                         }
                     </div>
-
-                    <!-- Footer / Chart -->
                     <div class="card-footer bg-white border-top-0">
                         <h6 class="text-center mb-3">Visualization</h6>
                         <canvas id="categoryChart" height="140"></canvas>
@@ -87,12 +80,12 @@
                     {
                         label: 'Income',
                         data: @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.Select(m => m.Income))),
-                        backgroundColor: 'rgba(25, 135, 84, 0.7)' // bootstrap green
+                        backgroundColor: 'rgba(25, 135, 84, 0.7)'
                     },
                     {
                         label: 'Expenses',
                         data: @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.Select(m => m.Expense))),
-                        backgroundColor: 'rgba(220, 53, 69, 0.7)' // bootstrap red
+                        backgroundColor: 'rgba(220, 53, 69, 0.7)'
                     }
                 ]
             },

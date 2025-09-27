@@ -22,14 +22,12 @@ namespace BankingManagmentApp.Controllers
             _userManager = userManager;
         }
 
-        // GET: Accounts
         public async Task<IActionResult> Index()
         {
             var applicationDbContext = _context.Accounts.Include(a => a.Customer);
             return View(await applicationDbContext.ToListAsync());
         }
 
-        // GET: Accounts/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -59,16 +57,13 @@ namespace BankingManagmentApp.Controllers
 
             return $"{countryCode}{checkDigits}{bankCode}{accountNumber}";
         }
-        // GET: Accounts/Create
+
         public IActionResult Create()
         {
             ViewData["CustomerId"] = new SelectList(_context.Customers, "Id", "Id");
             return View();
         }
 
-        // POST: Accounts/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("CustomerId,IBAN,AccountType,Balance,Currency,CreateAt,Status")] Accounts accounts)
@@ -87,11 +82,8 @@ namespace BankingManagmentApp.Controllers
                 await _context.SaveChangesAsync();
             }
             return RedirectToAction("Index", "Profile");
-            //ViewData["CustomerId"] = new SelectList(_context.Customers, "Id", "Id", accounts.CustomerId);
-            //return View(accounts);
         }
 
-        // GET: Accounts/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -108,9 +100,6 @@ namespace BankingManagmentApp.Controllers
             return View(accounts);
         }
 
-        // POST: Accounts/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,CustomerId,IBAN,AccountType,Balance,Currency,CreateAt,Status")] Accounts accounts)
@@ -144,9 +133,6 @@ namespace BankingManagmentApp.Controllers
             return View(accounts);
         }
 
-
-
-        // GET: Accounts/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -165,7 +151,6 @@ namespace BankingManagmentApp.Controllers
             return View(accounts);
         }
 
-        // POST: Accounts/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)

@@ -5,7 +5,7 @@ using BankingManagmentApp.Data;
 using BankingManagmentApp.Models.ML;
 using Microsoft.EntityFrameworkCore;
 
-using BankingManagmentApp.Services; // <-- for ICreditScoringService + CreditScoreResult
+using BankingManagmentApp.Services;
 
 
 namespace BankingManagmentApp.Services.Approval
