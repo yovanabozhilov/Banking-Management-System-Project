@@ -483,7 +483,7 @@
             <div class="card-footer py-3">
                 <div class="credit-info-glass">
                     <i class="fas fa-info-circle me-2"></i>
-                    @(Model.CreditInfoMessage ?? (ViewBag.CreditInfo as string) ?? "Credit score is not available yet. We’ll show it once we have enough real activity.")
+                    @Model.CreditInfoMessage
                 </div>
             </div>
         }
