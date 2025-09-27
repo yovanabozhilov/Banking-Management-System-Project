@@ -2,7 +2,7 @@
 
 @{
     ViewData["Title"] = "Edit Account";
-    ViewData["BodyClass"] = "profile-full-bg"; // enable purple gradient background
+    ViewData["BodyClass"] = "profile-full-bg"; 
 }
 <link rel="stylesheet" href="~/css/profile.css" asp-append-version="true" />
 
@@ -11,8 +11,6 @@
         <div class="row justify-content-center">
             <div class="col-12 col-lg-6 col-xl-5">
                 <div class="profile-card card shadow-lg border-0">
-
-                    <!-- Header -->
                     <div class="profile-header d-flex align-items-center gap-3 p-4 border-bottom">
                         <div class="profile-badge">
                             <i class="fa-solid fa-edit"></i>
@@ -22,48 +20,10 @@
                             <small class="opacity-75">Update account information</small>
                         </div>
                     </div>
-
-                    <!-- Body -->
                     <div class="card-body p-4 p-md-5">
                         <form asp-action="Edit">
                             <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
                             <input type="hidden" asp-for="Id" />
-
-                            @* <div class="mb-3">
-                                <label asp-for="CustomerId" class="form-label"></label>
-                                <select asp-for="CustomerId" class="form-select" asp-items="ViewBag.CustomerId"></select>
-                                <span asp-validation-for="CustomerId" class="text-danger"></span>
-                            </div> *@
-
-                            <div class="mb-3">
-                                <label asp-for="IBAN" class="form-label"></label>
-                                <input asp-for="IBAN" class="form-control" />
-                                <span asp-validation-for="IBAN" class="text-danger"></span>
-                            </div>
-
-                            <div class="mb-3">
-                                <label asp-for="AccountType" class="form-label">Account Type</label>
-                                <input asp-for="AccountType" class="form-control" />
-                                <span asp-validation-for="AccountType" class="text-danger"></span>
-                            </div>
-
-                            <div class="mb-3">
-                                <label asp-for="Balance" class="form-label"></label>
-                                <input asp-for="Balance" class="form-control" />
-                                <span asp-validation-for="Balance" class="text-danger"></span>
-                            </div>
-
-                            <div class="mb-3">
-                                <label asp-for="Currency" class="form-label"></label>
-                                <input asp-for="Currency" class="form-control" />
-                                <span asp-validation-for="Currency" class="text-danger"></span>
-                            </div>
-
-                            <div class="mb-3">
-                                <label asp-for="CreateAt" class="form-label">Create At</label>
-                                <input asp-for="CreateAt" class="form-control" />
-                                <span asp-validation-for="CreateAt" class="text-danger"></span>
-                            </div>
 
                             <div class="mb-3">
                                 <label asp-for="Status" class="form-label"></label>

@@ -1,13 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using BankingManagmentApp.Data;
+using BankingManagmentApp.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using BankingManagmentApp.Data;
-using BankingManagmentApp.Models;
-using Microsoft.AspNetCore.Identity;
+using Org.BouncyCastle.Utilities;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace BankingManagmentApp.Controllers
 {
@@ -72,12 +73,12 @@ namespace BankingManagmentApp.Controllers
             if (!ModelState.IsValid)
             {
                 accounts.CustomerId = user.Id;
-                accounts.IBAN =GenerateIBAN();
+                accounts.IBAN = GenerateIBAN();
                 accounts.AccountType = "User";
                 accounts.Balance = 0;
                 accounts.Currency = "BGN";
                 accounts.CreateAt = DateTime.Now;
-                accounts.Status = "Active";
+                accounts.Status = "Pending";
                 _context.Accounts.Add(accounts);
                 await _context.SaveChangesAsync();
             }
@@ -99,44 +100,34 @@ namespace BankingManagmentApp.Controllers
             ViewData["CustomerId"] = new SelectList(_context.Customers, "Id", "Id", accounts.CustomerId);
             return View(accounts);
         }
-
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,CustomerId,IBAN,AccountType,Balance,Currency,CreateAt,Status")] Accounts accounts)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,IBAN,AccountType,Balance,Currency,CreateAt,Status")] Accounts accounts)
         {
             if (id != accounts.Id)
-            {
                 return NotFound();
-            }
 
-            if (ModelState.IsValid)
+            var existingAccount = await _context.Accounts.FirstOrDefaultAsync(a => a.Id == id);
+            if (existingAccount == null)
+                return NotFound();
+
+            if (!ModelState.IsValid)
             {
-                try
-                {
-                    _context.Update(accounts);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!AccountsExists(accounts.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
+                existingAccount.Status = accounts.Status;
+                await _context.SaveChangesAsync();
+
             }
-            ViewData["CustomerId"] = new SelectList(_context.Customers, "Id", "Id", accounts.CustomerId);
-            return View(accounts);
+            _context.Accounts.Update(existingAccount);
+            ViewData["CustomerId"] = new SelectList(_context.Customers, "Id", "Id", existingAccount.CustomerId);
+            return RedirectToAction(nameof(Index));
         }
+
+
 
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
-            {
+            { 
                 return NotFound();
             }
 
@@ -162,7 +153,7 @@ namespace BankingManagmentApp.Controllers
             }
 
             await _context.SaveChangesAsync();
-            return RedirectToAction("Index","Profile");
+            return RedirectToAction("Index", "Profile");
         }
 
         private bool AccountsExists(int id)

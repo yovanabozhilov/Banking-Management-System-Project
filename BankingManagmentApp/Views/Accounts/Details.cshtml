@@ -2,17 +2,14 @@
 
 @{
     ViewData["Title"] = "Account Details";
-    ViewData["BodyClass"] = "profile-full-bg"; // enable purple gradient background
-}
+    ViewData["BodyClass"] = "profile-full-bg"; 
 <link rel="stylesheet" href="~/css/profile.css" asp-append-version="true" />
-
+}
 <div class="profile-page">
     <div class="container-xxl">
         <div class="row justify-content-center">
             <div class="col-12 col-lg-6 col-xl-5">
                 <div class="profile-card card shadow-lg border-0">
-
-                    <!-- Header -->
                     <div class="profile-header d-flex align-items-center gap-3 p-4 border-bottom">
                         <div class="profile-badge">
                             <i class="fa-solid fa-eye"></i>
@@ -22,8 +19,6 @@
                             <small class="opacity-75">Account information</small>
                         </div>
                     </div>
-
-                    <!-- Body -->
                     <div class="card-body p-4 p-md-5">
                         <dl class="row mb-4">
                             <dt class="col-sm-4">IBAN</dt>
@@ -44,8 +39,8 @@
                             <dt class="col-sm-4">Status</dt>
                             <dd class="col-sm-8">@Html.DisplayFor(model => model.Status)</dd>
 
-                            <dt class="col-sm-4">Customer ID</dt>
-                            <dd class="col-sm-8">@Html.DisplayFor(model => model.Customer.Id)</dd>
+                            <dt class="col-sm-4">Customer </dt>
+                            <dd class="col-sm-8">@Html.DisplayFor(model => model.Customer.FirstName)</dd>
                         </dl>
 
                         <div class="d-flex gap-2">

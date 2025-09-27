@@ -2,7 +2,7 @@
 
 @{
     ViewData["Title"] = "Cards";
-    ViewData["BodyClass"] = "profile-full-bg"; // optional purple gradient background
+    ViewData["BodyClass"] = "profile-full-bg"; 
 }
 <link rel="stylesheet" href="~/css/profile.css" asp-append-version="true" />
 
@@ -11,8 +11,6 @@
         <div class="row justify-content-center">
             <div class="col-12 col-lg-10 col-xl-9">
                 <div class="profile-card card shadow-lg border-0">
-
-                    <!-- Header -->
                     <div class="profile-header d-flex align-items-center gap-3 p-4 border-bottom">
                         <div class="profile-badge">
                             <i class="fa-solid fa-credit-card"></i>
@@ -22,8 +20,6 @@
                             <small class="opacity-75">Manage your cards</small>
                         </div>
                     </div>
-
-                    <!-- Body -->
                     <div class="card-body p-4 p-md-5">
                         <div class="mb-3">
                             <a asp-action="Create" class="btn btn-primary">
@@ -48,6 +44,7 @@
                                 <tbody>
                                     @foreach (var item in Model)
                                     {
+                                        @if(item.Status=="Pending"){
                                         <tr>
                                             <td>@item.IBAN</td>
                                             <td>@item.AccountType</td>
@@ -64,6 +61,7 @@
                                                 </div>
                                             </td>
                                         </tr>
+                                        }
                                     }
                                 </tbody>
                             </table>

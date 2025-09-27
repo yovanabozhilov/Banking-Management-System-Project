@@ -11,8 +11,6 @@
         <div class="row justify-content-center">
             <div class="col-12 col-lg-6 col-xl-5">
                 <div class="profile-card card shadow-lg border-0">
-
-                    <!-- Header -->
                     <div class="profile-header d-flex align-items-center gap-3 p-4 border-bottom">
                         <div class="profile-badge">
                             <i class="fa-solid fa-ban"></i>
@@ -22,8 +20,6 @@
                             <small class="opacity-75">Are you sure you want to block this account?</small>
                         </div>
                     </div>
-
-                    <!-- Body -->
                     <div class="card-body p-4 p-md-5">
                         <dl class="row mb-4">
                             <dt class="col-sm-4">IBAN</dt>
@@ -46,7 +42,6 @@
                         </dl>
 
                         <div class="d-flex gap-2">
-                            <!-- Променено: бутонът е type="button", формата има id -->
                             <form asp-action="Delete" class="flex-fill" id="blockForm" method="post">
                                 <input type="hidden" asp-for="Id" />
                                 <button type="button" id="confirmBlockBtn" class="btn btn-danger w-100">

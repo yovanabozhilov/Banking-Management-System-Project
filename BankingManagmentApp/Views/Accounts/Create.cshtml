@@ -21,12 +21,13 @@
                         </div>
                     </div>
                     <div class="card-body p-4 p-md-5">
-                        <form asp-action="Create">
+                        <form asp-action="Create" onsubmit="return confirmPayment(this)">
                             <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
                             <div class="mb-3">
                                 <button type="submit" class="btn btn-primary w-100">
                                     <i class="fa-solid fa-paper-plane me-1"></i> Submit Request
+
                                 </button>
                             </div>
 
@@ -46,4 +47,24 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script>
+        function confirmPayment(form) {
+            event.preventDefault();
+            Swal.fire({
+                title: 'New Card Confirmation',
+                html: `Do you want to confirm this action? <br>`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, confirm',
+                cancelButtonText: 'Cancel',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            });
+
+            return false;
+        }
+    </script>
 }

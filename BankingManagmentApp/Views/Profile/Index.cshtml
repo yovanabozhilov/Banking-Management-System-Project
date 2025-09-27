@@ -120,6 +120,8 @@
                 <div class="row g-3">
                     @foreach (var a in Model.Accounts)
                     {
+                        @if(a.Status=="Active")
+                        {
                         <div class="col-12 col-md-6">
                             <div class="account-card account-card-purple h-100">
                                 <div class="d-flex justify-content-between align-items-start">
@@ -164,7 +166,7 @@
                                 </div>
                             </div>
                         </div>
-
+                        }
                     }
                     <div class="text-nowrap w-100 mt-2">
                         <a class="btn btn-sm btn-gradient w-100 d-inline-flex align-items-center justify-content-center gap-2"
