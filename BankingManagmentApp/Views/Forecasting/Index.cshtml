@@ -1,7 +1,7 @@
 ﻿@using BankingManagmentApp.Models
 @using BankingManagmentApp.Services.Forecasting
 @{
-    ViewData["Title"] = "Forecasting";
+    ViewData["Title"] = "Forecasting Dashboard";
     ViewData["BodyClass"] = "profile-full-bg";
 
     var volume = (Dictionary<string, int>)ViewData["TransactionVolume"];
@@ -38,9 +38,8 @@
 
 <div class="container mx-auto px-4 py-8">
     <h1 class="page-title">
-    <span class="text-purple-300">@ViewData["Title"]</span>
-    <span class="text-white">Dashboard</span>
-</h1>
+        <span class="text-white">@ViewData["Title"]</span>
+    </h1>
 
     <div class="mb-8">
         <h2 class="section-title text-white"><i class="fas fa-chart-line text-white mr-2"></i> Transaction Insights</h2>

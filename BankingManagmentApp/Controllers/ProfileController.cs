@@ -1,3 +1,4 @@
+using BankingManagmentApp.Configuration;
 using BankingManagmentApp.Data;
 using BankingManagmentApp.Models;
 using BankingManagmentApp.Services;
@@ -6,12 +7,12 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using QuestPDF.Fluent;
 using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using BankingManagmentApp.Services.Pdf;
-using QuestPDF.Fluent;
 
 namespace BankingManagmentApp.Controllers
 {
@@ -22,11 +23,19 @@ namespace BankingManagmentApp.Controllers
         private readonly UserManager<Customers> _userManager;
         private readonly ICreditScoringService _scoring;
 
-        public ProfileController(ApplicationDbContext db, UserManager<Customers> userManager, ICreditScoringService scoring)
+        private readonly CreditScoringOptions _creditOpts;
+
+        public ProfileController(
+            ApplicationDbContext db,
+            UserManager<Customers> userManager,
+            ICreditScoringService scoring,
+            IOptions<CreditScoringOptions> creditOpts
+        )
         {
             _db = db;
             _userManager = userManager;
             _scoring = scoring;
+            _creditOpts = creditOpts?.Value ?? new CreditScoringOptions();
         }
 
         private IQueryable<Transactions> ApplyTxFilters(
@@ -62,6 +71,17 @@ namespace BankingManagmentApp.Controllers
 
             return query;
         }
+
+        private string BuildCreditInfoMessage()
+        {
+            var flowsText   = _creditOpts.RequireBothFlows ? " with both inflow and outflow" : "";
+            var monthsLabel = _creditOpts.MinActiveMonths == 1
+                ? "1 active month"
+                : $"{_creditOpts.MinActiveMonths} active months";
+
+            return $"Credit score is not available yet. We need at least {_creditOpts.MinTransactions} transactions across at least {monthsLabel} within the last {_creditOpts.LookbackDays} days{flowsText}.";
+        }
+
         public async Task<IActionResult> Index()
         {
             var user = await _userManager.GetUserAsync(User);
@@ -89,7 +109,7 @@ namespace BankingManagmentApp.Controllers
 
             var upcomingRepayments = await _db.LoanRepayments
                 .OrderBy(r => r.DueDate)
-                .Where(r => loanIds.Contains(r.LoanId)&& (r.Status!="Paid"&&r.Status!="Credit"))
+                .Where(r => loanIds.Contains(r.LoanId) && (r.Status != "Paid" && r.Status != "Credit"))
                 .Take(5)
                 .ToListAsync();
 
@@ -119,7 +139,8 @@ namespace BankingManagmentApp.Controllers
                 Loans = loans,
                 UpcomingRepayments = upcomingRepayments,
                 Credit = credit,
-                AvailableTransactionTypes = availableTypes
+                AvailableTransactionTypes = availableTypes,
+                CreditInfoMessage = credit is null ? BuildCreditInfoMessage() : null 
             };
 
             return View(vm);
@@ -145,7 +166,7 @@ namespace BankingManagmentApp.Controllers
             var accounts = await query.OrderBy(a => a.CreateAt).ToListAsync();
 
             var sb = new StringBuilder();
-            sb.Append('\uFEFF');
+            sb.Append('\uFEFF'); 
             sb.AppendLine("IBAN,Type,Currency,Balance,Status,Created");
 
             var inv = CultureInfo.InvariantCulture;
@@ -194,7 +215,7 @@ namespace BankingManagmentApp.Controllers
                 .ToListAsync();
 
             var sb = new StringBuilder();
-            sb.Append('\uFEFF');
+            sb.Append('\uFEFF'); 
             sb.AppendLine("Date,Type,Amount,Description,Reference,IBAN,Currency");
 
             var inv = CultureInfo.InvariantCulture;
@@ -258,8 +279,8 @@ namespace BankingManagmentApp.Controllers
             DateOnly? fromD = from.HasValue ? DateOnly.FromDateTime(from.Value.Date) : (DateOnly?)null;
             DateOnly? toD   = to.HasValue   ? DateOnly.FromDateTime(to.Value.Date)   : (DateOnly?)null;
 
-            var doc = new TransactionsStatementPdf(user, account, list, fromD, toD);
-            var bytes = doc.GeneratePdf(); 
+            var doc = new BankingManagmentApp.Services.Pdf.TransactionsStatementPdf(user, account, list, fromD, toD);
+            var bytes = doc.GeneratePdf();
 
             var fname = "transactions";
             if (accountId.HasValue) fname += $"_acc{accountId.Value}";
@@ -300,8 +321,8 @@ namespace BankingManagmentApp.Controllers
             var loanIds = loans.Select(l => l.Id).ToList();
 
             var upcomingRepayments = await _db.LoanRepayments
-                .Where(r => loanIds.Contains(r.LoanId))
                 .OrderBy(r => r.DueDate)
+                .Where(r => loanIds.Contains(r.LoanId) && (r.Status != "Paid" && r.Status != "Credit"))
                 .Take(5)
                 .ToListAsync();
 
@@ -339,7 +360,8 @@ namespace BankingManagmentApp.Controllers
                 Loans = loans,
                 UpcomingRepayments = upcomingRepayments,
                 Credit = credit,
-                AvailableTransactionTypes = availableTypes
+                AvailableTransactionTypes = availableTypes,
+                CreditInfoMessage = credit is null ? BuildCreditInfoMessage() : null 
             };
 
             return View("Index", vm);

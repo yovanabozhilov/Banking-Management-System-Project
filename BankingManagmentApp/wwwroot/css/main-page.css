@@ -50,7 +50,6 @@ body.profile-full-bg::before {
   z-index: 1;
 }
 
-/* Avatar */
 .fancy-avatar {
   background: linear-gradient(135deg, #6a4bcf, #8e6dfd);
   color: #fff;
@@ -65,11 +64,12 @@ body.profile-full-bg::before {
   box-shadow: 0 4px 12px rgba(106, 75, 207, 0.4);
 }
 
-/* Gradient text */
 .text-gradient {
-  background: linear-gradient(135deg, #6a4bcf, #8e6dfd);
+  background-image: linear-gradient(90deg, #7c3aed, #4f46e5);
   -webkit-background-clip: text;
+  background-clip: text;         
   -webkit-text-fill-color: transparent;
+  color: transparent;
 }
 
 /* ==========================
@@ -109,7 +109,6 @@ body.profile-full-bg::before {
   box-shadow: 0 12px 30px rgba(0,0,0,0.3);
 }
 
-/* IBAN & copy button */
 .iban span {
   font-weight:600;
   letter-spacing:1px;
@@ -127,7 +126,6 @@ body.profile-full-bg::before {
   transform: translateY(-1px);
 }
 
-/* Balance */
 .fancy-balance .amount {
   font-size: 1.8rem;
   font-weight: 700;
@@ -139,7 +137,6 @@ body.profile-full-bg::before {
   letter-spacing: 1px;
 }
 
-/* Status pills */
 .status-pill {
   padding: 0.25rem 0.6rem;
   font-size: 0.75rem;
@@ -159,7 +156,6 @@ body.profile-full-bg::before {
   color: #212529;
 }
 
-/* Block & Export buttons */
 .btn-block-card,
 .btn-export-card {
   border-radius: 2rem;
@@ -247,13 +243,11 @@ body.profile-full-bg::before {
   margin-top: 1rem;
 }
 
-/* Scrollable repayments table */
 .repayments-card .card-body {
   max-height: 400px;
   overflow-y: auto;
 }
 
-/* Table hover */
 .table-hover tbody tr:hover td {
   background: rgba(106,75,207,0.05);
 }
@@ -261,7 +255,7 @@ body.profile-full-bg::before {
 .page-title {
     font-size: 2.5rem;
     font-weight: 800;
-    color: #ffffff; /* white text */
+    color: #ffffff; 
     text-align: center;
     padding: 2rem 0 1rem;
 }

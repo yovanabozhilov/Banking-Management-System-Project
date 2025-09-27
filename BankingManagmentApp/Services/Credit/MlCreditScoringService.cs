@@ -14,6 +14,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.ML;
 using Microsoft.ML.Data;
 using Microsoft.ML.Trainers;
+using Microsoft.Extensions.Options;
+using BankingManagmentApp.Configuration;
 
 namespace BankingManagmentApp.Services
 {
@@ -35,7 +37,6 @@ namespace BankingManagmentApp.Services
     internal class MlRow
     {
         public string UserId { get; set; } = string.Empty;
-
         public float TotalBalance      { get; set; }
         public float NumAccounts       { get; set; }
         public float NumLoans          { get; set; }
@@ -68,10 +69,17 @@ namespace BankingManagmentApp.Services
 
         private const int MaxRiskLevels = 4;
 
-        public MlCreditScoringService(ApplicationDbContext db, IWebHostEnvironment env)
+        private readonly CreditScoringOptions _opts;
+
+        public MlCreditScoringService(
+            ApplicationDbContext db,
+            IWebHostEnvironment env,
+            IOptions<CreditScoringOptions> opts
+        )
         {
             _db = db;
             _ml = new MLContext(seed: 42);
+            _opts = opts?.Value ?? new CreditScoringOptions();
 
             _modelDir = Path.Combine(env.ContentRootPath, "App_Data", "ML");
             Directory.CreateDirectory(_modelDir);
@@ -79,6 +87,7 @@ namespace BankingManagmentApp.Services
             _modelPath      = Path.Combine(_modelDir, "credit_kmeans.zip");
             _clusterMapPath = Path.Combine(_modelDir, "cluster_map.json");
         }
+
         private class LiveSnapshot
         {
             public decimal TotalBalance { get; set; }
@@ -90,6 +99,32 @@ namespace BankingManagmentApp.Services
             public decimal AvgMonthlyInflow  { get; set; }
             public decimal AvgMonthlyOutflow { get; set; }
         }
+
+        private static string ComposeUserNote(LiveSnapshot s)
+        {
+            var inv = CultureInfo.InvariantCulture;
+            var net = s.AvgMonthlyInflow - s.AvgMonthlyOutflow;
+
+            var lines = new List<string>();
+
+            if (s.NumLoans > 0)
+            {
+                lines.Add($"Loans: {s.NumLoans}");
+                lines.Add($"    • On-time: {(s.OnTimeRatio).ToString("P0", inv)}");
+                lines.Add($"    • Overdue: {(s.OverdueRatio).ToString("P0", inv)}");
+            }
+            else
+            {
+                lines.Add("Loans: 0");
+            }
+
+            lines.Add($"Accounts: {s.NumAccounts}");
+            lines.Add($"Total balance: {s.TotalBalance.ToString("0.00", inv)}");
+            lines.Add($"Average monthly net: {net.ToString("+0.00;-0.00;0.00", inv)}");
+
+            return string.Join("\n", lines);
+        }
+
         public async Task<CreditScoreResult?> ComputeAsync(string userId)
         {
             await TrainIfNeededAsync();
@@ -97,7 +132,7 @@ namespace BankingManagmentApp.Services
             if (!await HasAnyUserDataAsync(userId))
                 return null;
 
-            var snap = await GetLiveSnapshotAsync(userId);
+            var snap = await GetLiveSnapshotAsync(userId, _opts.LookbackDays);
 
             var row = new MlRow
             {
@@ -126,23 +161,7 @@ namespace BankingManagmentApp.Services
 
             var score = ScoreFromRiskAndFeatures(risk, row);
 
-            string riskLabel = risk switch
-            {
-                1 => "Low",
-                2 => "Moderate",
-                3 => "Elevated",
-                _ => "High"
-            };
-
-            var inv = CultureInfo.InvariantCulture;
-            var net = snap.AvgMonthlyInflow - snap.AvgMonthlyOutflow;
-
-            var notes =
-                $"Cluster: {cluster}. " + 
-                $"Risk: {riskLabel}. " +
-                $"You have {snap.NumLoans} loan{(snap.NumLoans == 1 ? "" : "s")} and {snap.NumAccounts} account{(snap.NumAccounts == 1 ? "" : "s")}. " +
-                $"On-time payments: {snap.OnTimeRatio.ToString("P0", inv)}, overdue: {snap.OverdueRatio.ToString("P0", inv)}. " +
-                $"Total balance: {snap.TotalBalance.ToString("0.00", inv)}; monthly net flow: {net.ToString("+0.00;-0.00;0.00", inv)}.";
+            var notes = ComposeUserNote(snap);
 
             return new CreditScoreResult
             {
@@ -156,7 +175,8 @@ namespace BankingManagmentApp.Services
         {
             var baseRes = await ComputeAsync(userId);
             if (baseRes is null) return null;
-            var snap = await GetLiveSnapshotAsync(userId);
+
+            var snap = await GetLiveSnapshotAsync(userId, _opts.LookbackDays);
             decimal netFlow = snap.AvgMonthlyInflow - snap.AvgMonthlyOutflow;
             if (netFlow < 0) netFlow = 0;
 
@@ -240,6 +260,7 @@ namespace BankingManagmentApp.Services
                 _lock.Release();
             }
         }
+
         private async Task TrainInternalAsync(CancellationToken ct)
         {
             var feats = await _db.Set<CreditFeatures>()
@@ -328,7 +349,8 @@ namespace BankingManagmentApp.Services
             _model = model;
             _clusterToRisk = mapping;
         }
-        private async Task<LiveSnapshot> GetLiveSnapshotAsync(string userId, int lookbackDays = 90)
+
+        private async Task<LiveSnapshot> GetLiveSnapshotAsync(string userId, int lookbackDays)
         {
             var accountsQ = _db.Accounts.Where(a => a.CustomerId == userId);
             var totalBalance = await accountsQ.SumAsync(a => (decimal?)a.Balance) ?? 0m;
@@ -359,7 +381,6 @@ namespace BankingManagmentApp.Services
                     var onTime   = reps.Count(r => Is(r.Status, "Paid"));
                     var overdue1 = reps.Count(r => Is(r.Status, "Overdue"));
                     var overdue2 = reps.Count(r => r.DueDate < today && !Is(r.Status, "Paid"));
-
                     var overdue = Math.Max(overdue1, overdue2);
 
                     onTimeRatio  = (double)onTime  / total;
@@ -375,7 +396,7 @@ namespace BankingManagmentApp.Services
                             t.Date >= since)
                 .ToListAsync();
 
-            bool Has(string? s, string token) =>
+            static bool Has(string? s, string token) =>
                 !string.IsNullOrEmpty(s) &&
                 s.IndexOf(token, StringComparison.OrdinalIgnoreCase) >= 0;
 
@@ -383,7 +404,6 @@ namespace BankingManagmentApp.Services
             foreach (var t in tx)
             {
                 var type = t.TransactionType ?? "";
-
                 if (Has(type, "debit") || Has(type, "repay") || Has(type, "payment"))
                     outflowTotal += t.Amount;
                 else if (Has(type, "credit") || Has(type, "disbursement"))
@@ -406,6 +426,7 @@ namespace BankingManagmentApp.Services
                 AvgMonthlyOutflow = avgOut
             };
         }
+
         private static MlRow ToMlRow(CreditFeatures f) => new()
         {
             UserId           = f.UserId,
@@ -452,6 +473,7 @@ namespace BankingManagmentApp.Services
 
             return ClampScore(@base + delta);
         }
+
         private static CreditScoreResult HeuristicFallback(MlRow r, LiveSnapshot s)
         {
             var baseScore = 650.0;
@@ -470,22 +492,7 @@ namespace BankingManagmentApp.Services
                 final >= 660 ? 2 :
                 final >= 600 ? 3 : 4;
 
-            string riskLabel = risk switch
-            {
-                1 => "Low",
-                2 => "Moderate",
-                3 => "Elevated",
-                _ => "High"
-            };
-
-            var inv = CultureInfo.InvariantCulture;
-            var net = s.AvgMonthlyInflow - s.AvgMonthlyOutflow;
-
-            var notes =
-                $"Profile cluster heuristic; risk: {riskLabel}. " +
-                $"You have {s.NumLoans} loan{(s.NumLoans == 1 ? "" : "s")} and {s.NumAccounts} account{(s.NumAccounts == 1 ? "" : "s")}. " +
-                $"On-time payments: {s.OnTimeRatio.ToString("P0", inv)}, overdue: {s.OverdueRatio.ToString("P0", inv)}. " +
-                $"Total balance: {s.TotalBalance.ToString("0.00", inv)}; monthly net flow: {net.ToString("+0.00;-0.00;0.00", inv)}.";
+            var notes = ComposeUserNote(s);
 
             return new CreditScoreResult
             {
@@ -494,19 +501,58 @@ namespace BankingManagmentApp.Services
                 Notes     = notes
             };
         }
-        private async Task<bool> HasAnyUserDataAsync(string userId, int lookbackDays = 90)
+
+        private record TxStats(int Count, int DistinctMonths, decimal Inflow, decimal Outflow);
+
+        private async Task<TxStats> GetTxStatsAsync(string userId, int lookbackDays)
         {
-            if (await _db.Accounts.AnyAsync(a => a.CustomerId == userId)) return true;
-            if (await _db.Loans.AnyAsync(l => l.CustomerId == userId)) return true;
-
             var since = DateOnly.FromDateTime(DateTime.UtcNow.Date.AddDays(-lookbackDays));
-            if (await _db.Transactions
-                    .Include(t => t.Accounts)
-                    .AnyAsync(t => t.Accounts != null &&
-                                   t.Accounts.CustomerId == userId &&
-                                   t.Date >= since)) return true;
 
-            if (await _db.Set<CreditFeatures>().AnyAsync(cf => cf.UserId == userId)) return true;
+            var tx = await _db.Transactions
+                .Include(t => t.Accounts)
+                .Where(t => t.Accounts != null &&
+                            t.Accounts.CustomerId == userId &&
+                            t.Date >= since)
+                .Select(t => new { t.Date, t.Amount, t.TransactionType })
+                .ToListAsync();
+
+            static bool Has(string? s, string token) =>
+                !string.IsNullOrEmpty(s) &&
+                s.IndexOf(token, StringComparison.OrdinalIgnoreCase) >= 0;
+
+            decimal inflow = 0m, outflow = 0m;
+            foreach (var t in tx)
+            {
+                var type = t.TransactionType ?? "";
+                if (Has(type, "debit") || Has(type, "repay") || Has(type, "payment"))
+                    outflow += t.Amount;
+                else if (Has(type, "credit") || Has(type, "disbursement"))
+                    inflow += t.Amount;
+            }
+
+            var months = tx
+                .Select(t => new { t.Date.Year, t.Date.Month })
+                .Distinct()
+                .Count();
+
+            return new TxStats(tx.Count, months, inflow, outflow);
+        }
+
+        private async Task<bool> HasAnyUserDataAsync(string userId)
+        {
+            var lookbackDays  = _opts.LookbackDays <= 0 ? 90 : _opts.LookbackDays;
+            var minTx         = Math.Max(0, _opts.MinTransactions);
+            var minMonths     = Math.Max(1, _opts.MinActiveMonths);
+
+            if (minTx <= 0) return true;
+
+            var txs = await GetTxStatsAsync(userId, lookbackDays);
+            if (txs.Count >= minTx &&
+                txs.DistinctMonths >= minMonths &&
+                (!_opts.RequireBothFlows || (txs.Inflow > 0 && txs.Outflow > 0)))
+            {
+                return true;
+            }
 
             return false;
         }

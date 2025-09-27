@@ -1,23 +1,4 @@
-﻿// Please see documentation at https://learn.microsoft.com/aspnet/core/client-side/bundling-and-minification
-// for details on configuring this project to bundle and minify static web assets.
-
-// Write your JavaScript code.
-
-//Copying the IBAN 
-document.addEventListener('click', async (e) => {
-  const btn = e.target.closest('[data-copy-iban]');
-  if (!btn) return;
-  const iban = btn.getAttribute('data-copy-iban');
-  try {
-    await navigator.clipboard.writeText(iban);
-    btn.innerText = 'Copied!';
-    setTimeout(() => (btn.innerText = 'Copy IBAN'), 1500);
-  } catch {
-    alert('Copy failed');
-  }
-});
-
-(function () {
+﻿(function () {
   const COOKIE = 'theme';
   const COOKIE_OPTS = 'path=/; max-age=' + (60 * 60 * 24 * 365) + '; samesite=lax';
 
@@ -32,9 +13,7 @@ document.addEventListener('click', async (e) => {
   function applyTheme(mode) {
     let actual = mode;
     if (mode === 'system') actual = prefersDark() ? 'dark' : 'light';
-    // Bootstrap 5.3
     document.documentElement.setAttribute('data-bs-theme', actual);
-    // fallback клас за по-стари Bootstrap-и/собствени стилове
     document.documentElement.classList.toggle('dark', actual === 'dark');
   }
 
@@ -43,17 +22,15 @@ document.addEventListener('click', async (e) => {
     const mode = saved ? decodeURIComponent(saved) : 'system';
     applyTheme(mode);
 
-    // ако е системен режим – следи смяната на OS темата
     const mq = window.matchMedia('(prefers-color-scheme: dark)');
     mq.addEventListener?.('change', () => {
       const current = decodeURIComponent(getCookie(COOKIE) || 'system');
       if (current === 'system') applyTheme('system');
     });
 
-    // свържи radio-тата, ако има на страницата (Appearance)
     document.querySelectorAll('[data-theme-option]').forEach(r => {
       r.addEventListener('change', () => {
-        const selected = r.value;         // light | dark | system
+        const selected = r.value;
         setCookie(COOKIE, selected);
         applyTheme(selected);
       });
@@ -68,4 +45,47 @@ document.addEventListener('click', async (e) => {
   window.Theme = { initTheme, setTheme };
 })();
 
+document.addEventListener('click', async (e) => {
+  const btn = e.target.closest('[data-copy-iban]');
+  if (!btn || btn.classList.contains('copy-id-btn')) return;
+  const iban = btn.getAttribute('data-copy-iban');
+  if (!iban) return;
 
+  try {
+    await navigator.clipboard.writeText(iban);
+    const original = btn.textContent;
+    btn.textContent = 'Copied!';
+    setTimeout(() => (btn.textContent = original), 1200);
+  } catch {
+    alert('Copy failed');
+  }
+});
+
+document.addEventListener('click', async (e) => {
+  const btn = e.target.closest('.copy-id-btn');
+  if (!btn) return;
+
+  const id = btn.getAttribute('data-copy-id');
+  const iban = btn.getAttribute('data-copy-iban');
+  const text = id || iban;
+  const icon = btn.querySelector('i');
+
+  if (!text) return;
+
+  try {
+    await navigator.clipboard.writeText(text);
+    if (icon) {
+      const prev = icon.className;
+      icon.className = 'fas fa-check';
+      setTimeout(() => { icon.className = prev; }, 1200);
+    }
+  } catch {
+    if (icon) {
+      const prev = icon.className;
+      icon.className = 'fas fa-exclamation-triangle';
+      setTimeout(() => { icon.className = prev; }, 1200);
+    } else {
+      alert('Copy failed');
+    }
+  }
+});

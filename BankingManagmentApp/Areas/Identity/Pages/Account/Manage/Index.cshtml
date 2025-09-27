@@ -11,10 +11,8 @@
   <div class="container-xxl">
     <div class="row justify-content-center">
       <div class="col-12 col-lg-12 col-xl-11">
-        <!-- Card wrapper -->
         <div class="profile-card card shadow-lg border-0">
 
-          <!-- Header -->
           <div class="profile-header d-flex align-items-center gap-3 p-4 border-bottom">
             <div class="profile-badge">
               <i class="fa-solid fa-user-circle"></i>
@@ -25,7 +23,6 @@
             </div>
           </div>
 
-          <!-- Body -->
           <div class="card-body p-4 p-md-5">
             <partial name="_StatusMessage" for="StatusMessage" />
 
@@ -90,14 +87,9 @@
                   Save changes
                 </button>
               </div>
+
             </form>
           </div>
-
-          <!-- Footer (optional link) -->
-          <div class="card-footer bg-transparent text-center py-3">
-            <a asp-page="/Account/Manage/Index" class="btn btn-link">Back to Dashboard</a>
-          </div>
-
         </div>
       </div>
     </div>
@@ -107,7 +99,6 @@
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
     <script>
-      // Show validation summary if there are errors
       (function () {
         const summary = document.querySelector('[asp-validation-summary="ModelOnly"]')
                      || document.querySelector('.validation-summary-errors, .validation-summary-valid');

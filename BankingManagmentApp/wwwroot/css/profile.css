@@ -13,7 +13,6 @@ body.profile-full-bg::before {
     linear-gradient(180deg, #422897 0%, #8e6dfd 40%, #d7cffd 75%, #ffffff 100%);
   background-attachment: fixed;
 }
-
 [data-bs-theme="dark"] body.profile-full-bg::before {
   background:
     radial-gradient(1400px 700px at -10% -20%, rgba(106,75,207,.32), transparent 60%),
@@ -21,105 +20,240 @@ body.profile-full-bg::before {
     linear-gradient(180deg, #533db3 0%, #8468ee 45%, #e9e6ff 85%, #ffffff 100%);
 }
 
-/* Shared page spacing (keeps your header/footer intact) */
 .profile-page{ padding: 2rem 0 3rem; }
-
 .profile-full-bg {
-    background: linear-gradient(135deg, #e6f0ff 0%, #f9faff 100%);
-    min-height: 100vh;
+  background: linear-gradient(135deg, #e6f0ff 0%, #f9faff 100%);
+  min-height: 100vh;
 }
 
-.profile-card {
-    border-radius: 1rem;
-    background: #fff;
-}
+.profile-card { border-radius: 1rem; background: #fff; }
 
-/* Purple header strip on the card */
 body.profile-full-bg .profile-header {
-    /* same gradient you used for buttons */
-    background: linear-gradient(135deg, #6a4bcf, #8e6dfd);
-    color: #fff;
-    border-top-left-radius: 1rem;
-    border-top-right-radius: 1rem;
+  background: linear-gradient(135deg, #6a4bcf, #8e6dfd);
+  color: #fff;
+  border-top-left-radius: 1rem;
+  border-top-right-radius: 1rem;
 }
 
-/* Left-menu active link (Identity Manage nav) */
 body.profile-full-bg .nav-pills .nav-link.active,
 body.profile-full-bg .nav-pills .show > .nav-link {
-    background: linear-gradient(135deg, #6a4bcf, #8e6dfd);
-    color: #fff;
+  background: linear-gradient(135deg, #6a4bcf, #8e6dfd);
+  color: #fff;
 }
+body.profile-full-bg .nav-pills .nav-link:hover { color: #6a4bcf; }
 
-/* Optional: hover effect for other links in the left menu */
-body.profile-full-bg .nav-pills .nav-link:hover {
-    color: #6a4bcf;
-}
+.profile-badge i { font-size: 2.2rem; }
 
-.profile-badge i {
-    font-size: 2.2rem;
-}
-
-/* Purple primary button – same as loans page */
 body.profile-full-bg .btn-primary {
   background: linear-gradient(135deg, #6a4bcf, #8e6dfd);
   border: none;
 }
-
-body.profile-full-bg .btn-primary:hover {
-  filter: brightness(1.05);
-}
+body.profile-full-bg .btn-primary:hover { filter: brightness(1.05); }
 
 .card-footer.bg-transparent.text-center.py-3 a.btn-link {
   text-decoration: none;
   color: #6c757d;
 }
+.card-footer.bg-transparent.text-center.py-3 a.btn-link:hover { color: #acacac; }
 
-.card-footer.bg-transparent.text-center.py-3 a.btn-link:hover {
-  color: #acacac;
-}
+.profile-card, .profile-card .profile-header { border-left: none !important; }
+.profile-card .profile-header { border-left: 4px solid #6a4bcf; }
 
-/* Remove blue border on the left of the card/header */
-.profile-card,
-.profile-card .profile-header {
-    border-left: none !important;        /* remove any existing blue border */
-}
-
-/* Optional: force a purple left border if you want it as part of design */
-.profile-card .profile-header {
-    border-left: 4px solid #6a4bcf;      /* purple accent line on the left */
-}
-
-/* Purple theme for radio-button group */
 .btn-outline-primary,
 .btn-outline-primary:focus {
-    color: #6f42c1;               /* text purple */
-    border-color: #6f42c1;        /* border purple */
+  color: #6f42c1;
+  border-color: #6f42c1;
 }
-
 .btn-outline-primary:hover,
 .btn-check:focus + .btn-outline-primary,
 .btn-check:active + .btn-outline-primary,
 .btn-outline-primary.active,
 .btn-outline-primary.dropdown-toggle.show {
-    background-color: #6f42c1;    /* purple background on hover/active */
-    border-color: #6f42c1;
-    color: #fff;                  /* white text when active */
+  background-color: #6f42c1;
+  border-color: #6f42c1;
+  color: #fff;
 }
-
 .btn-check:checked + .btn-outline-primary {
-    background-color: #6f42c1;    /* purple when selected */
-    border-color: #6f42c1;
-    color: #fff;
+  background-color: #6f42c1;
+  border-color: #6f42c1;
+  color: #fff;
 }
 
 .btn-custom-purple {
-    background-color: #ffffff; /* white background */
-    color: #6f42c1;           /* purple text (adjust to match your theme) */
-    border: 1px solid #6f42c1;
+  background-color: #ffffff;
+  color: #6f42c1;
+  border: 1px solid #6f42c1;
+}
+.btn-custom-purple:hover {
+  background-color: #6f42c1;
+  color: #ffffff;
+  border-color: #6f42c1;
 }
 
-.btn-custom-purple:hover {
-    background-color: #6f42c1;
-    color: #ffffff;
-    border-color: #6f42c1;
+.profile-full-bg .credit-info-glass {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.18), rgba(99, 102, 241, 0.14));
+  border: 1px solid rgba(168, 85, 247, 0.45);
+  -webkit-background-clip: padding-box;
+  background-clip: padding-box;
+  -webkit-backdrop-filter: blur(10px) saturate(1.2);
+  backdrop-filter: blur(10px) saturate(1.2);
+  box-shadow: 0 8px 20px rgba(109, 40, 217, 0.15);
+  color: #2e1065;
+  font-size: 0.925rem;
+  line-height: 1.3;
 }
+.profile-full-bg .credit-info-glass i { opacity: 0.9; }
+[data-bs-theme="dark"] .profile-full-bg .credit-info-glass {
+  color: #ede9fe;
+  border-color: rgba(216, 180, 254, 0.45);
+  box-shadow: 0 8px 20px rgba(76, 29, 149, 0.25);
+}
+@supports not ((-webkit-backdrop-filter: blur(10px)) or (backdrop-filter: blur(10px))) {
+  .profile-full-bg .credit-info-glass { background: rgba(168, 85, 247, 0.2); }
+}
+.credit-info-glass.note-compact { padding: 8px 12px; margin: 4px 0; }
+.note-compact .note-text { white-space: pre-wrap; margin: 0; line-height: 1.2; }
+.note-compact .note-icon { position: absolute; top: 8px; right: 8px; opacity: .6; }
+
+@media (min-width: 1200px){ .container-profile{ max-width: 1400px; margin-inline: auto; } }
+@media (min-width: 1600px){ .container-profile{ max-width: 1560px; } }
+@media (min-width: 992px){ .profile-section .table-responsive{ overflow-x: visible; } }
+
+:root{
+  --tbl-hpad: .75rem;     
+  --tbl-head-vpad: .40rem; 
+  --tbl-body-vpad: .85rem; 
+  --tbl-line-height: 1.2;
+  --tbl-radius: .6rem;
+}
+
+.profile-section .p-3{ padding: 1rem !important; }
+
+.profile-section .table-responsive{
+  border-radius: var(--tbl-radius);
+  overflow: hidden;
+}
+
+.transactions-table,
+.loans-table,
+.repayments-table,
+.profile-section .table{
+  width: 100%;
+  table-layout: auto;
+}
+
+.profile-section .table.transactions-table thead > tr > th,
+.profile-section .table.loans-table thead > tr > th,
+.profile-section .table.repayments-table thead > tr > th{
+  padding-top: var(--tbl-head-vpad) !important;
+  padding-bottom: var(--tbl-head-vpad) !important;
+  padding-left: var(--tbl-hpad) !important;
+  padding-right: var(--tbl-hpad) !important;
+  line-height: var(--tbl-line-height) !important;
+  vertical-align: middle !important;
+  white-space: nowrap;
+}
+
+.profile-section .table.transactions-table tbody > tr > td,
+.profile-section .table.loans-table        tbody > tr > td,
+.profile-section .table.repayments-table   tbody > tr > td{
+  padding-top: var(--tbl-body-vpad) !important;
+  padding-bottom: var(--tbl-body-vpad) !important;
+  padding-left: var(--tbl-hpad) !important;
+  padding-right: var(--tbl-hpad) !important;
+  line-height: var(--tbl-line-height) !important;
+  vertical-align: middle !important;
+}
+
+.profile-section .table.transactions-table.table-sm > :not(caption) > * > *,
+.profile-section .table.loans-table.table-sm        > :not(caption) > * > *,
+.profile-section .table.repayments-table.table-sm   > :not(caption) > * > *{
+  padding-top: var(--tbl-body-vpad) !important;
+  padding-bottom: var(--tbl-body-vpad) !important;
+  padding-left: var(--tbl-hpad) !important;
+  padding-right: var(--tbl-hpad) !important;
+  line-height: var(--tbl-line-height) !important;
+}
+
+.transactions-table .nowrap,
+.loans-table .nowrap,
+.repayments-table .nowrap{ white-space: nowrap !important; }
+
+.transactions-table td.desc, .transactions-table th.desc,
+.loans-table td.desc,        .loans-table th.desc,
+.repayments-table td.desc,   .repayments-table th.desc{
+  white-space: normal;
+  word-break: break-word;
+}
+
+.transactions-card form.filters-condensed{ margin-bottom: .5rem; }
+
+.transactions-card .tx-inner{ padding: 1rem; }
+.transactions-card .tx-inner .table-responsive{ margin:0 !important; padding:0 !important; }
+
+.text-mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+
+.copy-id-btn {
+  color: #6a4bcf !important;
+  text-decoration: none !important;
+}
+.copy-id-btn:hover,
+.copy-id-btn:focus {
+  color: #8e6dfd !important;
+  text-decoration: none !important;
+}
+.copy-id-btn i { color: inherit; opacity: .95; }
+.copy-id-btn:hover i { opacity: 1; }
+[data-bs-theme="dark"] .copy-id-btn { color: #c4b5fd !important; }
+[data-bs-theme="dark"] .copy-id-btn i { color: #b79cff; }
+
+:root{
+  --tbl-head-vpad: .40rem;
+  --tbl-body-vpad: .85rem;
+  --tbl-row-min: calc( (var(--tbl-body-vpad) * 2) + 1.2rem );
+}
+
+.profile-section .table > thead > tr > th,
+.profile-section .table > tbody > tr > td{
+  padding-top: var(--tbl-body-vpad) !important;
+  padding-bottom: var(--tbl-body-vpad) !important;
+  padding-left: var(--tbl-hpad) !important;
+  padding-right: var(--tbl-hpad) !important;
+  line-height: var(--tbl-line-height) !important;
+  vertical-align: middle !important;
+}
+
+.profile-section .table thead > tr > th{
+  padding-top: var(--tbl-head-vpad) !important;
+  padding-bottom: var(--tbl-head-vpad) !important;
+}
+
+.profile-section .table > tbody > tr{
+  height: var(--tbl-row-min);
+}
+
+.profile-section .table .badge,
+.profile-section .table .status-pill,
+.profile-section .table .badge-tight{
+  font-size: .75rem;
+  line-height: 1;
+  padding: .35rem .5rem;
+  white-space: nowrap;
+}
+
+.profile-section .table .btn{
+  padding: .25rem .5rem;
+  line-height: 1.25;
+  min-height: auto;
+}
+
+.profile-section .table td > *:first-child{ margin-top: 0 !important; }
+.profile-section .table td > *:last-child{ margin-bottom: 0 !important; }
+
+

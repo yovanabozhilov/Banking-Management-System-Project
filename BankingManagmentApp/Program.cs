@@ -10,12 +10,12 @@ using Microsoft.Extensions.AI;
 using Microsoft.Extensions.Configuration;
 using OpenAI;
 using QuestPDF.Infrastructure;
+using BankingManagmentApp.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
 QuestPDF.Settings.License = LicenseType.Community;
 
-// DB
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
     ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
@@ -23,7 +23,6 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-// Identity
 builder.Services.AddDefaultIdentity<Customers>(options =>
 {
     options.SignIn.RequireConfirmedAccount = true;
@@ -35,10 +34,8 @@ builder.Services.AddDefaultIdentity<Customers>(options =>
 .AddEntityFrameworkStores<ApplicationDbContext>()
 .AddDefaultTokenProviders();
 
-// MVC
 builder.Services.AddControllersWithViews();
 
-// Session
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {
@@ -47,26 +44,23 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
 });
 
-// DI: credit scoring & loans
 builder.Services.AddScoped<ICreditScoringService, MlCreditScoringService>();
 builder.Services.AddScoped<LoansService>();
 
-// Approval/Workflow DI
 builder.Services.AddSingleton<LoanApprovalPolicy>();
 builder.Services.AddScoped<ILoanApprovalEngine, LoanApprovalEngine>();
 builder.Services.AddScoped<ILoanWorkflow, LoanWorkflow>();
 
-// Ако тези класове съществуват в проекта – остави редовете.
-// Ако получиш build грешка за липсващи типове, просто ги изтрий.
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<LoanContractGenerator>();
 builder.Services.Configure<FormOptions>(options =>
 {
-    options.MultipartBodyLengthLimit = 10 * 1024 * 1024; // 10 MB
+    options.MultipartBodyLengthLimit = 10 * 1024 * 1024; 
 });
 
+builder.Services.Configure<CreditScoringOptions>(
+    builder.Configuration.GetSection("CreditScoring"));
 
-// OpenAI Chat Client – поддържа и двата начина за конфиг (OpenAIKey или OpenAI:ApiKey)
 builder.Services.AddChatClient(sp =>
 {
     var config = sp.GetRequiredService<IConfiguration>();
@@ -87,15 +81,12 @@ builder.Services.AddChatClient(sp =>
     return chatClient;
 });
 
-// Chatbot services
 builder.Services.AddScoped<AiChatService>();
-builder.Services.AddScoped<KnowledgeBaseService>(); // TemplateAnswer-базиран retrieval
+builder.Services.AddScoped<KnowledgeBaseService>(); 
 builder.Services.AddScoped<ChatTools>();
 
-// Forecasting service
 builder.Services.AddScoped<ForecastService>();
 
-// Background auto-retrain
 builder.Services.AddHostedService<MlRetrainHostedService>();
 
 var app = builder.Build();
@@ -110,10 +101,8 @@ else
     app.UseHsts();
 }
 
-// seed/migrations
 await app.PrepareDataBase();
 
-// middleware
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
