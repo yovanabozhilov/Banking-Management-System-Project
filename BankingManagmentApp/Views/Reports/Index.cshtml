@@ -3,19 +3,25 @@
 
 @{
     ViewData["Title"] = "Reports";
+    ViewData["BodyClass"] = "profile-full-bg";
     bool show = (ViewBag.ShowResults as bool?) ?? false;
     <link rel="stylesheet" href="~/css/reports.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/profile.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/dashboard.css" />
 }
 
 <div class="container-xl py-3">
     <div class="page-header d-flex align-items-center justify-content-between flex-wrap gap-2">
         <div>
-            <h1 class="h3 mb-1">Reports</h1>
+            <h1 class="page-title">
+                <span class="text-white">@ViewData["Title"]</span>
+            </h1>
             <nav aria-label="breadcrumb">
-                <ol class="breadcrumb mb-0 small">
-                    <li class="breadcrumb-item"><a asp-controller="AdminDashboard" asp-action="Index">Dashboard</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">Reports</li>
-                </ol>
+                <a class="text-white" asp-controller="AdminDashboard" asp-action="Index"
+                    class="text-white-600 hover:text-indigo-800 underline underline-offset-4 text-sm"
+                    aria-label="Open Reports page">
+                    ← Dashboard
+                </a>
             </nav>
         </div>
     </div>
