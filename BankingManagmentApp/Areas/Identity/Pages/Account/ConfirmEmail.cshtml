@@ -1,8 +1,45 @@
-﻿@page
+﻿@* @page
 @model ConfirmEmailModel
 @{
     ViewData["Title"] = "Confirm email";
+    ViewData["BodyClass"] = "profile-full-bg";
+
 }
 
 <h1>@ViewData["Title"]</h1>
 <partial name="_StatusMessage" model="Model.StatusMessage" />
+ *@
+@page
+@model ConfirmEmailModel
+@{
+    ViewData["Title"] = "Confirm Email";
+    ViewData["BodyClass"] = "profile-full-bg";
+}
+<link rel="stylesheet" href="~/css/profile.css" asp-append-version="true" />
+
+<div class="profile-page">
+    <div class="container-xxl">
+        <div class="row justify-content-center">
+            <div class="col-12 col-lg-6 col-xl-5">
+                <div class="profile-card card shadow-lg border-0">
+                    <div class="profile-header d-flex align-items-center gap-3 p-4 border-bottom">
+                        <div class="profile-badge">
+                            <i class="fa-solid fa-envelope-circle-check"></i>
+                        </div>
+                        <div>
+                            <h3 class="mb-0">@ViewData["Title"]</h3>
+                            <small class="opacity-75">Please confirm your email address</small>
+                        </div>
+                    </div>
+
+                    <div class="card-body p-4 p-md-5 text-center">
+                        <partial name="_StatusMessage" model="Model.StatusMessage" />
+                        <a asp-action="Index" asp-controller="Profile" class="btn btn-outline-secondary w-100 mt-3">
+                            Back to Profile
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
