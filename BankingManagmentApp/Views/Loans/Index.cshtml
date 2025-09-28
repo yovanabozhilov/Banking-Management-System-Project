@@ -1,17 +1,18 @@
-﻿@model IEnumerable<BankingManagmentApp.Models.Loans>
+@model IEnumerable<BankingManagmentApp.Models.Loans>
 @using System.Globalization
 
 @{
     ViewData["Title"] = "Loans";
-    ViewData["BodyClass"] = "profile-full-bg"; 
+    ViewData["BodyClass"] = "profile-full-bg";
     var bg = CultureInfo.GetCultureInfo("bg-BG");
 }
 
 @section Head {
   <link rel="stylesheet" href="~/css/profile.css" asp-append-version="true" />
+  <link rel="stylesheet" href="~/css/loans.css" asp-append-version="true" />
 }
 
-@functions {
+@functions{
     string LoanStatusBadgeClass(string? s)
     {
         var st = s?.ToLower();
@@ -23,108 +24,120 @@
             _ => "bg-secondary"
         };
     }
+    string ShortId(string id)
+    {
+        if (string.IsNullOrEmpty(id)) return "-";
+        return id.Length <= 12 ? id : id.Substring(0, 8) + "…" + id[^4..];
+    }
 }
 
 <div class="profile-page">
-    <div class="container-xxl">
-        <div class="row justify-content-center">
-            <div class="col-12 col-lg-12 col-xl-11 col-xxl-11">
-                <div class="profile-card card shadow-lg border-0">
-                    <div class="profile-header d-flex align-items-center gap-3 p-4 border-bottom">
-                        <div class="profile-badge">
-                            <i class="fa-solid fa-sack-dollar"></i>
-                        </div>
-                        <div>
-                            <h3 class="mb-0">@ViewData["Title"]</h3>
-                            <small class="opacity-75">Overview of all loan applications</small>
-                        </div>
-                    </div>
-                    <div class="card-body p-4 p-md-5">
-                        <div class="mb-3 text-end">
-                            <a asp-action="Create" class="btn btn-primary">
-                                <i class="fa-solid fa-plus me-1"></i> Create New
-                            </a>
-                        </div>
-
-                        @if (!Model.Any())
-                        {
-                            <div class="text-muted text-center py-4">No loans found.</div>
-                        }
-                        else
-                        {
-                            <div class="table-responsive">
-                                <table class="table table-striped table-hover align-middle mb-0">
-                                    <thead class="table-light">
-                                        <tr>
-                                            <th>Type</th>
-                                            <th class="text-end">Amount</th>
-                                            <th>Term</th>
-                                            <th>Date</th>
-                                            <th>Status</th>
-                                            <th class="text-end">Approved amount</th>
-                                            <th>Approval date</th>
-                                            <th>Customer</th>
-                                            <th class="text-end">Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach (var item in Model)
-                                        {
-                                            var st = item.Status?.ToLower();
-                                            var isApproved = st == "approved" || st == "autoapproved";
-                                            <tr>
-                                                <td>@item.Type</td>
-                                                <td class="text-end text-mono">@item.Amount.ToString("N2", bg)</td>
-                                                <td class="nowrap">@item.Term.ToString("dd.MM.yyyy")</td>
-                                                <td class="nowrap">@item.Date.ToString("dd.MM.yyyy")</td>
-                                                <td>
-                                                    <span class="badge @LoanStatusBadgeClass(item.Status)">
-                                                        @item.Status
-                                                    </span>
-                                                    @if (User.IsInRole("Admin") && item.IsRisky)
-                                                    {
-                                                        <span class="ms-2 text-muted" title="Risky customer">⚠ Risk</span>
-                                                    }
-                                                </td>
-                                                <td class="text-end text-mono">
-                                                    @(isApproved ? item.ApprovedAmount.ToString("N2", bg) : "-")
-                                                </td>
-                                                <td class="nowrap">
-                                                    @(isApproved ? item.ApprovalDate.ToString("dd.MM.yyyy") : "-")
-                                                </td>
-                                                <td class="text-truncate" style="max-width:260px;">
-                                                    @item.Customer?.FirstName @item.Customer?.LastName
-                                                </td>
-                                                <td class="text-end">
-                                                    <div class="btn-group btn-group-sm" role="group">
-                                                        @if (User.IsInRole("Admin"))
-                                                        {
-                                                            <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-outline-primary">
-                                                                <i class="fa-solid fa-pen"></i>
-                                                            </a>
-                                                            <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-outline-danger">
-                                                                <i class="fa-solid fa-trash"></i>
-                                                            </a>
-                                                        }
-                                                        <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-outline-secondary">
-                                                            <i class="fa-solid fa-eye"></i>
-                                                        </a>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        }
-                                    </tbody>
-                                </table>
-                            </div>
-                        }
-                    </div>
-
-                </div>
+  <div class="container-fluid">
+    <div class="loans-container">
+      <div class="profile-card card shadow-lg border-0">
+        <div class="profile-header p-4 border-bottom">
+          <div class="d-flex align-items-center gap-3">
+            <div class="profile-badge">
+              <i class="fa-solid fa-sack-dollar"></i>
             </div>
+            <div>
+              <h3 class="mb-0">@ViewData["Title"]</h3>
+              <small class="opacity-75">Overview of all loan applications</small>
+            </div>
+          </div>
         </div>
+
+        <div class="card-body">
+          <div class="mb-3 text-end">
+            <a asp-action="Apply" class="btn btn-primary">
+              <i class="fa-solid fa-plus me-1"></i> Create New
+            </a>
+          </div>
+
+          @if (!Model.Any())
+          {
+            <div class="text-muted text-center py-4">No loans found.</div>
+          }
+          else
+          {
+            <div class="table-responsive rounded-3 overflow-hidden">
+              <table class="table table-striped table-hover align-middle mb-0 loans-table-compact w-100">
+                <thead class="table-light">
+                  <tr>
+                    <th class="nowrap col-loanid">Loan&nbsp;ID</th>
+                    <th class="col-type">Type</th>
+                    <th class="text-end col-amount">Amount</th>
+                    <th class="nowrap col-term">Term</th>
+                    <th class="nowrap col-date">Date</th>
+                    <th class="col-status">Status</th>
+                    <th class="text-end nowrap col-approved">Approved</th>
+                    <th class="nowrap col-approvedon">Approved&nbsp;on</th>
+                    <th class="col-borrower">Borrower</th>
+                    <th class="nowrap col-borrower-id">Borrower&nbsp;ID</th>
+                    <th class="text-end col-actions">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                @foreach (var item in Model)
+                {
+                  var st = item.Status?.ToLower();
+                  var isApproved = st == "approved" || st == "autoapproved";
+                  <tr>
+                    <td class="text-mono">@item.Id</td>
+                    <td>@item.Type</td>
+                    <td class="text-end text-mono">@item.Amount.ToString("N2", bg)</td>
+                    <td class="nowrap">@item.Term.ToString("dd.MM.yyyy")</td>
+                    <td class="nowrap">@item.Date.ToString("dd.MM.yyyy")</td>
+                    <td>
+                      <span class="badge @LoanStatusBadgeClass(item.Status)">@item.Status</span>
+                      @if (User.IsInRole("Admin") && item.IsRisky)
+                      { <span class="ms-2 text-muted" title="Risky customer">⚠ Risk</span> }
+                    </td>
+                    <td class="text-end text-mono">@(isApproved ? item.ApprovedAmount.ToString("N2", bg) : "-")</td>
+                    <td class="nowrap">@(isApproved ? item.ApprovalDate.ToString("dd.MM.yyyy") : "-")</td>
+                    <td class="text-truncate">@item.Customer?.FirstName @item.Customer?.LastName</td>
+                    <td class="text-mono nowrap">
+                      @if (!string.IsNullOrEmpty(item.CustomerId))
+                      {
+                        <span title="@item.CustomerId">@ShortId(item.CustomerId)</span>
+                        <button type="button"
+                                class="btn btn-link p-0 ms-1 align-baseline copy-id-btn"
+                                data-copy-id="@item.CustomerId"
+                                title="Copy borrower ID" aria-label="Copy borrower ID">
+                          <i class="fas fa-copy"></i>
+                        </button>
+                      }
+                      else { <span class="text-muted">-</span> }
+                    </td>
+                    <td class="text-end">
+                      <div class="btn-group btn-group-sm" role="group">
+                        @if (User.IsInRole("Admin"))
+                        {
+                          <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-outline-primary">
+                            <i class="fa-solid fa-pen"></i>
+                          </a>
+                          <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-outline-danger">
+                            <i class="fa-solid fa-trash"></i>
+                          </a>
+                        }
+                        <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-outline-secondary">
+                          <i class="fa-solid fa-eye"></i>
+                        </a>
+                      </div>
+                    </td>
+                  </tr>
+                }
+                </tbody>
+              </table>
+            </div>
+          }
+        </div>
+
+      </div>
     </div>
+  </div>
 </div>
 
 @section Scripts {
-    <script>document.body.classList.add('profile-full-bg');</script>
+  <script>document.body.classList.add('profile-full-bg');</script>
 }
