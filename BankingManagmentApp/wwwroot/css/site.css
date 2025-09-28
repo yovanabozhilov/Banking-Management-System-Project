@@ -21,7 +21,6 @@ body {
     margin-bottom: 60px;
 }
 
-/* --- Profile page --- */
 .container-profile {
     max-width: 1100px;
     margin: 0 auto;
@@ -143,13 +142,11 @@ body {
 }
 
 
-/* gradient colors */
 .account-card {
     background: linear-gradient(180deg, #2f158d 0%, #6a50ca 100%);
     border-color: #0a145f;
 }
 
-/* Settings polish */
 .settings .card {
     border-radius: 1rem;
 }
@@ -162,8 +159,6 @@ body {
         color: #fff;
     }
 
-
-/* Fallback ако не ползваш Bootstrap 5.3 */
 .dark body {
     background-color: #121212;
     color: #e9ecef;
@@ -180,16 +175,12 @@ body {
 }
 
 
-/* ===== Dark theme polishing (Bootstrap 5.3 with data-bs-theme) ===== */
-/* Основни цветове за тъмна тема */
 [data-bs-theme="dark"] {
     --bs-body-bg: #121212;
     --bs-body-color: #e9ecef;
     --bs-border-color: #2b2f32;
-    /* По-приятни линкове в тъмно */
     --bs-link-color: #8ab4f8;
     --bs-link-hover-color: #a8c7fa;
-    /* Карти, навбар, дропдауни */
     --bs-card-bg: #1b1f22;
     --bs-card-border-color: #2b2f32;
     --bs-dropdown-bg: #1b1f22;
@@ -197,7 +188,6 @@ body {
     --bs-dropdown-link-hover-bg: #23272a;
 }
 
-    /* Ако някъде е останало text-dark/bg-white – направи ги видими в dark */
     [data-bs-theme="dark"] .text-dark {
         color: var(--bs-body-color) !important;
     }
@@ -206,7 +196,6 @@ body {
         background-color: var(--bs-card-bg) !important;
     }
 
-    /* Формови полета да изглеждат четимо в тъмно */
     [data-bs-theme="dark"] .form-control,
     [data-bs-theme="dark"] .form-select,
     [data-bs-theme="dark"] .input-group-text {
@@ -223,7 +212,6 @@ body {
             box-shadow: 0 0 0 .25rem rgba(138,180,248,.15);
         }
 
-    /* Таблици */
     [data-bs-theme="dark"] .table {
         color: var(--bs-body-color);
     }
@@ -232,19 +220,16 @@ body {
         --bs-table-bg-type: #16181a;
     }
 
-    /* Навигация */
     [data-bs-theme="dark"] .navbar,
     [data-bs-theme="dark"] .dropdown-menu {
         background-color: var(--bs-body-bg);
     }
 
-    /* Карти */
     [data-bs-theme="dark"] .card {
         background-color: var(--bs-card-bg);
         border-color: var(--bs-card-border-color);
     }
 
-/* ===== Accent chip/pill ===== */
 :root {
     --chip-accent-bg: #0b5ed7;
     --chip-accent-fg: #ffffff;
@@ -262,7 +247,6 @@ body {
     border-color: var(--chip-accent-border) !important;
 }
 
-/* За Bootstrap badges */
 .badge.chip-accent {
     background-color: var(--chip-accent-bg) !important;
     color: var(--chip-accent-fg) !important;
@@ -270,27 +254,22 @@ body {
 }
 
 
-/* --- Account "credit card" sizing & layout --- */
 .account-card {
-    /* по-дебела вертикално */
     padding: 22px 20px;
     border-radius: 16px;
-    min-height: 190px; /* ↑ височина */
-    /* леко по-тясна хоризонтално и центрирана в колоната */
+    min-height: 190px; 
     width: 100%;
-    max-width: 420px; /* ← направи я по-тясна */
+    max-width: 420px;
     margin-left: 0 !important;
-    margin-right: auto !important; /* лепи се вляво, без да се центрира */
+    margin-right: auto !important; 
 }
 
 @media (min-width: 992px) {
     .account-card {
-        /* на по-широки екрани още една щипка компактност */
         max-width: 400px;
     }
 }
 
-/* малко по-„картично“ усещане за числата/текстовете */
 .account-card .iban {
     font-size: .95rem;
 }
@@ -305,14 +284,10 @@ body {
     opacity: .9;
 }
 
-/* по-плътни контроли вътре, за да изглежда административно и стегнато */
 .account-card .btn.btn-sm {
     padding: .3rem .5rem;
 }
 
-/* ===== Profile polish: hierarchy, density, tables ===== */
-
-/* по-лек фон за цялата секция, без да засяга други страници */
 .container-profile {
     padding-top: .5rem;
 }
@@ -321,7 +296,6 @@ body {
         border-radius: .75rem;
     }
 
-    /* card headers: по-ясна йерархия */
     .container-profile .card-header {
         background: linear-gradient(180deg, rgba(0,0,0,.02), rgba(0,0,0,0));
         border-bottom: 1px solid var(--bs-border-color);
@@ -335,7 +309,6 @@ body {
             color: #495057;
         }
 
-/* „кредитната карта“ (account-card) – по-висока и по-тясна, лява подредба */
 .account-card {
     padding: 22px 20px;
     border-radius: 16px;
@@ -370,7 +343,6 @@ body {
     padding: .3rem .5rem;
 }
 
-/* компактни таблици навсякъде в профила */
 .container-profile .table thead th {
     text-transform: uppercase;
     letter-spacing: .06em;
@@ -385,7 +357,6 @@ body {
     padding-bottom: .45rem;
 }
 
-/* по-плътни таблици (използва се вече .table-compact – тук я дефинираме) */
 .table-compact thead th {
     padding: .45rem .6rem;
 }
@@ -394,18 +365,15 @@ body {
     padding: .4rem .6rem;
 }
 
-/* sticky thead да „виси“ красиво над редовете */
 .table .sticky-top {
     box-shadow: 0 2px 0 rgba(0,0,0,.03);
     z-index: 1;
 }
 
-/* по-елегантен hover, тон към primary */
 .table-hover tbody tr:hover > * {
     background-color: rgba(13,110,253,.06);
 }
 
-/* моноширинни числа и no-wrap помощни класове */
 .text-mono {
     font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
     letter-spacing: .3px;
@@ -415,13 +383,11 @@ body {
     white-space: nowrap;
 }
 
-/* малко по-компактни badges */
 .badge-tight {
     padding: .35em .5em;
     font-weight: 600;
 }
 
-/* amount цветове – по-четливи и в тъмно */
 :root {
     --amount-pos: #18a957;
     --amount-neg: #c0392b;
@@ -442,7 +408,6 @@ body {
     font-weight: 600;
 }
 
-/* филтърната лента при Transactions — по-стегната */
 .container-profile .card-header form .form-label {
     font-size: .7rem;
     text-transform: uppercase;
@@ -455,18 +420,15 @@ body {
     min-height: calc(1.5em + .5rem + 2px);
 }
 
-/* „Note“ под кредитния скор – по-умерено и четимо */
 .container-profile .alert-info {
     background: rgba(13,110,253,.06);
     border-color: rgba(13,110,253,.12);
     color: inherit;
 }
 
-/* Еднакво вертикално разстояние между всички секции (таблици) в профила */
 .profile-section {
     margin-bottom: 1rem;
 }
-/* мобилно */
 @media (min-width: 768px) {
     .profile-section {
         margin-bottom: 1.25rem;
@@ -479,7 +441,6 @@ body {
     }
 }
 
-/* Помощни класове, използвани в таблиците */
 .text-mono {
     font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
 }

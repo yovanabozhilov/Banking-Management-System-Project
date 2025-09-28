@@ -496,7 +496,6 @@
         </div>
     </div>
 
-    <!-- UPCOMING REPAYMENTS -->
     <div class="card shadow-sm profile-section repayments-card">
         <div class="card-header d-flex align-items-center justify-content-between repayments-header">
             <strong><i class="fas fa-calendar-alt me-2"></i>Upcoming repayments</strong>
@@ -583,5 +582,40 @@
             }
         </div>
     </div>
+    <script>
+        function confirmPayment(form) {
+            event.preventDefault();
+            const amount = form.querySelector("input[name='Amount']").value;
+            Swal.fire({
+                title: 'Transaction Confirmation?',
+                text: `Do you confirm this transaction=> Amount: ${amount} lv. `,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, confirm',
+                cancelButtonText: 'Cancel',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            });
 
+            return false;
+        }
+    </script>
+    @if (TempData["InsufficientFunds"] != null)
+    {
+        <script>
+            Swal.fire({
+                title: 'Insufficient availability',
+                text: '@TempData["InsufficientFunds"]',
+                icon: 'error',
+                confirmButtonText: 'Okay',
+                customClass: {
+                    popup: 'rounded-4 shadow-lg',
+                    confirmButton: 'btn btn-danger px-4 py-2'
+                }
+            });
+        </script>
+    }
 </div>
