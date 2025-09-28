@@ -1,9 +1,9 @@
-﻿@model BankingManagmentApp.Models.Loans
+@model BankingManagmentApp.Models.Loans
 @using System.Globalization
 
 @{
     ViewData["Title"] = "Loan Details";
-    ViewData["BodyClass"] = "loans-full-bg"; 
+    ViewData["BodyClass"] = "loans-full-bg";
     var bg = CultureInfo.GetCultureInfo("bg-BG");
 }
 
@@ -23,7 +23,14 @@
             _ => "bg-secondary"
         };
     }
+
+    string ShortId(string id)
+    {
+        if (string.IsNullOrEmpty(id)) return "-";
+        return id.Length <= 12 ? id : id.Substring(0, 8) + "…" + id[^4..];
+    }
 }
+
 <div class="profile-page py-5">
   <div class="container-xxl pb-5">
     <div class="row justify-content-center">
@@ -49,6 +56,13 @@
           <div class="loan-body card-body p-4 p-md-5">
 
             <dl class="details-dl mb-4">
+              <div class="details-row">
+                <dt>Loan ID</dt>
+                <dd class="text-mono">
+                  <span>@Model?.Id</span>
+                </dd>
+              </div>
+
               <div class="details-row">
                 <dt>Credit Type</dt>
                 <dd>@Model?.Type</dd>
@@ -96,8 +110,28 @@
               </div>
 
               <div class="details-row">
-                <dt>Customer</dt>
+                <dt>Borrower</dt>
                 <dd>@Model?.Customer?.FirstName @Model?.Customer?.LastName</dd>
+              </div>
+
+              <div class="details-row">
+                <dt>Borrower ID</dt>
+                <dd class="text-mono">
+                  @if (!string.IsNullOrEmpty(Model?.CustomerId))
+                  {
+                    <span title="@Model.CustomerId">@ShortId(Model.CustomerId)</span>
+                    <button type="button"
+                            class="btn btn-link copy-link-purple p-0 ms-2 align-baseline copy-id-btn"
+                            data-copy-id="@Model.CustomerId"
+                            title="Copy borrower ID" aria-label="Copy borrower ID">
+                      <i class="fas fa-copy" aria-hidden="true"></i>
+                    </button>
+                  }
+                  else
+                  {
+                    <span class="text-muted">-</span>
+                  }
+                </dd>
               </div>
             </dl>
 
@@ -116,7 +150,7 @@
                       <i class="fa-regular fa-file-lines"></i>
                       <span class="doc-name text-truncate">@doc.FileName</span>
                     </div>
-                    <a class="btn btn-outline-primary"
+                    <a class="btn btn-primary"
                        asp-action="DownloadDocument"
                        asp-route-id="@doc.Id">
                       <i class="fa-solid fa-download me-1"></i> Download
@@ -131,6 +165,7 @@
               <div class="text-muted">No documents attached.</div>
             }
           </div>
+
           <div class="card-footer bg-transparent d-flex justify-content-between">
             @if (User.IsInRole("Admin"))
             {
