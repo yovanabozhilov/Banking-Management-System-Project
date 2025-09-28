@@ -23,7 +23,6 @@
         margin-top: 60px;
     }
 
-    /* изключваме чатбота */
     .card:not(#chatbot-container) {
         position: relative !important;
         transform: none !important;
@@ -127,7 +126,6 @@
     height: 550px;
 }
 
-/* изключваме чатбота */
 .card:not(#chatbot-container) {
     background: rgba(255, 255, 255, 0.8);
     border: 1px solid rgba(0, 0, 0, 0.1);
@@ -156,7 +154,6 @@
     z-index: 1;
 }
 
-/* изключваме чатбота */
 .card:not(#chatbot-container):hover {
     transform: scale(1.05) rotate(0deg);
     box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.2);
