@@ -9,9 +9,10 @@ using BankingManagmentApp.Data;
 using BankingManagmentApp.ViewModels.Reports;
 using BankingManagmentApp.Services.Pdf;
 using BankingManagmentApp.Services.Excel;
+using BankingManagmentApp.Services;
+using System.Text;
 using QuestPDF.Fluent;
 using QuestPDF.Infrastructure;
-using BankingManagmentApp.Services;
 
 namespace BankingManagmentApp.Controllers
 {
@@ -46,7 +47,7 @@ namespace BankingManagmentApp.Controllers
             return View(new ReportResultVm
             {
                 Filters = filters,
-                Rows = []
+                Rows = new System.Collections.Generic.List<ReportRow>()
             });
         }
 
@@ -80,12 +81,16 @@ namespace BankingManagmentApp.Controllers
             var emailSubject = $"Financial Report {fileName}";
             var emailBody = "Please find your requested financial report attached.";
             var userEmail = User.Identity?.Name;
-            var doc = new FinancialReportPdf(vm);
-            var bytes = doc.GeneratePdf();
+
+            QuestPDF.Infrastructure.IDocument pdfDoc = new FinancialReportPdf(vm);
+            byte[] bytes = pdfDoc.GeneratePdf(); 
+
             if (!string.IsNullOrEmpty(userEmail))
             {
-                await _emailService.SendEmailWithAttachmentAsync(userEmail, emailSubject, emailBody, bytes, fileName);
+                await _emailService.SendEmailWithAttachmentAsync(
+                    userEmail, emailSubject, emailBody, bytes, fileName);
             }
+
             return File(bytes, "application/pdf", fileName);
         }
 
@@ -101,7 +106,8 @@ namespace BankingManagmentApp.Controllers
             var emailSubject = $"Financial Report {fileName}";
             var emailBody = "Please find your requested financial report attached.";
             var userEmail = User.Identity?.Name;
-            var bytes = FinancialReportExcel.Build(vm);
+
+            var bytes = FinancialReportExcel.Build(vm); 
             if (!string.IsNullOrEmpty(userEmail))
             {
                 await _emailService.SendEmailWithAttachmentAsync(userEmail, emailSubject, emailBody, bytes, fileName);
@@ -124,6 +130,12 @@ namespace BankingManagmentApp.Controllers
 
             if (filters.GroupBy != ReportGroupBy.Monthly && filters.GroupBy != ReportGroupBy.Yearly)
                 filters.GroupBy = ReportGroupBy.Monthly;
+
+            if (!string.IsNullOrWhiteSpace(filters.CustomerId))
+                filters.CustomerId = filters.CustomerId!.Trim();
+
+            if (!string.IsNullOrWhiteSpace(filters.CustomerName))
+                filters.CustomerName = filters.CustomerName!.Trim();
         }
 
         private async Task PopulateAccountsSelect(ReportFilterVm filters)
@@ -158,7 +170,11 @@ namespace BankingManagmentApp.Controllers
 
         private async Task<ReportResultVm> BuildReport(ReportFilterVm filters)
         {
-            var q = _db.Transactions.AsNoTracking().AsQueryable();
+            var q = _db.Transactions
+                .AsNoTracking()
+                .Include(t => t.Accounts)
+                    .ThenInclude(a => a.Customer)
+                .AsQueryable();
 
             if (filters.AccountId.HasValue)
                 q = q.Where(t => t.AccountsId == filters.AccountId.Value);
@@ -169,9 +185,38 @@ namespace BankingManagmentApp.Controllers
             if (filters.To.HasValue)
                 q = q.Where(t => t.Date <= filters.To.Value);
 
-            if (filters.GroupBy == ReportGroupBy.Monthly)
+            if (!string.IsNullOrWhiteSpace(filters.CustomerId))
+                q = q.Where(t => t.Accounts.CustomerId == filters.CustomerId);
+
+            if (!string.IsNullOrWhiteSpace(filters.CustomerName))
             {
-                var rows = await q
+                var name = filters.CustomerName!.ToLower();
+                q = q.Where(t =>
+                    (t.Accounts.Customer.FirstName + " " + t.Accounts.Customer.LastName).ToLower().Contains(name) ||
+                    t.Accounts.Customer.UserName.ToLower().Contains(name) ||
+                    t.Accounts.Customer.Email.ToLower().Contains(name));
+            }
+
+            var uniqueCustomers = await q
+                .Select(t => new
+                {
+                    t.Accounts.CustomerId,
+                    t.Accounts.Customer.FirstName,
+                    t.Accounts.Customer.LastName
+                })
+                .Distinct()
+                .ToListAsync();
+
+            string? selectedCustId = null;
+            string? selectedCustName = null;
+            if (uniqueCustomers.Count == 1)
+            {
+                selectedCustId = uniqueCustomers[0].CustomerId;
+                selectedCustName = $"{uniqueCustomers[0].FirstName} {uniqueCustomers[0].LastName}".Trim();
+            }
+
+            var rows = filters.GroupBy == ReportGroupBy.Monthly
+                ? await q
                     .GroupBy(t => new { t.Date.Year, t.Date.Month })
                     .Select(g => new ReportRow
                     {
@@ -180,35 +225,8 @@ namespace BankingManagmentApp.Controllers
                         TotalTransactions = g.Count(),
                         TotalAmount = g.Sum(x => x.Amount)
                     })
-                    .ToListAsync();
-
-                var typeSums = await q
-                    .GroupBy(t => new { t.Date.Year, t.Date.Month, t.TransactionType })
-                    .Select(g => new
-                    {
-                        g.Key.Year,
-                        g.Key.Month,
-                        g.Key.TransactionType,
-                        Total = g.Sum(x => x.Amount)
-                    })
-                    .ToListAsync();
-
-                foreach (var r in rows)
-                {
-                    r.AmountByType = typeSums
-                        .Where(ts => ts.Year == r.Year && ts.Month == r.Month)
-                        .ToDictionary(ts => ts.TransactionType ?? "Unknown", ts => ts.Total);
-                }
-
-                return new ReportResultVm
-                {
-                    Filters = filters,
-                    Rows = rows.OrderBy(x => x.Year).ThenBy(x => x.Month ?? 0).ToList()
-                };
-            }
-            else
-            {
-                var rows = await q
+                    .ToListAsync()
+                : await q
                     .GroupBy(t => new { t.Date.Year })
                     .Select(g => new ReportRow
                     {
@@ -219,12 +237,34 @@ namespace BankingManagmentApp.Controllers
                     })
                     .ToListAsync();
 
+            if (filters.GroupBy == ReportGroupBy.Monthly)
+            {
+                var typeSums = await q
+                    .GroupBy(t => new { t.Date.Year, t.Date.Month, t.TransactionType })
+                    .Select(g => new
+                    {
+                        g.Key.Year,
+                        g.Key.Month,
+                        Type = g.Key.TransactionType ?? "Unknown",
+                        Total = g.Sum(x => x.Amount)
+                    })
+                    .ToListAsync();
+
+                foreach (var r in rows)
+                {
+                    r.AmountByType = typeSums
+                        .Where(ts => ts.Year == r.Year && ts.Month == r.Month)
+                        .ToDictionary(ts => ts.Type, ts => ts.Total);
+                }
+            }
+            else
+            {
                 var typeSums = await q
                     .GroupBy(t => new { t.Date.Year, t.TransactionType })
                     .Select(g => new
                     {
                         g.Key.Year,
-                        g.Key.TransactionType,
+                        Type = g.Key.TransactionType ?? "Unknown",
                         Total = g.Sum(x => x.Amount)
                     })
                     .ToListAsync();
@@ -233,15 +273,42 @@ namespace BankingManagmentApp.Controllers
                 {
                     r.AmountByType = typeSums
                         .Where(ts => ts.Year == r.Year)
-                        .ToDictionary(ts => ts.TransactionType ?? "Unknown", ts => ts.Total);
+                        .ToDictionary(ts => ts.Type, ts => ts.Total);
                 }
-
-                return new ReportResultVm
-                {
-                    Filters = filters,
-                    Rows = rows.OrderBy(x => x.Year).ToList()
-                };
             }
+
+            var totalsByType = await q
+                .GroupBy(t => t.TransactionType ?? "Unknown")
+                .Select(g => new { Type = g.Key, Total = g.Sum(x => x.Amount) })
+                .ToDictionaryAsync(x => x.Type, x => x.Total);
+
+            var descAgg = await q
+                .GroupBy(t => new { Type = t.TransactionType ?? "Unknown", t.Description })
+                .Select(g => new { g.Key.Type, g.Key.Description, Total = g.Sum(x => x.Amount) })
+                .ToListAsync();
+
+            var topDescDict = descAgg
+                .GroupBy(x => x.Type)
+                .ToDictionary(
+                    g => g.Key,
+                    g => g
+                        .OrderByDescending(x => x.Total)
+                        .Take(5)
+                        .Select(x => new DescriptionAggVm { Description = x.Description ?? "(no description)", Total = x.Total })
+                        .ToList()
+                );
+
+            return new ReportResultVm
+            {
+                Filters = filters,
+                Rows = (filters.GroupBy == ReportGroupBy.Monthly
+                    ? rows.OrderBy(x => x.Year).ThenBy(x => x.Month ?? 0)
+                    : rows.OrderBy(x => x.Year)).ToList(),
+                TotalsByType = totalsByType,
+                TopDescriptionsByType = topDescDict,
+                SelectedCustomerId = selectedCustId,
+                SelectedCustomerName = selectedCustName
+            };
         }
     }
 }

@@ -14,7 +14,12 @@ namespace BankingManagmentApp.ViewModels.Reports
     {
         public DateOnly? From { get; set; }
         public DateOnly? To { get; set; }
+
         public int? AccountId { get; set; }
+
+        public string? CustomerId { get; set; }     
+        public string? CustomerName { get; set; }   
+
         public ReportGroupBy GroupBy { get; set; } = ReportGroupBy.Monthly;
         public IEnumerable<SelectListItem>? AccountsSelect { get; set; }
         public string SelectedAccountLabel { get; set; } = "All accounts";

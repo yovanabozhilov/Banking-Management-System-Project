@@ -1,43 +1,133 @@
+@using BankingManagmentApp.ViewModels.Reports
 @model BankingManagmentApp.ViewModels.Reports.ReportResultVm
 
 @if (Model.Rows.Count == 0)
 {
-    <div class="alert alert-info">No data for the selected period.</div>
+    <div class="card shadow-sm profile-section">
+        <div class="card-body">
+            <div class="text-muted">No data for the selected period.</div>
+        </div>
+    </div>
 }
 else
 {
-    <div class="card shadow-sm">
-        <div class="card-header">
-            <strong>
+    <div class="card shadow-sm profile-section report-results">
+        <div class="card-header d-flex align-items-center justify-content-between flex-wrap gap-2">
+            <div class="fw-semibold">
+                <i class="fas fa-poll me-2"></i>
                 Results — @Model.Filters.GroupBy.ToString()
-                (@Model.Filters.From → @Model.Filters.To, @Model.Filters.SelectedAccountLabel)
-            </strong>
+                <span class="text-muted">
+                    (@Model.Filters.From?.ToString("yyyy-MM-dd") → @Model.Filters.To?.ToString("yyyy-MM-dd"),
+                    @Model.Filters.SelectedAccountLabel)
+                </span>
+            </div>
+
+            <div class="btn-bar d-flex align-items-center gap-2">
+                <form asp-action="ExportCsv" method="post" class="m-0 p-0">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="Filters.From" value="@(Model.Filters.From?.ToString("yyyy-MM-dd"))" />
+                    <input type="hidden" name="Filters.To" value="@(Model.Filters.To?.ToString("yyyy-MM-dd"))" />
+                    <input type="hidden" name="Filters.AccountId" value="@(Model.Filters.AccountId?.ToString())" />
+                    <input type="hidden" name="Filters.GroupBy" value="@Model.Filters.GroupBy" />
+                    <input type="hidden" name="Filters.CustomerId" value="@Model.Filters.CustomerId" />
+                    <input type="hidden" name="Filters.CustomerName" value="@Model.Filters.CustomerName" />
+                </form>
+
+                <form asp-action="ExportExcel" method="post" class="m-0 p-0">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="Filters.From" value="@(Model.Filters.From?.ToString("yyyy-MM-dd"))" />
+                    <input type="hidden" name="Filters.To" value="@(Model.Filters.To?.ToString("yyyy-MM-dd"))" />
+                    <input type="hidden" name="Filters.AccountId" value="@(Model.Filters.AccountId?.ToString())" />
+                    <input type="hidden" name="Filters.GroupBy" value="@Model.Filters.GroupBy" />
+                    <input type="hidden" name="Filters.CustomerId" value="@Model.Filters.CustomerId" />
+                    <input type="hidden" name="Filters.CustomerName" value="@Model.Filters.CustomerName" />
+                    <button type="submit" class="btn btn-sm btn-outline-success">
+                        <i class="fas fa-file-excel me-1"></i> Export Excel
+                    </button>
+                </form>
+
+                <form asp-action="ExportPdf" method="post" class="m-0 p-0">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="Filters.From" value="@(Model.Filters.From?.ToString("yyyy-MM-dd"))" />
+                    <input type="hidden" name="Filters.To" value="@(Model.Filters.To?.ToString("yyyy-MM-dd"))" />
+                    <input type="hidden" name="Filters.AccountId" value="@(Model.Filters.AccountId?.ToString())" />
+                    <input type="hidden" name="Filters.GroupBy" value="@Model.Filters.GroupBy" />
+                    <input type="hidden" name="Filters.CustomerId" value="@Model.Filters.CustomerId" />
+                    <input type="hidden" name="Filters.CustomerName" value="@Model.Filters.CustomerName" />
+                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                        <i class="fas fa-file-pdf me-1"></i> Export PDF
+                    </button>
+                </form>
+            </div>
         </div>
+
         <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-striped table-sm align-middle">
-                    <thead>
-                    <tr>
-                        <th>Period</th>
-                        <th class="text-end">Transactions</th>
-                        <th class="text-end">Total Amount</th>
-                        <th>Breakdown (by type)</th>
-                    </tr>
+            <div class="row g-3 align-items-stretch mb-3">
+                <div class="col-12 col-md-6">
+                    <div class="p-3 rounded-3 chart-card">
+                        <canvas id="byTypePie"></canvas>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6">
+                    <div class="p-3 rounded-3 chart-card">
+                        <h6 class="mb-2">Breakdown by type</h6>
+                        <ul class="list-unstyled mb-0">
+                            @foreach (var kv in Model.TotalsByType.OrderByDescending(x => x.Value))
+                            {
+                                var pct = Model.TotalByTypeAll == 0 ? 0 : Math.Round((kv.Value / Model.TotalByTypeAll) * 100m, 2);
+                                <li class="mb-2">
+                                    <div class="d-flex justify-content-between">
+                                        <span class="fw-semibold">@kv.Key</span>
+                                        <span class="text-mono">@kv.Value.ToString("N2") (@pct%)</span>
+                                    </div>
+                                    @if (Model.TopDescriptionsByType.TryGetValue(kv.Key, out var list) && list.Any())
+                                    {
+                                        <div class="small text-muted mt-1">
+                                            @for (int i = 0; i < list.Count; i++)
+                                            {
+                                                var d = list[i];
+                                                <span>@(i==0 ? "" : " · ")@d.Description (<span class="text-mono">@d.Total.ToString("N2")</span>)</span>
+                                            }
+                                        </div>
+                                    }
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-responsive rounded-4 overflow-hidden">
+                <table class="table table-compact align-middle mb-0 w-100">
+                    <thead class="table-light sticky-top">
+                        <tr>
+                            <th class="nowrap">Year</th>
+                            @if (Model.Filters.GroupBy == ReportGroupBy.Monthly)
+                            {
+                                <th class="nowrap">Month</th>
+                            }
+                            <th class="text-end nowrap">Transactions</th>
+                            <th class="text-end nowrap">Total Amount</th>
+                            <th>By type</th>
+                            <th class="nowrap">Client</th>
+                            <th class="nowrap">Client ID</th>
+                        </tr>
                     </thead>
                     <tbody>
                     @foreach (var r in Model.Rows)
                     {
-                        var period = r.Month.HasValue ? $"{r.Year}-{r.Month.Value:00}" : r.Year.ToString();
+                        var customerLabel = Model.SelectedCustomerName ?? (string.IsNullOrEmpty(Model.Filters.CustomerName) && string.IsNullOrEmpty(Model.Filters.CustomerId) ? "All / Multiple" : (Model.Filters.CustomerName ?? "Filtered"));
+                        var customerId = Model.SelectedCustomerId ?? (string.IsNullOrEmpty(Model.Filters.CustomerId) ? "—" : Model.Filters.CustomerId);
                         <tr>
-                            <td>@period</td>
-                            <td class="text-end">@r.TotalTransactions</td>
-                            <td class="text-end">@r.TotalAmount.ToString("N2")</td>
+                            <td class="nowrap">@r.Year</td>
+                            @if (Model.Filters.GroupBy == ReportGroupBy.Monthly)
+                            {
+                                <td class="nowrap">@r.Month</td>
+                            }
+                            <td class="text-end text-mono">@r.TotalTransactions</td>
+                            <td class="text-end text-mono">@r.TotalAmount.ToString("N2")</td>
                             <td>
-                                @if (r.AmountByType.Count == 0)
-                                {
-                                    <span class="text-muted">—</span>
-                                }
-                                else
+                                @if (r.AmountByType != null && r.AmountByType.Any())
                                 {
                                     <div class="d-flex flex-wrap gap-2">
                                         @foreach (var kv in r.AmountByType.OrderBy(k => k.Key))
@@ -48,20 +138,78 @@ else
                                         }
                                     </div>
                                 }
+                                else
+                                {
+                                    <span class="text-muted">–</span>
+                                }
                             </td>
+                            <td class="nowrap">@customerLabel</td>
+                            <td class="nowrap text-mono">@customerId</td>
                         </tr>
                     }
                     </tbody>
                     <tfoot>
                         <tr class="table-light">
                             <th>Total</th>
-                            <th class="text-end">@Model.GrandTotalTransactions</th>
-                            <th class="text-end">@Model.GrandTotalAmount.ToString("N2")</th>
-                            <th></th>
+                            @if (Model.Filters.GroupBy == ReportGroupBy.Monthly)
+                            {
+                                <th></th>
+                            }
+                            <th class="text-end text-mono">@Model.GrandTotalTransactions</th>
+                            <th class="text-end text-mono">@Model.GrandTotalAmount.ToString("N2")</th>
+                            <th colspan="3"></th>
                         </tr>
                     </tfoot>
                 </table>
             </div>
         </div>
     </div>
+
+    <script>
+        (function () {
+            const ctx = document.getElementById('byTypePie');
+            if (!ctx) return;
+
+            const dataMap = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.TotalsByType));
+            const labels = Object.keys(dataMap);
+            const values = Object.values(dataMap).map(v => Number(v));
+
+            const palette = [
+                '#4f46e5', '#10b981', '#ef4444', '#f59e0b', '#14b8a6',
+                '#8b5cf6', '#22c55e', '#3b82f6', '#e11d48', '#0ea5e9'
+            ];
+            const colors = labels.map((_, i) => palette[i % palette.length]);
+
+            const total = values.reduce((a, b) => a + b, 0);
+            const pct = v => total === 0 ? 0 : Math.round((v / total) * 1000) / 10; // 1 decimal
+
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels,
+                    datasets: [{
+                        data: values,
+                        backgroundColor: colors,
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { usePointStyle: true } },
+                        tooltip: {
+                            callbacks: {
+                                label: (ctx) => {
+                                    const label = ctx.label || '';
+                                    const v = ctx.parsed || 0;
+                                    return `${label}: ${v.toLocaleString()} (${pct(v)}%)`;
+                                }
+                            }
+                        }
+                    },
+                    cutout: '60%'
+                }
+            });
+        })();
+    </script>
 }
