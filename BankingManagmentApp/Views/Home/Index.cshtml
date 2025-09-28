@@ -17,9 +17,18 @@
             and seamless integrations. Stay in charge and achieve your goals — all in one powerful, intuitive platform.
         </p>
 
-        <a asp-area="Identity" asp-page="/Account/Register" class="cta-button">
-            Launch GlowPay Today
-        </a>
+        @if (User?.Identity?.IsAuthenticated == true)
+        {
+            <a asp-area="" asp-controller="Profile" asp-action="Index" class="cta-button">
+                Launch GlowPay Today
+            </a>
+        }
+        else
+        {
+            <a asp-area="Identity" asp-page="/Account/Register" class="cta-button">
+                Launch GlowPay Today
+            </a>
+        }
     </div>
 
     <div class="hero-image">
