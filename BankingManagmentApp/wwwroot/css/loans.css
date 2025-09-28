@@ -1,14 +1,9 @@
-/* =========================
-   Loans (Index + Apply)
-   ========================= */
-
-/* Page-wide gradient (purple -> white) only when you set ViewData["BodyClass"] = "loans-full-bg" */
 body.loans-full-bg { position: relative; }
 body.loans-full-bg::before{
   content:"";
   position: fixed;
   inset: 0;
-  z-index: -1;              /* behind header/footer/content */
+  z-index: -1;              
   pointer-events: none;
   background:
     radial-gradient(1400px 700px at -10% -20%, rgba(106,75,207,.28), transparent 60%),
@@ -23,12 +18,8 @@ body.loans-full-bg::before{
     linear-gradient(180deg, #533db3 0%, #8468ee 45%, #e9e6ff 85%, #ffffff 100%);
 }
 
-/* Shared page spacing (keeps your header/footer intact) */
 .loan-page{ padding: 2rem 0 3rem; }
 
-/* ----------------------------------
-   Header chips used in Index & Apply
------------------------------------ */
 .loan-badge{
   width: 48px; height: 48px;
   display: grid; place-items: center;
@@ -38,9 +29,6 @@ body.loans-full-bg::before{
   font-size: 1.25rem; color: #fff;
 }
 
-/* =========================
-   APPLY card (you already use these)
-   ========================= */
 .loan-card{ border-radius: 1rem; overflow: hidden; }
 .loan-header{
   padding: 1.5rem;
@@ -75,19 +63,14 @@ body.loans-full-bg::before{
 }
 .btn-primary:hover{ filter: brightness(1.05); }
 
-/* =========================
-   INDEX list/table
-   ========================= */
 .loan-list-card{ border-radius: 1rem; overflow: hidden; }
 
-/* Gradient header strip like Apply */
 .loan-list-header{
   padding: 1.25rem 1.5rem;
   color: #fff;
   background: linear-gradient(135deg, #6a4bcf, #8e6dfd);
 }
 
-/* Compact table spacing & tidy look */
 .table-compact th,
 .table-compact td{ padding: .75rem 1rem; }
 @media (max-width: 576px){
@@ -95,26 +78,23 @@ body.loans-full-bg::before{
   .table-compact td{ padding: .5rem .75rem; }
 }
 
-/* Sticky header inside the card body */
 .table thead.sticky-top{
   position: sticky; top: 0; z-index: 3;
 }
 .table thead.sticky-top th{
-  background: var(--bs-body-bg, #fff) !important;   /* ensure opaque */
+  background: var(--bs-body-bg, #fff) !important;   
   box-shadow: 0 2px 0 rgba(0,0,0,.04);
 }
 [data-bs-theme="dark"] .table thead.sticky-top th{
   background: #111418 !important;
 }
 
-/* Monospaced numbers for alignment */
 .text-mono{
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   font-variant-numeric: tabular-nums;
 }
 .nowrap{ white-space: nowrap; }
 
-/* Tight badges for statuses */
 .badge-tight{
   display: inline-block;
   padding: .4rem .6rem;
@@ -122,10 +102,8 @@ body.loans-full-bg::before{
   font-weight: 600;
 }
 
-/* Extra visual hint for risky rows */
 .risk-flag{ color:#b00020; font-weight:600; }
 
-/* Keep table zebra contrast in dark */
 [data-bs-theme="dark"] .table-striped>tbody>tr:nth-of-type(odd)>*{
   --bs-table-accent-bg: rgba(255,255,255,.03);
 }
@@ -133,7 +111,6 @@ body.loans-full-bg::before{
   --bs-table-accent-bg: rgba(255,255,255,.06);
 }
 
-/* "Create new" button on the right in header stays readable */
 .loan-list-header .btn.btn-light{
   color:#4b3faf; border: none;
 }
@@ -141,7 +118,6 @@ body.loans-full-bg::before{
   filter: brightness(1.05);
 }
 
-/* ---- Details page polish ---- */
 .details-dl {
   display: grid;
   gap: .5rem 1.25rem;
@@ -166,10 +142,8 @@ body.loans-full-bg::before{
 }
 .text-mono { font-variant-numeric: tabular-nums; }
 
-/* Section title for blocks inside the card */
 .section-title { font-size: 1.05rem; }
 
-/* Documents list */
 .doc-list .doc-item {
   padding: .6rem .75rem;
   border: 1px solid rgba(0,0,0,.06);
@@ -188,7 +162,6 @@ body.loans-full-bg::before{
   border-radius: .5rem;
 }
 
-/* Danger header variant for Delete */
 .loan-header.danger {
   background: linear-gradient(135deg, #dc3545, #ff6b6b);
   color: #fff;
@@ -203,7 +176,6 @@ body.loans-full-bg::before{
   color: #fff;
 }
 
-/* Soft danger callout */
 .alert-danger-soft {
   background: rgba(220,53,69,.08);
   border: 1px solid rgba(220,53,69,.25);
@@ -215,7 +187,6 @@ body.loans-full-bg::before{
   color: #ffb3b8;
 }
 
-/* Reuse details layout (if not already added) */
 .details-dl { display: grid; gap: .5rem 1.25rem; }
 .details-dl .details-row {
   display: grid;
@@ -242,3 +213,53 @@ body.loans-full-bg::before{
     color: #acacac;
     text-decoration: none;
 }
+
+.loans-container{
+  max-width: min(2200px, 99vw);
+  margin: 0 auto;
+  padding-left: 12px;
+  padding-right: 12px;
+}
+
+.loans-container .profile-card{
+  border-radius: 16px;
+  overflow: hidden;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.loans-container .profile-header{
+  display:flex;
+  align-items:center;
+  justify-content:flex-start;
+}
+
+.loans-container .profile-card .card-body{
+  padding-left: .75rem;
+  padding-right: .75rem;
+}
+
+.loans-table-compact{ font-size: .95rem; }
+.loans-table-compact th,
+.loans-table-compact td{ padding:.5rem .55rem; }
+
+.col-loanid{ width: 90px; }
+.col-type{ width: 140px; }
+.col-amount{ width: 120px; }
+.col-term, .col-date, .col-approvedon{ width: 120px; }
+.col-status{ width: 140px; }
+.col-approved{ width: 120px; }
+.col-borrower{ width: 230px; }
+.col-borrower-id{ width: 170px; }
+.col-actions{ width: 110px; }
+
+.copy-link-purple{
+  color:#6a4bcf !important;          
+  text-decoration: none;
+}
+.copy-link-purple:hover,
+.copy-link-purple:focus{
+  color:#8e6dfd !important;          
+  text-decoration: underline;
+}
+.copy-link-purple i{ vertical-align:-1px; }
