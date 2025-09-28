@@ -1,4 +1,4 @@
-﻿using iText.Kernel.Pdf;
+using iText.Kernel.Pdf;
 using iText.Layout;
 using iText.Layout.Element;
 using System.IO;
@@ -18,18 +18,19 @@ public class LoanContractGenerator
             document.Add(new Paragraph("Loan Agreement")
                 .SetTextAlignment(iText.Layout.Properties.TextAlignment.CENTER)
                 .SetFontSize(24)
-                );
+            );
 
             document.Add(new Paragraph(" "));
 
-            document.Add(new Paragraph($"This loan agreement is made between the Client and the Bank.")
+            document.Add(new Paragraph("This loan agreement is made between the Client and the Bank.")
                 .SetFontSize(12));
 
             document.Add(new Paragraph($"Client Name: {loan.Customer?.FirstName} {loan.Customer?.LastName}"));
+            document.Add(new Paragraph($"Client ID: {loan.CustomerId}")); 
             document.Add(new Paragraph($"Loan ID: {loan.Id}"));
             document.Add(new Paragraph($"Loan Amount: {loan.ApprovedAmount:N2} BGN"));
-            document.Add(new Paragraph($"Loan Term: until {loan.Term.ToString("dd.MM.yyyy")}"));
-            document.Add(new Paragraph($"Approval Date: {loan.ApprovalDate.ToString("dd.MM.yyyy")}"));
+            document.Add(new Paragraph($"Loan Term: until {loan.Term:dd.MM.yyyy}"));
+            document.Add(new Paragraph($"Approval Date: {loan.ApprovalDate:dd.MM.yyyy}"));
 
             document.Add(new Paragraph(" "));
             document.Add(new Paragraph("Terms and Conditions:")
