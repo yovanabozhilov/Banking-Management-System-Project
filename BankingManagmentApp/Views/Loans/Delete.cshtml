@@ -1,9 +1,9 @@
-﻿@model BankingManagmentApp.Models.Loans
+@model BankingManagmentApp.Models.Loans
 @using System.Globalization
 
 @{
     ViewData["Title"] = "Cancel Loan";
-    ViewData["BodyClass"] = "loans-full-bg"; 
+    ViewData["BodyClass"] = "loans-full-bg";
     var bg = CultureInfo.GetCultureInfo("bg-BG");
 }
 
@@ -22,6 +22,12 @@
             "declined" or "autodeclined" or "rejected" => "bg-danger",
             _ => "bg-secondary"
         };
+    }
+
+    string ShortId(string id)
+    {
+        if (string.IsNullOrEmpty(id)) return "-";
+        return id.Length <= 12 ? id : id.Substring(0, 8) + "…" + id[^4..];
     }
 }
 
@@ -47,6 +53,7 @@
               </span>
             </div>
           </div>
+
           <div class="card-body p-4 p-md-5">
             <div class="alert-danger-soft d-flex align-items-start gap-2 mb-4 rounded-3 p-3">
               <i class="fa-solid fa-triangle-exclamation mt-1" aria-hidden="true"></i>
@@ -54,7 +61,15 @@
                 <strong>Warning:</strong> This action can’t be undone. Any attached documents will no longer be available.
               </div>
             </div>
+
             <dl class="details-dl mb-4">
+              <div class="details-row">
+                <dt>Loan ID</dt>
+                <dd class="text-mono">
+                  <span>@Model?.Id</span>
+                </dd>
+              </div>
+
               <div class="details-row">
                 <dt>Type</dt>
                 <dd>@Model?.Type</dd>
@@ -102,14 +117,37 @@
               </div>
 
               <div class="details-row">
-                <dt>Customer</dt>
+                <dt>Borrower</dt>
                 <dd>@Model?.Customer?.FirstName @Model?.Customer?.LastName</dd>
               </div>
+
+              <div class="details-row">
+                <dt>Borrower ID</dt>
+                <dd class="text-mono">
+                  @if (!string.IsNullOrEmpty(Model?.CustomerId))
+                  {
+                    <span title="@Model.CustomerId">
+                      @(Model.CustomerId.Length <= 12 ? Model.CustomerId : Model.CustomerId.Substring(0,8) + "…" + Model.CustomerId[^4..])
+                    </span>
+                    <button type="button"
+                            class="btn btn-link copy-link-purple p-0 ms-2 align-baseline copy-id-btn"
+                            data-copy-id="@Model.CustomerId"
+                            title="Copy borrower ID" aria-label="Copy borrower ID">
+                      <i class="fas fa-copy" aria-hidden="true"></i>
+                    </button>
+                  }
+                  else
+                  {
+                    <span class="text-muted">-</span>
+                  }
+                </dd>
+              </div>
             </dl>
+
             <form asp-action="Delete" method="post" class="d-flex justify-content-between flex-wrap gap-2" id="loanDeleteForm">
               @Html.AntiForgeryToken()
               <input type="hidden" asp-for="Id" />
-              <a asp-action="Index" asp-asp-controller="Profile" class="btn btn-outline-secondary">
+              <a asp-controller="Loans" asp-action="Index" class="btn btn-outline-secondary">
                 <i class="fa-solid fa-arrow-left-long me-1"></i> Back to list
               </a>
               <button type="button" class="btn btn-danger" id="confirmDeleteLoanBtn">
@@ -127,6 +165,7 @@
 @section Scripts {
   <script>
     document.body.classList.add('loans-full-bg');
+
     (function () {
       const btn = document.getElementById('confirmDeleteLoanBtn');
       const form = document.getElementById('loanDeleteForm');
