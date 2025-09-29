@@ -1,6 +1,9 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -10,9 +13,7 @@ using BankingManagmentApp.ViewModels.Reports;
 using BankingManagmentApp.Services.Pdf;
 using BankingManagmentApp.Services.Excel;
 using BankingManagmentApp.Services;
-using System.Text;
 using QuestPDF.Fluent;
-using QuestPDF.Infrastructure;
 
 namespace BankingManagmentApp.Controllers
 {
@@ -47,7 +48,7 @@ namespace BankingManagmentApp.Controllers
             return View(new ReportResultVm
             {
                 Filters = filters,
-                Rows = new System.Collections.Generic.List<ReportRow>()
+                Rows = new List<ReportRow>()
             });
         }
 
@@ -82,8 +83,8 @@ namespace BankingManagmentApp.Controllers
             var emailBody = "Please find your requested financial report attached.";
             var userEmail = User.Identity?.Name;
 
-            QuestPDF.Infrastructure.IDocument pdfDoc = new FinancialReportPdf(vm);
-            byte[] bytes = pdfDoc.GeneratePdf(); 
+            var pdfDoc = new FinancialReportPdf(vm);
+            byte[] bytes = pdfDoc.GeneratePdf();
 
             if (!string.IsNullOrEmpty(userEmail))
             {
@@ -107,7 +108,7 @@ namespace BankingManagmentApp.Controllers
             var emailBody = "Please find your requested financial report attached.";
             var userEmail = User.Identity?.Name;
 
-            var bytes = FinancialReportExcel.Build(vm); 
+            var bytes = FinancialReportExcel.Build(vm);
             if (!string.IsNullOrEmpty(userEmail))
             {
                 await _emailService.SendEmailWithAttachmentAsync(userEmail, emailSubject, emailBody, bytes, fileName);
@@ -254,7 +255,7 @@ namespace BankingManagmentApp.Controllers
                 {
                     r.AmountByType = typeSums
                         .Where(ts => ts.Year == r.Year && ts.Month == r.Month)
-                        .ToDictionary(ts => ts.Type, ts => ts.Total);
+                        .ToDictionary(ts => ts.Type, ts => ts.Total, StringComparer.OrdinalIgnoreCase);
                 }
             }
             else
@@ -273,30 +274,102 @@ namespace BankingManagmentApp.Controllers
                 {
                     r.AmountByType = typeSums
                         .Where(ts => ts.Year == r.Year)
-                        .ToDictionary(ts => ts.Type, ts => ts.Total);
+                        .ToDictionary(ts => ts.Type, ts => ts.Total, StringComparer.OrdinalIgnoreCase);
                 }
             }
 
-            var totalsByType = await q
+            if (filters.GroupBy == ReportGroupBy.Monthly)
+            {
+                var flows = await q
+                    .GroupBy(t => new { t.Date.Year, t.Date.Month })
+                    .Select(g => new
+                    {
+                        g.Key.Year,
+                        g.Key.Month,
+                        Credits = g.Where(x => (x.TransactionType ?? "") == "Credit").Sum(x => (decimal?)x.Amount) ?? 0m,
+                        Debits  = g.Where(x => (x.TransactionType ?? "") == "Debit").Sum(x => (decimal?)x.Amount) ?? 0m
+                    })
+                    .ToListAsync();
+
+                foreach (var r in rows)
+                {
+                    var f = flows.FirstOrDefault(x => x.Year == r.Year && x.Month == r.Month);
+                    if (f != null) r.NetFlow = f.Credits - f.Debits;
+                }
+            }
+            else
+            {
+                var flows = await q
+                    .GroupBy(t => new { t.Date.Year })
+                    .Select(g => new
+                    {
+                        g.Key.Year,
+                        Credits = g.Where(x => (x.TransactionType ?? "") == "Credit").Sum(x => (decimal?)x.Amount) ?? 0m,
+                        Debits  = g.Where(x => (x.TransactionType ?? "") == "Debit").Sum(x => (decimal?)x.Amount) ?? 0m
+                    })
+                    .ToListAsync();
+
+                foreach (var r in rows)
+                {
+                    var f = flows.FirstOrDefault(x => x.Year == r.Year);
+                    if (f != null) r.NetFlow = f.Credits - f.Debits;
+                }
+            }
+
+            var totalsByTypeList = await q
                 .GroupBy(t => t.TransactionType ?? "Unknown")
                 .Select(g => new { Type = g.Key, Total = g.Sum(x => x.Amount) })
-                .ToDictionaryAsync(x => x.Type, x => x.Total);
-
-            var descAgg = await q
-                .GroupBy(t => new { Type = t.TransactionType ?? "Unknown", t.Description })
-                .Select(g => new { g.Key.Type, g.Key.Description, Total = g.Sum(x => x.Amount) })
                 .ToListAsync();
 
-            var topDescDict = descAgg
-                .GroupBy(x => x.Type)
-                .ToDictionary(
-                    g => g.Key,
-                    g => g
-                        .OrderByDescending(x => x.Total)
-                        .Take(5)
-                        .Select(x => new DescriptionAggVm { Description = x.Description ?? "(no description)", Total = x.Total })
-                        .ToList()
-                );
+            var totalsByType = new Dictionary<string, decimal>(StringComparer.OrdinalIgnoreCase);
+            foreach (var x in totalsByTypeList)
+                totalsByType[x.Type] = x.Total;
+
+            var descRaw = await q
+                .Select(t => new
+                {
+                    Type = t.TransactionType ?? "Unknown",
+                    Desc = t.Description ?? "",
+                    Amount = t.Amount
+                })
+                .ToListAsync();
+
+            var descGrouped = descRaw
+                .Select(x => new
+                {
+                    x.Type,
+                    Key = NormalizeKeyword(x.Desc),  
+                    x.Amount
+                })
+                .GroupBy(x => new { x.Type, x.Key })
+                .Select(g => new
+                {
+                    g.Key.Type,
+                    Key = g.Key.Key,
+                    Total = g.Sum(z => z.Amount)
+                })
+                .ToList();
+
+            var topDescDict = new Dictionary<string, List<DescriptionAggVm>>(StringComparer.OrdinalIgnoreCase);
+            foreach (var grp in descGrouped.GroupBy(x => x.Type))
+            {
+                var list = grp
+                    .OrderByDescending(x => x.Total)
+                    .Take(5)
+                    .Select(x => new DescriptionAggVm
+                    {
+                        Description = ToTitleCaseSafe(x.Key),
+                        Total = x.Total
+                    })
+                    .ToList();
+
+                topDescDict[grp.Key] = list;
+            }
+
+            var totalCredits = await q.Where(t => (t.TransactionType ?? "") == "Credit")
+                .SumAsync(t => (decimal?)t.Amount) ?? 0m;
+            var totalDebits = await q.Where(t => (t.TransactionType ?? "") == "Debit")
+                .SumAsync(t => (decimal?)t.Amount) ?? 0m;
 
             return new ReportResultVm
             {
@@ -307,8 +380,78 @@ namespace BankingManagmentApp.Controllers
                 TotalsByType = totalsByType,
                 TopDescriptionsByType = topDescDict,
                 SelectedCustomerId = selectedCustId,
-                SelectedCustomerName = selectedCustName
+                SelectedCustomerName = selectedCustName,
+                TotalCredits = totalCredits,
+                TotalDebits = totalDebits
             };
+        }
+
+        private static readonly Dictionary<string, string> KeywordSynonyms =
+            new(StringComparer.OrdinalIgnoreCase)
+        {
+            ["payment"] = "pay",
+            ["payments"] = "pay",
+            ["paid"] = "pay",
+            ["paying"] = "pay",
+            ["payout"] = "pay",
+            ["payouts"] = "pay",
+
+            ["salary"] = "salary",
+            ["salaries"] = "salary",
+            ["wage"] = "salary",
+            ["wages"] = "salary",
+
+            ["deposit"] = "deposit",
+            ["deposits"] = "deposit",
+            ["withdraw"] = "withdraw",
+            ["withdrawing"] = "withdraw",
+            ["withdrawn"] = "withdraw",
+            ["withdrawal"] = "withdraw",
+            ["withdrawals"] = "withdraw",
+            ["withdrawl"] = "withdraw",
+            ["withdrawls"] = "withdraw",
+
+            ["transfer"] = "transfer",
+            ["transfers"] = "transfer",
+
+            ["fee"] = "fee",
+            ["fees"] = "fee"
+        };
+
+        private static readonly HashSet<string> Stopwords =
+            new(StringComparer.OrdinalIgnoreCase)
+        {
+            "the","a","an","to","for","from","of","and","on","in","at","by","via","with"
+        };
+
+        private static string NormalizeKeyword(string? s)
+        {
+            if (string.IsNullOrWhiteSpace(s))
+                return "(no description)";
+
+            var t = s.Trim().ToLowerInvariant();
+            t = Regex.Replace(t, @"[^\p{L}\p{Nd}]+", " ");
+            t = Regex.Replace(t, @"\s+", " ").Trim();
+
+            if (t.Length == 0)
+                return "(no description)";
+
+            var tokens = t.Split(' ', StringSplitOptions.RemoveEmptyEntries)
+                          .Where(tok => !Stopwords.Contains(tok))
+                          .Select(tok => KeywordSynonyms.TryGetValue(tok, out var canon) ? canon : tok)
+                          .ToList();
+
+            if (tokens.Count == 0)
+                return "(no description)";
+
+            return string.Join(' ', tokens);
+        }
+
+        private static string ToTitleCaseSafe(string text)
+        {
+            if (string.Equals(text, "(no description)", StringComparison.OrdinalIgnoreCase))
+                return "(no description)";
+            return CultureInfo.CurrentCulture.TextInfo.ToTitleCase(text);
         }
     }
 }
