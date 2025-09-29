@@ -155,12 +155,11 @@ namespace BankingManagmentApp.Services
             var pred    = engine.Predict(row);
             var cluster = (int)pred.PredictedClusterId;
 
-            var initialRisk = _clusterToRisk.TryGetValue(cluster, out var r) ? r : MaxRiskLevels;
-            var score = ScoreFromRiskAndFeatures(initialRisk, row);
+            var risk = _clusterToRisk.TryGetValue(cluster, out var r)
+                ? r
+                : MaxRiskLevels;
             
-            int risk = score >= 720 ? 1 :
-                       score >= 660 ? 2 :
-                       score >= 600 ? 3 : 4;
+            var score = ScoreFromRiskAndFeatures(risk, row);
             
             var notes = ComposeUserNote(snap);
             
