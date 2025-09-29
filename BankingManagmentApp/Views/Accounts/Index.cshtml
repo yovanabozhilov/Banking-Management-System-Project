@@ -1,15 +1,27 @@
-﻿@model IEnumerable<BankingManagmentApp.Models.Accounts>
+@model IEnumerable<BankingManagmentApp.Models.Accounts>
+@using BankingManagmentApp.Utilities
 
 @{
     ViewData["Title"] = "Cards";
-    ViewData["BodyClass"] = "profile-full-bg"; 
+    ViewData["BodyClass"] = "profile-full-bg";
 }
-<link rel="stylesheet" href="~/css/profile.css" asp-append-version="true" />
+
+@section Head {
+  <link rel="stylesheet" href="~/css/profile.css" asp-append-version="true" />
+}
+
+@functions{
+    string ShortId(string id)
+    {
+        if (string.IsNullOrEmpty(id)) return "-";
+        return id.Length <= 12 ? id : id.Substring(0, 8) + "…" + id[^4..];
+    }
+}
 
 <div class="profile-page">
-    <div class="container-xxl">
+    <div class="container-fluid">
         <div class="row justify-content-center">
-            <div class="col-12 col-lg-10 col-xl-9">
+            <div class="col-12">
                 <div class="profile-card card shadow-lg border-0">
                     <div class="profile-header d-flex align-items-center gap-3 p-4 border-bottom">
                         <div class="profile-badge">
@@ -20,53 +32,99 @@
                             <small class="opacity-75">Manage your cards</small>
                         </div>
                     </div>
+
                     <div class="card-body p-4 p-md-5">
-                        <div class="mb-3">
+                        <div class="mb-3 text-end">
                             <a asp-action="Create" class="btn btn-primary">
                                 <i class="fa-solid fa-plus me-1"></i> Apply for a new card
                             </a>
                         </div>
 
-                        <div class="table-responsive">
-                            <table class="table table-striped align-middle">
-                                <thead>
-                                    <tr>
-                                        <th>IBAN</th>
-                                        <th>Type</th>
-                                        <th>Balance</th>
-                                        <th>Currency</th>
-                                        <th>Created At</th>
-                                        <th>Status</th>
-                                        <th>Customer</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach (var item in Model)
-                                    {
-                                        @if(item.Status=="Pending"){
+                        @if (!Model.Any())
+                        {
+                            <div class="text-muted text-center py-4">No cards found.</div>
+                        }
+                        else
+                        {
+                            <div class="table-responsive rounded-3 overflow-hidden">
+                                <table class="table table-striped table-hover align-middle mb-0 w-100">
+                                    <thead class="table-light">
                                         <tr>
-                                            <td>@item.IBAN</td>
-                                            <td>@item.AccountType</td>
-                                            <td>@item.Balance</td>
-                                            <td>@item.Currency</td>
-                                            <td>@item.CreateAt.ToString("dd/MM/yyyy")</td>
-                                            <td>@item.Status</td>
-                                            <td>@item.Customer.FirstName</td>
-                                            <td>
-                                                <div class="d-flex gap-1">
-                                                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">Edit</a>
-                                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-info">Details</a>
-                                                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger">Block</a>
-                                                </div>
-                                            </td>
+                                            <th>IBAN</th>
+                                            <th>Type</th>
+                                            <th class="text-end">Balance</th>
+                                            <th>Currency</th>
+                                            <th class="nowrap">Created At</th>
+                                            <th>Status</th>
+                                            <th>Client</th>
+                                            <th class="nowrap">Client&nbsp;ID</th>
+                                            <th class="text-end">Actions</th>
                                         </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var item in Model)
+                                        {
+                                            if (item.Status == "Pending")
+                                            {
+                                                <tr>
+                                                    <td class="text-mono nowrap">
+                                                        @if (!string.IsNullOrEmpty(item.IBAN))
+                                                        {
+                                                            <span title="@item.IBAN">@item.IBAN.MaskIban()</span>
+                                                            <button type="button"
+                                                                    class="btn btn-link p-0 ms-1 align-baseline copy-id-btn"
+                                                                    data-copy-iban="@item.IBAN"
+                                                                    title="Copy IBAN" aria-label="Copy IBAN">
+                                                                <i class="fas fa-copy"></i>
+                                                            </button>
+                                                        }
+                                                        else { <span class="text-muted">-</span> }
+                                                    </td>
+                                                    <td>@item.AccountType</td>
+                                                    <td class="text-end text-mono">@item.Balance.ToString("N2")</td>
+                                                    <td>@item.Currency</td>
+                                                    <td class="nowrap">@item.CreateAt.ToString("dd/MM/yyyy")</td>
+                                                    <td>@item.Status</td>
+                                                    <td class="text-truncate">@item.Customer?.FirstName @item.Customer?.LastName</td>
+                                                    <td class="text-mono nowrap">
+                                                        @if (!string.IsNullOrEmpty(item.CustomerId))
+                                                        {
+                                                            <span title="@item.CustomerId">@ShortId(item.CustomerId)</span>
+                                                            <button type="button"
+                                                                    class="btn btn-link p-0 ms-1 align-baseline copy-id-btn"
+                                                                    data-copy-id="@item.CustomerId"
+                                                                    title="Copy Client ID" aria-label="Copy Client ID">
+                                                                <i class="fas fa-copy"></i>
+                                                            </button>
+                                                        }
+                                                        else { <span class="text-muted">-</span> }
+                                                    </td>
+                                                    <td class="text-end">
+                                                        <div class="btn-group btn-group-sm" role="group">
+                                                            <a asp-action="Edit" asp-route-id="@item.Id"
+                                                            class="btn btn-outline-primary"
+                                                            title="Edit" aria-label="Edit">
+                                                            <i class="fa-solid fa-pen"></i>
+                                                            </a>
+                                                            <a asp-action="Details" asp-route-id="@item.Id"
+                                                            class="btn btn-outline-secondary"
+                                                            title="Details" aria-label="Details">
+                                                            <i class="fa-solid fa-eye"></i>
+                                                            </a>
+                                                            <a asp-action="Delete" asp-route-id="@item.Id"
+                                                            class="btn btn-outline-danger"
+                                                            title="Block" aria-label="Block">
+                                                            <i class="fa-solid fa-ban"></i>
+                                                            </a>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            }
                                         }
-                                    }
-                                </tbody>
-                            </table>
-                        </div>
-
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
                     </div>
 
                 </div>
@@ -74,3 +132,47 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+<script>
+document.addEventListener('click', function (e) {
+    const btn = e.target.closest('[data-copy],[data-copy-iban],[data-copy-id]');
+    if (!btn) return;
+
+    const text = btn.getAttribute('data-copy')
+              ?? btn.getAttribute('data-copy-iban')
+              ?? btn.getAttribute('data-copy-id')
+              ?? '';
+    if (!text) return;
+
+    const originalHtml = btn.innerHTML;
+
+    function showCopied() {
+        btn.innerHTML = '<i class="fa-solid fa-check"></i>';
+        btn.classList.add('text-success');
+        setTimeout(() => {
+            btn.innerHTML = originalHtml;
+            btn.classList.remove('text-success');
+        }, 1200);
+    }
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(showCopied).catch(fallbackCopy);
+    } else {
+        fallbackCopy();
+    }
+
+    function fallbackCopy() {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); showCopied(); }
+        catch (err) { console.warn('Copy failed', err); }
+        finally { document.body.removeChild(ta); }
+    }
+});
+</script>
+}
