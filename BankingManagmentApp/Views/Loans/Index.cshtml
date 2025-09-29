@@ -110,21 +110,30 @@
                       else { <span class="text-muted">-</span> }
                     </td>
                     <td class="text-end">
-                      <div class="btn-group btn-group-sm" role="group">
-                        @if (User.IsInRole("Admin"))
-                        {
-                          <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-outline-primary">
-                            <i class="fa-solid fa-pen"></i>
-                          </a>
-                          <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-outline-danger">
-                            <i class="fa-solid fa-trash"></i>
-                          </a>
-                        }
-                        <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-outline-secondary">
-                          <i class="fa-solid fa-eye"></i>
+                    <div class="btn-group btn-group-sm" role="group">
+                      @if (User.IsInRole("Admin"))
+                      {
+                        <a asp-action="Edit" asp-route-id="@item.Id"
+                          class="btn btn-outline-primary"
+                          title="Redact" aria-label="Edit">
+                          <i class="fa-solid fa-pen"></i>
                         </a>
-                      </div>
-                    </td>
+                      }
+                      <a asp-action="Details" asp-route-id="@item.Id"
+                        class="btn btn-outline-secondary"
+                        title="Details" aria-label="Details">
+                        <i class="fa-solid fa-eye"></i>
+                      </a>
+                      @if (User.IsInRole("Admin"))
+                      {
+                        <a asp-action="Delete" asp-route-id="@item.Id"
+                          class="btn btn-outline-danger"
+                          title="Delete" aria-label="Delete">
+                          <i class="fa-solid fa-trash"></i>
+                        </a>
+                      }
+                    </div>
+                  </td>
                   </tr>
                 }
                 </tbody>
