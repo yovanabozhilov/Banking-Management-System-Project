@@ -76,7 +76,7 @@ public class LoanWorkflowTests
         await workflow.ProcessNewApplicationAsync(loan);
 
         var updatedLoan = await db.Loans.FindAsync(loan.Id);
-        Assert.Equal("PendingReview", updatedLoan.Status);  // <-- corrected
+        Assert.Equal("PendingReview", updatedLoan.Status);  
         Assert.Equal(1000, updatedLoan.ApprovedAmount);
 
         var repayments = await db.LoanRepayments.Where(r => r.LoanId == loan.Id).ToListAsync();
@@ -114,7 +114,7 @@ public class LoanWorkflowTests
         await workflow.ProcessNewApplicationAsync(loan);
     
         var updatedLoan = await db.Loans.FindAsync(loan.Id);
-        Assert.Equal("AutoDeclined", updatedLoan.Status);  // <-- corrected
+        Assert.Equal("AutoDeclined", updatedLoan.Status); 
         Assert.Equal(0, updatedLoan.ApprovedAmount);
     }
 }

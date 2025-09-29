@@ -22,7 +22,6 @@ namespace BankingManagmentApp.Tests.Services
         [Fact]
         public void ForecastTransactionVolumeMonthly_ReturnsCorrectCounts()
         {
-            // Arrange
             var context = GetDbContext(nameof(ForecastTransactionVolumeMonthly_ReturnsCorrectCounts));
             context.Transactions.AddRange(new List<Transactions>
             {
@@ -34,10 +33,8 @@ namespace BankingManagmentApp.Tests.Services
 
             var service = new ForecastService(context);
 
-            // Act
             var result = service.ForecastTransactionVolumeMonthly();
 
-            // Assert
             Assert.Equal(2, result["2025-09"]);
             Assert.Equal(1, result["2025-08"]);
         }
@@ -64,7 +61,6 @@ namespace BankingManagmentApp.Tests.Services
         {
             var context = GetDbContext(nameof(DetectTransactionAnomalies_ReturnsAnomalies));
         
-            // Normal transactions
             for (int i = 0; i < 20; i++)
             {
                 context.Transactions.Add(new Transactions
@@ -75,7 +71,6 @@ namespace BankingManagmentApp.Tests.Services
                 });
             }
         
-            // One big anomaly
             context.Transactions.Add(new Transactions
             {
                 Date = new DateOnly(2025, 9, 2),
@@ -127,7 +122,7 @@ namespace BankingManagmentApp.Tests.Services
 
             var churn = service.ForecastChurnRate();
 
-            Assert.Equal(2d / 3d, churn, 3); // allow rounding tolerance
+            Assert.Equal(2d / 3d, churn, 3); 
         }
     }
 }

@@ -5,7 +5,7 @@ using BankingManagmentApp.Services.Approval;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using Xunit;
-using BankingManagmentApp.Services;   // for ICreditScoringService + CreditScoreResult
+using BankingManagmentApp.Services;  
 
 namespace BankingManagmentApp.Tests.Services
 {
@@ -128,7 +128,7 @@ namespace BankingManagmentApp.Tests.Services
 
             var scoring = new Mock<ICreditScoringService>();
             scoring.Setup(s => s.ComputeAsync(It.IsAny<string>(), It.IsAny<ApplicationFeatures>()))
-                   .ReturnsAsync(new CreditScoreResult { RiskLevel = 1, Score = 650 }); // below MinScoreRisk1
+                   .ReturnsAsync(new CreditScoreResult { RiskLevel = 1, Score = 650 }); 
 
             var engine = new LoanApprovalEngine(db, scoring.Object, GetPolicy());
 

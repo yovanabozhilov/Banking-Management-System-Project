@@ -17,7 +17,7 @@ namespace BankingManagmentApp.Tests.Controllers
         private ApplicationDbContext GetDbContext()
         {
             var options = new DbContextOptionsBuilder<ApplicationDbContext>()
-                .UseInMemoryDatabase(Guid.NewGuid().ToString()) 
+                .UseInMemoryDatabase(Guid.NewGuid().ToString())
                 .Options;
 
             return new ApplicationDbContext(options);
@@ -72,8 +72,8 @@ namespace BankingManagmentApp.Tests.Controllers
             {
                 Id = 1,
                 Loan = loan,
-                DueDate = DateOnly.FromDateTime(DateTime.Today.AddDays(-5)), 
-                Status = "Pending",
+                DueDate = DateOnly.FromDateTime(DateTime.Today.AddDays(-5)),
+                Status = "Approved",
                 AmountDue = 100,
                 AmountPaid = 0
             };
@@ -82,8 +82,8 @@ namespace BankingManagmentApp.Tests.Controllers
             {
                 Id = 2,
                 Loan = loan,
-                DueDate = DateOnly.FromDateTime(DateTime.Today.AddDays(5)), 
-                Status = "Pending",
+                DueDate = DateOnly.FromDateTime(DateTime.Today.AddDays(5)),
+                Status = "Approved",
                 AmountDue = 200,
                 AmountPaid = 0
             };
@@ -103,7 +103,7 @@ namespace BankingManagmentApp.Tests.Controllers
             var updatedRepayment2 = await context.LoanRepayments.FindAsync(2);
 
             updatedRepayment1!.Status.Should().Be("Overdue");  
-            updatedRepayment2!.Status.Should().Be("Pending");   
+            updatedRepayment2!.Status.Should().Be("Approved");  
         }
 
         [Fact]

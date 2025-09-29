@@ -1,21 +1,67 @@
 using System.Net;
 using System.Net.Http.Json;
+using System.Security.Claims;
 using System.Text;
-using System.Text.Json;
 using System.Threading.Tasks;
+using BankingManagmentApp;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.AspNetCore.TestHost;
+using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Logging;
+using System.Text.Encodings.Web;
+using Microsoft.Extensions.DependencyInjection;
 using Xunit;
-using BankingManagmentApp; 
 
 namespace BankingManagmentApp.Tests.Controllers
 {
+    public class TestAuthHandler : AuthenticationHandler<AuthenticationSchemeOptions>
+    {
+        public TestAuthHandler(IOptionsMonitor<AuthenticationSchemeOptions> options,
+                               ILoggerFactory logger,
+                               System.Text.Encodings.Web.UrlEncoder encoder,
+                               ISystemClock clock)
+            : base(options, logger, encoder, clock) { }
+
+        protected override Task<AuthenticateResult> HandleAuthenticateAsync()
+        {
+            var identity = new ClaimsIdentity(new[]
+            {
+                new Claim(ClaimTypes.NameIdentifier, "test-user-id"),
+                new Claim(ClaimTypes.Name, "testuser")
+            }, "Test");
+
+            var principal = new ClaimsPrincipal(identity);
+            var ticket = new AuthenticationTicket(principal, "Test");
+            return Task.FromResult(AuthenticateResult.Success(ticket));
+        }
+    }
+
     public class ChatControllerApiTests : IClassFixture<WebApplicationFactory<Program>>
     {
         private readonly HttpClient _client;
 
         public ChatControllerApiTests(WebApplicationFactory<Program> factory)
         {
-            _client = factory.CreateClient();
+            _client = factory.WithWebHostBuilder(builder =>
+            {
+                builder.ConfigureTestServices(services =>
+                {
+                    services.AddAuthentication("Test")
+                            .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>("Test", _ => { });
+
+                    services.PostConfigureAll<AuthenticationOptions>(opt =>
+                    {
+                        opt.DefaultAuthenticateScheme = "Test";
+                        opt.DefaultChallengeScheme = "Test";
+                        opt.DefaultScheme = "Test";
+                    });
+                });
+            }).CreateClient(new WebApplicationFactoryClientOptions
+            {
+                AllowAutoRedirect = false
+            });
         }
 
         [Fact]
@@ -47,7 +93,7 @@ namespace BankingManagmentApp.Tests.Controllers
         {
             var response = await _client.GetAsync("/chat/stream?prompt=");
 
-            response.EnsureSuccessStatusCode();
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             var content = await response.Content.ReadAsStringAsync();
             Assert.Contains("Message cannot be empty", content);
         }
@@ -59,7 +105,7 @@ namespace BankingManagmentApp.Tests.Controllers
 
             response.EnsureSuccessStatusCode();
             var html = await response.Content.ReadAsStringAsync();
-            Assert.Contains("<html", html.ToLower()); 
+            Assert.Contains("<html", html.ToLower());
         }
     }
 }

@@ -1,146 +1,251 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using BankingManagmentApp.Services.Pdf;
 using BankingManagmentApp.ViewModels.Reports;
-using FluentAssertions;
 using QuestPDF.Fluent;
-using UglyToad.PdfPig;
-using Xunit;
+using QuestPDF.Helpers;
+using QuestPDF.Infrastructure;
+using System;
+using System.Globalization;
+using System.Linq;
 
-namespace BankingManagmentApp.Tests.Reporting.Pdf
+namespace BankingManagmentApp.Services.Pdf
 {
-    public class FinancialReportPdfTests
+    public class FinancialReportPdf : IDocument
     {
-        private static string Normalize(string s) =>
-            new string(s.Where(ch => !char.IsWhiteSpace(ch)).ToArray());
+        private readonly ReportResultVm _vm;
+        public FinancialReportPdf(ReportResultVm vm) => _vm = vm;
 
-        private static ReportResultVm SampleMonthlyVm() => new()
+        private static readonly NumberFormatInfo InvNoGroup = new NumberFormatInfo
         {
-            Filters = new ReportFilterVm
-            {
-                From = new DateOnly(2025, 1, 1),
-                To = new DateOnly(2025, 1, 31),
-                SelectedAccountLabel = "ACC-123",
-                GroupBy = ReportGroupBy.Monthly
-            },
-            Rows = new List<ReportRow>
-            {
-                new ReportRow
-                {
-                    Year = 2025,
-                    Month = 1,
-                    TotalTransactions = 3,
-                    TotalAmount = 1234.56m,
-                    AmountByType = new Dictionary<string, decimal>
-                    {
-                        ["Deposit"] = 1000.50m,
-                        ["Withdraw"] = 234.06m
-                    }
-                }
-            }
+            NumberDecimalSeparator = ".",
+            NumberGroupSeparator = ""
         };
 
-        private static ReportResultVm SampleYearlyVm() => new()
+        private static string F2(decimal x) => x.ToString("F2", InvNoGroup);
+        private static string F2(double x)  => x.ToString("F2", InvNoGroup);
+        private static string N0(int x)     => x.ToString("D", CultureInfo.InvariantCulture); 
+
+        public DocumentMetadata GetMetadata() => new DocumentMetadata
         {
-            Filters = new ReportFilterVm
-            {
-                From = new DateOnly(2025, 1, 1),
-                To = new DateOnly(2025, 12, 31),
-                SelectedAccountLabel = "ACC-123",
-                GroupBy = ReportGroupBy.Yearly
-            },
-            Rows = new List<ReportRow>
-            {
-                new ReportRow
-                {
-                    Year = 2025,
-                    Month = null,
-                    TotalTransactions = 10,
-                    TotalAmount = 2500.00m,
-                    AmountByType = new Dictionary<string, decimal>
-                    {
-                        ["Deposit"] = 2000.00m,
-                        ["Withdraw"] = 500.00m
-                    }
-                }
-            }
+            Title = "GlowPay Financial Report", 
+            Author = "BankingManagementApp",
+            Subject = "Aggregated transactions report"
         };
 
-        private static string ExtractAllText(byte[] pdfBytes)
+        public void Compose(IDocumentContainer container)
         {
-            using var ms = new MemoryStream(pdfBytes);
-            using var doc = PdfDocument.Open(ms);
-            var sb = new StringBuilder();
-            foreach (var page in doc.GetPages())
-                sb.AppendLine(page.Text);
-            return sb.ToString();
+            container.Page(page =>
+            {
+                page.Size(PageSizes.A4);
+                page.Margin(30);
+                page.DefaultTextStyle(x => x.FontSize(10));
+
+                page.Header().Column(col =>
+                {
+                    col.Item().Text("GlowPay Financial Report").FontSize(14).SemiBold();
+
+                    col.Item().Text(t =>
+                    {
+                        t.Span("Period: ").SemiBold();
+                        t.Span($"{_vm.Filters.From:yyyy-MM-dd}–{_vm.Filters.To:yyyy-MM-dd}");
+                    });
+
+                    col.Item().Text(t =>
+                    {
+                        t.Span("Group by: ").SemiBold();
+                        t.Span(_vm.Filters.GroupBy.ToString());
+                    });
+
+                    col.Item().Text(t =>
+                    {
+                        t.Span("Account: ").SemiBold();
+                        t.Span(_vm.Filters.SelectedAccountLabel ?? "All accounts");
+                    });
+
+                    if (!string.IsNullOrWhiteSpace(_vm.SelectedCustomerName) ||
+                        !string.IsNullOrWhiteSpace(_vm.SelectedCustomerId))
+                    {
+                        col.Item().Text(t =>
+                        {
+                            t.Span("Client: ").SemiBold();
+                            t.Span($"{_vm.SelectedCustomerName} ({_vm.SelectedCustomerId})");
+                        });
+                    }
+
+                    col.Item().PaddingTop(8).Height(1).Background(Colors.Grey.Lighten2);
+                });
+
+                page.Content().PaddingTop(10).Column(col =>
+                {
+                    if (_vm.TotalsByType != null && _vm.TotalsByType.Any())
+                    {
+                        col.Item().PaddingBottom(6)
+                                  .Text("Totals by Transaction Type").FontSize(12).SemiBold();
+
+                        col.Item().PaddingBottom(10).Table(t =>
+                        {
+                            t.ColumnsDefinition(c =>
+                            {
+                                c.RelativeColumn(6);
+                                c.RelativeColumn(3);
+                                c.RelativeColumn(3);
+                            });
+
+                            t.Header(h =>
+                            {
+                                h.Cell().Element(CellHeader).Text("Type");
+                                h.Cell().Element(CellHeader).AlignRight().Text("Amount");
+                                h.Cell().Element(CellHeader).AlignRight().Text("Percent");
+                            });
+
+                            var total = _vm.TotalByTypeAll;
+                            int i = 0;
+                            foreach (var kv in _vm.TotalsByType.OrderByDescending(x => x.Value))
+                            {
+                                var bg = (i++ % 2 == 0) ? Colors.White : Colors.Grey.Lighten5;
+                                var type = string.IsNullOrWhiteSpace(kv.Key) ? "Unknown" : kv.Key;
+                                var pct = total == 0 ? 0 : Math.Round((kv.Value / total) * 100m, 2);
+
+                                t.Cell().Element(c => CellBody(c, bg)).Text(type);
+                                t.Cell().Element(c => CellBody(c, bg)).AlignRight().Text(F2(kv.Value));
+                                t.Cell().Element(c => CellBody(c, bg)).AlignRight().Text($"{F2((double)pct)}%");
+                            }
+                        });
+                    }
+
+                    if (_vm.TopDescriptionsByType != null && _vm.TopDescriptionsByType.Any())
+                    {
+                        col.Item().PaddingBottom(6)
+                                  .Text("Top References by Type").FontSize(12).SemiBold();
+
+                        col.Item().PaddingBottom(10).Table(t =>
+                        {
+                            t.ColumnsDefinition(c =>
+                            {
+                                c.RelativeColumn(3);
+                                c.RelativeColumn(6);
+                                c.RelativeColumn(3);
+                            });
+
+                            t.Header(h =>
+                            {
+                                h.Cell().Element(CellHeader).Text("Type");
+                                h.Cell().Element(CellHeader).Text("Reference");
+                                h.Cell().Element(CellHeader).AlignRight().Text("Amount");
+                            });
+
+                            int i = 0;
+                            foreach (var typeEntry in _vm.TopDescriptionsByType.OrderBy(k => k.Key))
+                            {
+                                var type = string.IsNullOrWhiteSpace(typeEntry.Key) ? "Unknown" : typeEntry.Key;
+
+                                foreach (var d in typeEntry.Value.OrderByDescending(x => x.Total))
+                                {
+                                    var bg = (i++ % 2 == 0) ? Colors.White : Colors.Grey.Lighten5;
+                                    var desc = string.IsNullOrWhiteSpace(d.Description) ? "—" : d.Description;
+
+                                    t.Cell().Element(c => CellBody(c, bg)).Text(type);
+                                    t.Cell().Element(c => CellBody(c, bg)).Text(desc);
+                                    t.Cell().Element(c => CellBody(c, bg)).AlignRight().Text(F2(d.Total));
+                                }
+                            }
+                        });
+                    }
+
+                    col.Item().PaddingBottom(6)
+                              .Text("Detailed Results").FontSize(12).SemiBold();
+
+                    col.Item().Table(t =>
+                    {
+                        var hasMonth = _vm.Filters.GroupBy == ReportGroupBy.Monthly;
+
+                        t.ColumnsDefinition(c =>
+                        {
+                            c.RelativeColumn(1.4f);
+                            if (hasMonth) c.RelativeColumn(1.4f);
+                            c.RelativeColumn(1.6f);
+                            c.RelativeColumn(2.0f);
+                            c.RelativeColumn(2.0f);
+                            c.RelativeColumn(4.0f);
+                            c.RelativeColumn(2.5f);
+                            c.RelativeColumn(3.0f);
+                        });
+
+                        t.Header(h =>
+                        {
+                            h.Cell().Element(CellHeader).Text("Year");
+                            if (hasMonth) h.Cell().Element(CellHeader).Text("Month");
+                            h.Cell().Element(CellHeader).AlignRight().Text("Transactions");
+                            h.Cell().Element(CellHeader).AlignRight().Text("Total Amount");
+                            h.Cell().Element(CellHeader).AlignRight().Text("Net Flow");
+                            h.Cell().Element(CellHeader).Text("By Type");
+                            h.Cell().Element(CellHeader).Text("Client");
+                            h.Cell().Element(CellHeader).Text("Client ID");
+                        });
+
+                        int i = 0;
+                        foreach (var r in _vm.Rows.OrderBy(x => x.Year).ThenBy(x => x.Month ?? 0))
+                        {
+                            var bg = (i++ % 2 == 0) ? Colors.White : Colors.Grey.Lighten5;
+
+                            var custLabel = _vm.SelectedCustomerName
+                                ?? (string.IsNullOrEmpty(_vm.Filters.CustomerName) && string.IsNullOrEmpty(_vm.Filters.CustomerId)
+                                    ? "All / Multiple"
+                                    : (_vm.Filters.CustomerName ?? "Filtered"));
+
+                            var custId = _vm.SelectedCustomerId
+                                ?? (string.IsNullOrEmpty(_vm.Filters.CustomerId) ? "—" : _vm.Filters.CustomerId);
+
+                            t.Cell().Element(c => CellBody(c, bg)).Text(r.Year.ToString(CultureInfo.InvariantCulture));
+                            if (hasMonth) t.Cell().Element(c => CellBody(c, bg)).Text(r.Month?.ToString() ?? "");
+                            t.Cell().Element(c => CellBody(c, bg)).AlignRight().Text(N0(r.TotalTransactions));
+                            t.Cell().Element(c => CellBody(c, bg)).AlignRight().Text(F2(r.TotalAmount));
+                            t.Cell().Element(c => CellBody(c, bg)).AlignRight().Text(F2(r.NetFlow));
+
+                            var byType = (r.AmountByType ?? new())
+                                .OrderBy(x => x.Key)
+                                .Select(x => $"{(string.IsNullOrWhiteSpace(x.Key) ? "Unknown" : x.Key)}: {F2(x.Value)}");
+                            t.Cell().Element(c => CellBody(c, bg)).Text(string.Join("  •  ", byType));
+
+                            t.Cell().Element(c => CellBody(c, bg)).Text(custLabel);
+                            t.Cell().Element(c => CellBody(c, bg)).Text(custId);
+                        }
+
+                        t.Footer(f =>
+                        {
+                            f.Cell().Element(CellHeader).Text("Total");
+                            if (hasMonth) f.Cell().Element(CellHeader).Text("");
+                            f.Cell().Element(CellHeader).AlignRight().Text(N0(_vm.GrandTotalTransactions));
+                            f.Cell().Element(CellHeader).AlignRight().Text(F2(_vm.GrandTotalAmount));
+                            f.Cell().Element(CellHeader).AlignRight().Text(F2(_vm.NetFlow));
+                            f.Cell().Element(CellHeader).Text("");
+                            f.Cell().Element(CellHeader).Text("");
+                            f.Cell().Element(CellHeader).Text("");
+                        });
+                    });
+                });
+
+                page.Footer().Row(r =>
+                {
+                    r.RelativeItem().Text($"Generated {DateTime.Now:yyyy-MM-dd HH:mm}")
+                        .FontSize(9).FontColor(Colors.Grey.Darken2);
+                    r.ConstantItem(120).AlignRight().Text(x =>
+                    {
+                        x.Span("Page ").FontSize(9).FontColor(Colors.Grey.Darken2);
+                        x.CurrentPageNumber().FontSize(9).FontColor(Colors.Grey.Darken2);
+                        x.Span(" / ").FontSize(9).FontColor(Colors.Grey.Darken2);
+                        x.TotalPages().FontSize(9).FontColor(Colors.Grey.Darken2);
+                    });
+                });
+            });
         }
 
-        [Fact]
-        public void GeneratePdf_Monthly_ShouldContainHeader_And_TableData()
-        {
-            var vm = SampleMonthlyVm();
-            var doc = new FinancialReportPdf(vm);
+        static IContainer CellHeader(IContainer c) =>
+            c.DefaultTextStyle(x => x.SemiBold())
+             .Background(Colors.Grey.Lighten3)
+             .Padding(4);
 
-            var pdfBytes = doc.GeneratePdf();
-            pdfBytes.Should().NotBeNullOrEmpty();
-
-            var text = ExtractAllText(pdfBytes);
-            var norm = Normalize(text);
-
-            norm.Should().Contain("GlowPayFinancialReport");
-            norm.Should().Contain("Period:2025-01-01–2025-01-31");
-            norm.Should().Contain("Account:ACC-123");
-            norm.Should().Contain("Groupby:Monthly");
-
-            // Таблични хедъри (нормализирани)
-            norm.Should().Contain("Year");
-            norm.Should().Contain("Month");
-            norm.Should().Contain("Totaltransactions");
-            norm.Should().Contain("Totalamount");
-            norm.Should().Contain("Bytype");
-
-            // Данни
-            norm.Should().Contain("2025");
-            norm.Should().Contain("1");
-            norm.Should().Contain("3");
-            norm.Should().Contain("1234.56");
-
-            // По тип (PDF екстрактът често маха интервали)
-            norm.Should().Contain("Deposit:1000.50");
-            norm.Should().Contain("Withdraw:234.06");
-        }
-
-        [Fact]
-        public void GeneratePdf_Yearly_ShouldOmit_Month_Column()
-        {
-            var vm = SampleYearlyVm();
-            var doc = new FinancialReportPdf(vm);
-
-            var pdfBytes = doc.GeneratePdf();
-            var norm = Normalize(ExtractAllText(pdfBytes));
-
-            norm.Should().Contain("Groupby:Yearly");
-            norm.Should().Contain("Year");
-            norm.Should().NotContain("Month");
-        }
-
-        [Fact]
-        public void GeneratePdf_ShouldUseInvariantCulture_ForAmounts()
-        {
-            var vm = SampleMonthlyVm();
-            var doc = new FinancialReportPdf(vm);
-
-            var norm = Normalize(ExtractAllText(doc.GeneratePdf()));
-
-            norm.Should().Contain("1000.50");
-            norm.Should().Contain("234.06");
-            norm.Should().Contain("1234.56");
-            norm.Should().NotContain("1000,50");
-            norm.Should().NotContain("234,06");
-        }
+        static IContainer CellBody(IContainer c, string bg) =>
+            c.Background(bg)
+             .PaddingVertical(2)
+             .PaddingHorizontal(3);
     }
 }

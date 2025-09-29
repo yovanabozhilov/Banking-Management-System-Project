@@ -1,3 +1,8 @@
+using System;
+using System.Security.Claims;
+using System.Text;
+using System.Threading.Tasks;
+using BankingManagmentApp.Configuration;     
 using BankingManagmentApp.Controllers;
 using BankingManagmentApp.Data;
 using BankingManagmentApp.Models;
@@ -7,12 +12,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;          
 using Moq;
-using System;
-using System.Collections.Generic;
-using System.Security.Claims;
-using System.Text;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace BankingManagmentApp.Tests.Controllers
@@ -42,7 +43,9 @@ namespace BankingManagmentApp.Tests.Controllers
             userMgr.Setup(x => x.GetUserAsync(It.IsAny<ClaimsPrincipal>()))
                    .ReturnsAsync(user);
 
-            var controller = new ProfileController(context, userMgr.Object, scoring);
+            var creditOpts = Options.Create(new CreditScoringOptions());
+
+            var controller = new ProfileController(context, userMgr.Object, scoring, creditOpts);
 
             var claims = new ClaimsPrincipal(new ClaimsIdentity(new[]
             {
@@ -91,7 +94,7 @@ namespace BankingManagmentApp.Tests.Controllers
                        .ReturnsAsync(new CreditScoreResult
                        {
                            Score = 700,
-                           RiskLevel = 2, 
+                           RiskLevel = 2,
                            Notes = "ok"
                        });
 

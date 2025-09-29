@@ -9,7 +9,6 @@ using Xunit;
 
 namespace BankingManagmentApp.Tests.Services.Email
 {
-    // Наследяваме EmailService и hook-овете, за да шпионираме извикванията
     internal sealed class SpyEmailService : global::EmailService
     {
         public SpyEmailService(IConfiguration cfg) : base(cfg) { }
@@ -120,7 +119,6 @@ namespace BankingManagmentApp.Tests.Services.Email
             var bytes = new byte[] { 9, 9, 9 };
             await svc.SendEmailWithAttachmentAsync("boss@bank.com", "Monthly Reports", "See attached", bytes, "reports.xlsx");
 
-            // Ориг. имплементация игнорира входните subject/message и ползва фикс стойности:
             Assert.Equal("Financial Reports", svc.LastMessage!.Subject);
             Assert.Contains("Dear admin, we are sending you an attachment with the reports", svc.LastMessage!.TextBody);
 

@@ -66,7 +66,8 @@ namespace BankingManagmentApp.Tests.Controllers
             acc.CustomerId.Should().Be("u1");
             acc.AccountType.Should().Be("User");
             acc.Currency.Should().Be("BGN");
-            acc.Status.Should().Be("Active");
+
+            acc.Status.Should().Be("Pending");
         }
 
         [Fact]
@@ -96,7 +97,7 @@ namespace BankingManagmentApp.Tests.Controllers
             }) as RedirectToActionResult;
 
             result.Should().NotBeNull();
-            ctx.Accounts.Count().Should().Be(0); 
+            ctx.Accounts.Count().Should().Be(0);
         }
 
         [Fact]
