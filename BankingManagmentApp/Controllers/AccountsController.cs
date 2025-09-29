@@ -1,4 +1,4 @@
-﻿using BankingManagmentApp.Data;
+using BankingManagmentApp.Data;
 using BankingManagmentApp.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -46,15 +46,19 @@ namespace BankingManagmentApp.Controllers
 
             return View(accounts);
         }
+
         private string GenerateIBAN()
         {
-            string countryCode = "BG";
-            Random rnd = new Random();
-            string checkDigits = rnd.Next(10, 99).ToString();
+            const string countryCode = "BG";
+            var rnd = new Random();
 
-            string bankCode = "XXXX";
+            var checkDigits = rnd.Next(0, 100).ToString("00");     
+            var bankCode    = rnd.Next(1000, 10000).ToString();    
 
-            string accountNumber = DateTime.Now.Ticks.ToString().Substring(0, 10);
+            var ticks = DateTime.UtcNow.Ticks.ToString();
+            var accountNumber = ticks.Length >= 10
+                ? ticks[^10..]                              
+                : ticks.PadLeft(10, '0');
 
             return $"{countryCode}{checkDigits}{bankCode}{accountNumber}";
         }
@@ -100,6 +104,7 @@ namespace BankingManagmentApp.Controllers
             ViewData["CustomerId"] = new SelectList(_context.Customers, "Id", "Id", accounts.CustomerId);
             return View(accounts);
         }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,IBAN,AccountType,Balance,Currency,CreateAt,Status")] Accounts accounts)
@@ -121,8 +126,6 @@ namespace BankingManagmentApp.Controllers
             ViewData["CustomerId"] = new SelectList(_context.Customers, "Id", "Id", existingAccount.CustomerId);
             return RedirectToAction(nameof(Index));
         }
-
-
 
         public async Task<IActionResult> Delete(int? id)
         {
