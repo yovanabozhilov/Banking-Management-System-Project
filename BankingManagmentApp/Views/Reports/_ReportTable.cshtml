@@ -1,6 +1,21 @@
 @using BankingManagmentApp.ViewModels.Reports
 @model BankingManagmentApp.ViewModels.Reports.ReportResultVm
 
+@{
+    var descDict = Model.TopDescriptionsByType ?? new Dictionary<string, List<DescriptionAggVm>>(System.StringComparer.OrdinalIgnoreCase);
+    var descJson = System.Text.Json.JsonSerializer.Serialize(descDict);
+    var totalsByTypeJson = System.Text.Json.JsonSerializer.Serialize(Model.TotalsByType ?? new Dictionary<string, decimal>(StringComparer.OrdinalIgnoreCase));
+    var netFlowInvariant = Model.NetFlow.ToString(System.Globalization.CultureInfo.InvariantCulture);
+}
+
+@functions{
+    string ShortId(string? id)
+    {
+        if (string.IsNullOrEmpty(id)) return "—";
+        return id.Length <= 12 ? id : id.Substring(0, 8) + "…" + id[^4..];
+    }
+}
+
 @if (Model.Rows.Count == 0)
 {
     <div class="card shadow-sm profile-section">
@@ -23,16 +38,6 @@ else
             </div>
 
             <div class="btn-bar d-flex align-items-center gap-2">
-                <form asp-action="ExportCsv" method="post" class="m-0 p-0">
-                    @Html.AntiForgeryToken()
-                    <input type="hidden" name="Filters.From" value="@(Model.Filters.From?.ToString("yyyy-MM-dd"))" />
-                    <input type="hidden" name="Filters.To" value="@(Model.Filters.To?.ToString("yyyy-MM-dd"))" />
-                    <input type="hidden" name="Filters.AccountId" value="@(Model.Filters.AccountId?.ToString())" />
-                    <input type="hidden" name="Filters.GroupBy" value="@Model.Filters.GroupBy" />
-                    <input type="hidden" name="Filters.CustomerId" value="@Model.Filters.CustomerId" />
-                    <input type="hidden" name="Filters.CustomerName" value="@Model.Filters.CustomerName" />
-                </form>
-
                 <form asp-action="ExportExcel" method="post" class="m-0 p-0">
                     @Html.AntiForgeryToken()
                     <input type="hidden" name="Filters.From" value="@(Model.Filters.From?.ToString("yyyy-MM-dd"))" />
@@ -63,36 +68,31 @@ else
 
         <div class="card-body">
             <div class="row g-3 align-items-stretch mb-3">
-                <div class="col-12 col-md-6">
-                    <div class="p-3 rounded-3 chart-card">
-                        <canvas id="byTypePie"></canvas>
+                @if (Model.TopDescriptionsByType != null && Model.TopDescriptionsByType.Any())
+                {
+                    foreach (var kv in Model.TopDescriptionsByType)
+                    {
+                        var typeKey = kv.Key ?? "Unknown";
+                        var canvasId = "pie_" + typeKey.Replace(" ", "_");
+                        <div class="col-12 col-md-6 col-xl-4">
+                            <div class="p-3 rounded-3 chart-card h-100">
+                                <h6 class="mb-3">Top @typeKey References</h6>
+                                <canvas id="@canvasId"></canvas>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="col-12 col-md-6 col-xl-4">
+                        <div class="p-3 rounded-3 chart-card h-100 text-muted">No reference data.</div>
                     </div>
-                </div>
-                <div class="col-12 col-md-6">
-                    <div class="p-3 rounded-3 chart-card">
-                        <h6 class="mb-2">Breakdown by type</h6>
-                        <ul class="list-unstyled mb-0">
-                            @foreach (var kv in Model.TotalsByType.OrderByDescending(x => x.Value))
-                            {
-                                var pct = Model.TotalByTypeAll == 0 ? 0 : Math.Round((kv.Value / Model.TotalByTypeAll) * 100m, 2);
-                                <li class="mb-2">
-                                    <div class="d-flex justify-content-between">
-                                        <span class="fw-semibold">@kv.Key</span>
-                                        <span class="text-mono">@kv.Value.ToString("N2") (@pct%)</span>
-                                    </div>
-                                    @if (Model.TopDescriptionsByType.TryGetValue(kv.Key, out var list) && list.Any())
-                                    {
-                                        <div class="small text-muted mt-1">
-                                            @for (int i = 0; i < list.Count; i++)
-                                            {
-                                                var d = list[i];
-                                                <span>@(i==0 ? "" : " · ")@d.Description (<span class="text-mono">@d.Total.ToString("N2")</span>)</span>
-                                            }
-                                        </div>
-                                    }
-                                </li>
-                            }
-                        </ul>
+                }
+
+                <div class="col-12 col-md-6 col-xl-4">
+                    <div class="p-3 rounded-3 chart-card h-100">
+                        <h6 class="mb-3">Transaction Type</h6>
+                        <canvas id="pie_cd"></canvas>
                     </div>
                 </div>
             </div>
@@ -108,6 +108,7 @@ else
                             }
                             <th class="text-end nowrap">Transactions</th>
                             <th class="text-end nowrap">Total Amount</th>
+                            <th class="text-end nowrap">Net Flow</th>
                             <th>By type</th>
                             <th class="nowrap">Client</th>
                             <th class="nowrap">Client ID</th>
@@ -126,6 +127,7 @@ else
                             }
                             <td class="text-end text-mono">@r.TotalTransactions</td>
                             <td class="text-end text-mono">@r.TotalAmount.ToString("N2")</td>
+                            <td class="text-end text-mono">@r.NetFlow.ToString("N2")</td>
                             <td>
                                 @if (r.AmountByType != null && r.AmountByType.Any())
                                 {
@@ -144,7 +146,23 @@ else
                                 }
                             </td>
                             <td class="nowrap">@customerLabel</td>
-                            <td class="nowrap text-mono">@customerId</td>
+                            <td class="nowrap text-mono">
+                                @if (!string.IsNullOrWhiteSpace(customerId) && customerId != "—")
+                                {
+                                    <span title="@customerId">@ShortId(customerId)</span>
+                                    <button type="button"
+                                            class="btn btn-link p-0 ms-1 align-baseline copy-id-btn"
+                                            data-copy-id="@customerId"
+                                            title="Copy Client ID"
+                                            aria-label="Copy Client ID">
+                                        <i class="fas fa-copy" style="color:#8b5cf6;"></i>
+                                    </button>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">—</span>
+                                }
+                            </td>
                         </tr>
                     }
                     </tbody>
@@ -157,6 +175,7 @@ else
                             }
                             <th class="text-end text-mono">@Model.GrandTotalTransactions</th>
                             <th class="text-end text-mono">@Model.GrandTotalAmount.ToString("N2")</th>
+                            <th class="text-end text-mono">@Model.NetFlow.ToString("N2")</th>
                             <th colspan="3"></th>
                         </tr>
                     </tfoot>
@@ -167,48 +186,158 @@ else
 
     <script>
         (function () {
-            const ctx = document.getElementById('byTypePie');
-            if (!ctx) return;
-
-            const dataMap = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.TotalsByType));
-            const labels = Object.keys(dataMap);
-            const values = Object.values(dataMap).map(v => Number(v));
+            const descByType = @Html.Raw(descJson);
+            const totalsByType = @Html.Raw(totalsByTypeJson);
+            const netFromServer = Number('@netFlowInvariant');
 
             const palette = [
                 '#4f46e5', '#10b981', '#ef4444', '#f59e0b', '#14b8a6',
-                '#8b5cf6', '#22c55e', '#3b82f6', '#e11d48', '#0ea5e9'
+                '#8b5cf6', '#22c55e', '#3b82f6', '#e11d48', '#0ea5e9',
+                '#6366f1', '#84cc16'
             ];
-            const colors = labels.map((_, i) => palette[i % palette.length]);
 
-            const total = values.reduce((a, b) => a + b, 0);
-            const pct = v => total === 0 ? 0 : Math.round((v / total) * 1000) / 10; // 1 decimal
+            function topNPlusOther(items, n) {
+                const list = (items || []).map(x => ({
+                    label: x.Description || '—',
+                    value: Number(x.Total || 0)
+                }));
+                list.sort((a, b) => b.value - a.value);
+                const head = list.slice(0, n);
+                const tailSum = list.slice(n).reduce((s, x) => s + x.value, 0);
+                if (tailSum > 0) head.push({ label: 'Other', value: tailSum });
+                return head;
+            }
 
-            new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels,
-                    datasets: [{
-                        data: values,
-                        backgroundColor: colors,
-                        borderWidth: 0
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: { position: 'bottom', labels: { usePointStyle: true } },
-                        tooltip: {
-                            callbacks: {
-                                label: (ctx) => {
-                                    const label = ctx.label || '';
-                                    const v = ctx.parsed || 0;
-                                    return `${label}: ${v.toLocaleString()} (${pct(v)}%)`;
+            function topNPlusOtherPairs(pairs, n) {
+                const list = (pairs || [])
+                    .map(([k, v]) => ({ label: k || 'Unknown', value: Number(v || 0) }))
+                    .filter(x => x.value !== 0);
+                list.sort((a, b) => b.value - a.value);
+                const head = list.slice(0, n);
+                const tailSum = list.slice(n).reduce((s, x) => s + x.value, 0);
+                if (tailSum > 0) head.push({ label: 'Other', value: tailSum });
+                return head;
+            }
+
+            function formatAmount(n) {
+                return Number(n || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            }
+
+            function renderPie(canvasId, items) {
+                const el = document.getElementById(canvasId);
+                if (!el || !items || !items.length || typeof Chart === 'undefined') return;
+
+                const top = topNPlusOther(items, 8);
+                const labels = top.map(x => x.label);
+                const values = top.map(x => x.value);
+                const total = values.reduce((a, b) => a + b, 0) || 1;
+                const colors = labels.map((_, i) => palette[i % palette.length]);
+
+                new Chart(el, {
+                    type: 'doughnut',
+                    data: { labels, datasets: [{ data: values, backgroundColor: colors, borderWidth: 0 }] },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: { position: 'bottom', labels: { usePointStyle: true } },
+                            tooltip: {
+                                callbacks: {
+                                    label: (ctx) => {
+                                        const v = Number(ctx.parsed) || 0;
+                                        const pct = Math.round((v / total) * 1000) / 10;
+                                        return `${ctx.label}: ${formatAmount(v)} (${pct}%)`;
+                                    }
                                 }
                             }
-                        }
-                    },
-                    cutout: '60%'
+                        },
+                        cutout: '60%'
+                    }
+                });
+            }
+
+            if (descByType && typeof descByType === 'object') {
+                Object.keys(descByType).forEach(typeKey => {
+                    const list = descByType[typeKey] || [];
+                    const id = 'pie_' + String(typeKey).replace(/\s+/g, '_');
+                    renderPie(id, list);
+                });
+            }
+
+            (function renderTotalsByType() {
+                const el = document.getElementById('pie_cd');
+                if (!el || typeof Chart === 'undefined') return;
+
+                const entries = Object.entries(totalsByType || {});
+                if (!entries.length) {
+                    el.parentElement.innerHTML = '<div class="text-muted">No data.</div>';
+                    return;
                 }
+
+                const top = topNPlusOtherPairs(entries, 8);
+                const labels = top.map(x => x.label);
+                const values = top.map(x => x.value);
+                const sum = values.reduce((a, b) => a + b, 0) || 1;
+
+                const centerText = {
+                    id: 'centerText',
+                    afterDraw(chart) {
+                        const {ctx, chartArea: {left, right, top, bottom}} = chart;
+                        ctx.save();
+                        const x = (left + right) / 2;
+                        const y = (top + bottom) / 2;
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        ctx.font = '600 12px Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial';
+                        ctx.fillStyle = '#475569';
+                        ctx.fillText('Net Flow', x, y - 10);
+                        ctx.font = '700 14px Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial';
+                        ctx.fillStyle = '#111827';
+                        ctx.fillText(formatAmount(netFromServer), x, y + 8);
+                        ctx.restore();
+                    }
+                };
+
+                new Chart(el, {
+                    type: 'doughnut',
+                    data: {
+                        labels,
+                        datasets: [{
+                            data: values,
+                            backgroundColor: labels.map((_, i) => palette[i % palette.length]),
+                            borderWidth: 0
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: { position: 'bottom', labels: { usePointStyle: true } },
+                            tooltip: {
+                                callbacks: {
+                                    label: (ctx) => {
+                                        const v = Number(ctx.parsed) || 0;
+                                        const pct = Math.round((v / sum) * 1000) / 10;
+                                        return `${ctx.label}: ${formatAmount(v)} (${pct}%)`;
+                                    }
+                                }
+                            }
+                        },
+                        cutout: '60%'
+                    },
+                    plugins: [centerText]
+                });
+            })();
+
+            // Copy Client ID (purple button) — copies full ID from data-copy-id
+            document.addEventListener('click', function (e) {
+                const btn = e.target.closest('.copy-id-btn');
+                if (!btn) return;
+                const val = btn.getAttribute('data-copy-id') || '';
+                if (!val) return;
+                navigator.clipboard.writeText(val).then(() => {
+                    // Optional quick visual feedback
+                    btn.classList.add('opacity-75');
+                    setTimeout(() => btn.classList.remove('opacity-75'), 300);
+                });
             });
         })();
     </script>
