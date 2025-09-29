@@ -46,7 +46,7 @@ namespace BankingManagmentApp.Tests.Services.AI
             using var db = NewDb();
             var kb = new KnowledgeBaseService(db);
 
-            var resEmpty = await kb.SearchAsync("a"); // < 2 символа
+            var resEmpty = await kb.SearchAsync("a"); 
             Assert.Empty(resEmpty);
         }
     }

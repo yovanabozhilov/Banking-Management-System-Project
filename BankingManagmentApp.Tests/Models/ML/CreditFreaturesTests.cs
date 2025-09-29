@@ -1,4 +1,3 @@
-// File: BankingManagmentApp.Tests/Models/ML/CreditFeaturesTests.cs
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -23,7 +22,6 @@ namespace BankingManagmentApp.Tests.Models.ML
 
         public async Task InitializeAsync()
         {
-            // Позволяваме пълен override с TEST_SQLSERVER_CSTR
             var cstrEnv = Environment.GetEnvironmentVariable("TEST_SQLSERVER_CSTR");
             if (!string.IsNullOrWhiteSpace(cstrEnv))
             {
@@ -43,7 +41,6 @@ namespace BankingManagmentApp.Tests.Models.ML
             }
             else
             {
-                // По подразбиране: локален SQL Server
                 var host = Environment.GetEnvironmentVariable("TEST_SQLSERVER_HOST") ?? "localhost";
                 var port = Environment.GetEnvironmentVariable("TEST_SQLSERVER_PORT") ?? "1433";
                 var user = Environment.GetEnvironmentVariable("TEST_SQLSERVER_USER") ?? "sa";
@@ -52,7 +49,7 @@ namespace BankingManagmentApp.Tests.Models.ML
                 var baseCstr = $"Server={host},{port};User Id={user};Password={pass};TrustServerCertificate=True;Connect Timeout=2;";
                 _dbName = $"test_cf_{Guid.NewGuid():N}";
 
-                _serverCstr = baseCstr; // без Initial Catalog
+                _serverCstr = baseCstr; 
                 _serverCstrMaster = baseCstr + "Database=master;";
                 _dbCstr = baseCstr + $"Database={_dbName};";
             }
@@ -72,7 +69,7 @@ namespace BankingManagmentApp.Tests.Models.ML
                 cmd.Parameters.AddWithValue("@n", _dbName);
                 await cmd.ExecuteNonQueryAsync();
             }
-            catch { /* ignore */ }
+            catch { }
         }
 
         [Fact]
@@ -84,10 +81,8 @@ namespace BankingManagmentApp.Tests.Models.ML
                 await RunInMemoryAsync();
         }
 
-        // ---------------- SQL Server path ----------------
         private async Task RunAgainstSqlServerAsync()
         {
-            // 1) Създай временна база
             using (var conn = new SqlConnection(_serverCstrMaster))
             {
                 await conn.OpenAsync();
@@ -96,13 +91,11 @@ namespace BankingManagmentApp.Tests.Models.ML
                 await cmd.ExecuteNonQueryAsync();
             }
 
-            // 2) EF схема
             using (var ctx = await NewSqlServerContextAsync())
             {
                 await ctx.Database.EnsureCreatedAsync();
             }
 
-            // 3) VIEW (T-SQL) – типове за double? => FLOAT; паричните остават DECIMAL
             var createViewSql = @"
 CREATE OR ALTER VIEW dbo.vw_CreditFeatures AS
 WITH Monthly AS (
@@ -171,7 +164,6 @@ LEFT JOIN TxAgg  t ON t.UserId = u.UserId;
                 await ctx.Database.ExecuteSqlRawAsync(createViewSql);
             }
 
-            // 4) Seed
             int acc1Id, acc2Id, loan1Id, loan2Id;
             using (var ctx = await NewSqlServerContextAsync())
             {
@@ -200,10 +192,8 @@ LEFT JOIN TxAgg  t ON t.UserId = u.UserId;
                 );
 
                 ctx.Transactions.AddRange(
-                    // 2024-01
                     new Transactions { AccountsId = acc1Id, TransactionType = "Credit", Amount = 1000m, Date = DateOnly.FromDateTime(new DateTime(2024, 1, 15)) },
                     new Transactions { AccountsId = acc1Id, TransactionType = "Debit",  Amount =  300m, Date = DateOnly.FromDateTime(new DateTime(2024, 1, 20)) },
-                    // 2024-02
                     new Transactions { AccountsId = acc2Id, TransactionType = "Credit", Amount =  500m, Date = DateOnly.FromDateTime(new DateTime(2024, 2, 10)) },
                     new Transactions { AccountsId = acc2Id, TransactionType = "Debit",  Amount =  100m, Date = DateOnly.FromDateTime(new DateTime(2024, 2, 12)) }
                 );
@@ -211,7 +201,6 @@ LEFT JOIN TxAgg  t ON t.UserId = u.UserId;
                 await ctx.SaveChangesAsync();
             }
 
-            // 5) Assert през VIEW
             using (var ctx = await NewSqlServerContextAsync())
             {
                 var row = await ctx.Set<CreditFeatures>().SingleAsync(x => x.UserId == "u1");
@@ -232,7 +221,6 @@ LEFT JOIN TxAgg  t ON t.UserId = u.UserId;
             }
         }
 
-        // ---------------- InMemory fallback ----------------
         private async Task RunInMemoryAsync()
         {
             var options = new DbContextOptionsBuilder<ApplicationDbContext>()
@@ -273,7 +261,6 @@ LEFT JOIN TxAgg  t ON t.UserId = u.UserId;
             );
             await ctx.SaveChangesAsync();
 
-            // Ръчно „вю“ изчисление
             var totalBalance = ctx.Accounts.Where(x => x.CustomerId == "u1").Sum(x => x.Balance);
             var numAccounts  = ctx.Accounts.Count(x => x.CustomerId == "u1");
             var loans        = ctx.Loans.Where(x => x.CustomerId == "u1").ToList();
@@ -328,7 +315,6 @@ LEFT JOIN TxAgg  t ON t.UserId = u.UserId;
             row.AvgMonthlyOutflow.Should().Be(200m);
         }
 
-        // ---------------- helpers ----------------
         private async Task<bool> CanConnectAsync(string cstr)
         {
             try

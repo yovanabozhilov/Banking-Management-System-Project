@@ -16,7 +16,7 @@ namespace BankingManagmentApp.Tests.Services
         private static ApplicationDbContext CreateContext()
         {
             var options = new DbContextOptionsBuilder<ApplicationDbContext>()
-                .UseInMemoryDatabase(Guid.NewGuid().ToString()) // isolated DB per test
+                .UseInMemoryDatabase(Guid.NewGuid().ToString()) 
                 .Options;
             return new ApplicationDbContext(options);
         }
@@ -73,13 +73,9 @@ namespace BankingManagmentApp.Tests.Services
             var today = DateOnly.FromDateTime(DateTime.Today);
 
             ctx.LoanRepayments.AddRange(
-                // Overdue
                 new LoanRepayments { LoanId = loan.Id, DueDate = today.AddDays(-5), AmountDue = 100, AmountPaid = 0, Status = "" },
-                // Due today
                 new LoanRepayments { LoanId = loan.Id, DueDate = today, AmountDue = 200, AmountPaid = 0, Status = "" },
-                // Scheduled
                 new LoanRepayments { LoanId = loan.Id, DueDate = today.AddDays(5), AmountDue = 300, AmountPaid = 0, Status = "" },
-                // Paid
                 new LoanRepayments { LoanId = loan.Id, DueDate = today, AmountDue = 400, AmountPaid = 400, Status = "" }
             );
             await ctx.SaveChangesAsync();
@@ -95,7 +91,7 @@ namespace BankingManagmentApp.Tests.Services
             Assert.Equal("Due", reps[1].Status);
             Assert.Equal("Scheduled", reps[2].Status);
             Assert.Equal("Paid", reps[3].Status);
-            Assert.NotNull(reps[3].PaymentDate); // should set PaymentDate when Paid
+            Assert.NotNull(reps[3].PaymentDate); 
         }
 
         [Fact]
@@ -126,7 +122,7 @@ namespace BankingManagmentApp.Tests.Services
             var rep2 = ctx.LoanRepayments.First(r => r.LoanId == loan2.Id);
 
             Assert.Equal("Overdue", rep1.Status);
-            Assert.Equal("", rep2.Status); // untouched
+            Assert.Equal("", rep2.Status); 
         }
     }
 }

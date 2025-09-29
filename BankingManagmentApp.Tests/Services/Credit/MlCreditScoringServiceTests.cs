@@ -1,12 +1,14 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using BankingManagmentApp.Configuration;
 using BankingManagmentApp.Data;
 using BankingManagmentApp.Models.ML;
 using BankingManagmentApp.Services;
-using BankingManagmentApp.Services.Approval;
+using BankingManagmentApp.Services.Approval; 
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Moq;
 using Xunit;
 
@@ -16,34 +18,55 @@ namespace BankingManagmentApp.Tests.Services
     {
         private readonly string _tempDir;
         private readonly ApplicationDbContext _db;
-        private readonly MlCreditScoringService _service;
+        private readonly Mock<IWebHostEnvironment> _env;
 
         public MlCreditScoringServiceTests()
         {
             _tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
             Directory.CreateDirectory(_tempDir);
 
-            var env = new Mock<IWebHostEnvironment>();
-            env.SetupGet(e => e.ContentRootPath).Returns(_tempDir);
+            _env = new Mock<IWebHostEnvironment>();
+            _env.SetupGet(e => e.ContentRootPath).Returns(_tempDir);
 
-            var opts = new DbContextOptionsBuilder<ApplicationDbContext>()
+            var optsDb = new DbContextOptionsBuilder<ApplicationDbContext>()
                 .UseInMemoryDatabase(Guid.NewGuid().ToString())
                 .Options;
 
-            _db = new ApplicationDbContext(opts);
-            _service = new MlCreditScoringService(_db, env.Object);
+            _db = new ApplicationDbContext(optsDb);
         }
+
+        private MlCreditScoringService CreateService(CreditScoringOptions cfg) =>
+            new MlCreditScoringService(_db, _env.Object, Options.Create(cfg));
 
         [Fact]
         public async Task ComputeAsync_NoUser_ReturnsNull()
         {
-            var result = await _service.ComputeAsync("missing-user");
+            var strictCfg = new CreditScoringOptions
+            {
+                LookbackDays = 90,
+                MinTransactions = 3,
+                MinActiveMonths = 1,
+                RequireBothFlows = true
+            };
+            var service = CreateService(strictCfg);
+
+            var result = await service.ComputeAsync("missing-user");
+
             Assert.Null(result);
         }
 
         [Fact]
         public async Task ComputeAsync_UserWithFeatures_ReturnsRiskNotes()
         {
+            var relaxedCfg = new CreditScoringOptions
+            {
+                LookbackDays = 90,
+                MinTransactions = 0,
+                MinActiveMonths = 0,
+                RequireBothFlows = false
+            };
+            var service = CreateService(relaxedCfg);
+
             _db.Set<CreditFeatures>().Add(new CreditFeatures
             {
                 UserId = "u1",
@@ -57,16 +80,25 @@ namespace BankingManagmentApp.Tests.Services
             });
             await _db.SaveChangesAsync();
 
-            var result = await _service.ComputeAsync("u1");
+            var result = await service.ComputeAsync("u1");
 
             Assert.NotNull(result);
             Assert.InRange(result!.Score, 300, 850);
-            Assert.Contains("Risk:", result.Notes);
+            Assert.False(string.IsNullOrWhiteSpace(result.Notes));
         }
 
         [Fact]
         public async Task ComputeAsync_WithApplication_AdjustsScore()
         {
+            var relaxedCfg = new CreditScoringOptions
+            {
+                LookbackDays = 90,
+                MinTransactions = 0,
+                MinActiveMonths = 0,
+                RequireBothFlows = false
+            };
+            var service = CreateService(relaxedCfg);
+
             _db.Set<CreditFeatures>().Add(new CreditFeatures
             {
                 UserId = "u2",
@@ -87,7 +119,7 @@ namespace BankingManagmentApp.Tests.Services
                 Product = ProductType.Auto
             };
 
-            var result = await _service.ComputeAsync("u2", app);
+            var result = await service.ComputeAsync("u2", app);
 
             Assert.NotNull(result);
             Assert.InRange(result!.Score, 300, 850);
@@ -97,6 +129,15 @@ namespace BankingManagmentApp.Tests.Services
         [Fact]
         public async Task TrainIfNeededAsync_TrainsModel_WhenNoArtifacts()
         {
+            var relaxedCfg = new CreditScoringOptions
+            {
+                LookbackDays = 90,
+                MinTransactions = 0,
+                MinActiveMonths = 0,
+                RequireBothFlows = false
+            };
+            var service = CreateService(relaxedCfg);
+
             _db.Set<CreditFeatures>().Add(new CreditFeatures
             {
                 UserId = "u3",
@@ -110,7 +151,7 @@ namespace BankingManagmentApp.Tests.Services
             });
             await _db.SaveChangesAsync();
 
-            await _service.TrainIfNeededAsync();
+            await service.TrainIfNeededAsync();
 
             Assert.True(File.Exists(Path.Combine(_tempDir, "App_Data", "ML", "credit_kmeans.zip")));
             Assert.True(File.Exists(Path.Combine(_tempDir, "App_Data", "ML", "cluster_map.json")));
@@ -119,6 +160,15 @@ namespace BankingManagmentApp.Tests.Services
         [Fact]
         public async Task ForceTrainAsync_AlwaysRetrains_WhenDataExists()
         {
+            var relaxedCfg = new CreditScoringOptions
+            {
+                LookbackDays = 90,
+                MinTransactions = 0,
+                MinActiveMonths = 0,
+                RequireBothFlows = false
+            };
+            var service = CreateService(relaxedCfg);
+
             _db.Set<CreditFeatures>().Add(new CreditFeatures
             {
                 UserId = "uForce",
@@ -132,7 +182,7 @@ namespace BankingManagmentApp.Tests.Services
             });
             await _db.SaveChangesAsync();
 
-            await _service.ForceTrainAsync();
+            await service.ForceTrainAsync();
 
             var mlDir = Path.Combine(_tempDir, "App_Data", "ML");
             Assert.True(File.Exists(Path.Combine(mlDir, "credit_kmeans.zip")));

@@ -12,10 +12,6 @@ using Xunit;
 
 namespace BankingManagmentApp.Tests.Services.AI
 {
-    /// <summary>
-    /// Fake IChatClient – не бива да се вика в тези тестове (те покриват само tool-пътя).
-    /// Ако бъде извикан, хвърля изключение.
-    /// </summary>
     internal sealed class ThrowingChatClient : IChatClient
     {
         public Task<ChatResponse> GetResponseAsync(
@@ -37,7 +33,6 @@ namespace BankingManagmentApp.Tests.Services.AI
 
         public object? GetService(Type serviceType, object? settings) => null;
 
-        // изискван от IDisposable
         public void Dispose() { }
     }
 
@@ -107,7 +102,7 @@ namespace BankingManagmentApp.Tests.Services.AI
             var (svc, _, userId) = BuildService();
             var txt = await svc.SendAsync("How much is my balance?", userId, "Ivan");
             Assert.Contains("Your total balance across accounts is", txt);
-            Assert.Contains("150.00", txt); // 100 + 50
+            Assert.Contains("150.00", txt); 
         }
 
         [Fact]

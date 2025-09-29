@@ -57,7 +57,6 @@ namespace BankingManagmentApp.Tests.Services.AI
             var list = await tools.GetRecentTransactionsAsync("u1", 2);
             Assert.Equal(2, list.Count);
 
-            // dynamic object -> четем с reflection както прави AiChatService
             var first = list[0];
             var iban = first.GetType().GetProperty("AccountIban")!.GetValue(first)?.ToString();
             Assert.Contains("BG11AAAA", iban);

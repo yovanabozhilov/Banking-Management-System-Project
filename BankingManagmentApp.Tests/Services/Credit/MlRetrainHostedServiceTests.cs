@@ -14,14 +14,11 @@ namespace BankingManagmentApp.Tests.Services
         [Fact]
         public void NextOccurrence_ReturnsToday_WhenFutureTime()
         {
-            // Arrange
             var now = new DateTime(2025, 9, 18, 2, 0, 0);
             var at = new TimeSpan(3, 15, 0);
 
-            // Act
             var next = InvokeNextOccurrence(now, at);
 
-            // Assert
             Assert.Equal(new DateTime(2025, 9, 18, 3, 15, 0), next);
         }
 
@@ -39,7 +36,6 @@ namespace BankingManagmentApp.Tests.Services
         [Fact]
         public async Task ExecuteAsync_Calls_TrainIfNeeded_Then_ForceTrain()
         {
-            // Arrange
             var scoringMock = new Mock<ICreditScoringService>();
             scoringMock.Setup(s => s.TrainIfNeededAsync(It.IsAny<CancellationToken>()))
                        .Returns(Task.CompletedTask)
@@ -58,21 +54,13 @@ namespace BankingManagmentApp.Tests.Services
             var svc = new MlRetrainHostedService(provider, logger.Object);
 
             using var cts = new CancellationTokenSource();
-            cts.CancelAfter(TimeSpan.FromMilliseconds(200)); // stop quickly
+            cts.CancelAfter(TimeSpan.FromMilliseconds(200)); 
 
-            // Act
             await svc.StartAsync(cts.Token);
 
-            // Assert
             scoringMock.Verify(s => s.TrainIfNeededAsync(It.IsAny<CancellationToken>()), Times.AtLeastOnce);
-            // ForceTrain might or might not run depending on the timing,
-            // so we don't assert it strictly. If you want to ensure it's called,
-            // you could reduce the scheduled delay in the service for testability.
         }
 
-        /// <summary>
-        /// Uses reflection to call private static NextOccurrence for pure unit testing.
-        /// </summary>
         private static DateTime InvokeNextOccurrence(DateTime now, TimeSpan at)
         {
             var method = typeof(MlRetrainHostedService)

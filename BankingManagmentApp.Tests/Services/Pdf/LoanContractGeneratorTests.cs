@@ -26,9 +26,6 @@ namespace BankingManagmentApp.Tests.Services.Pdf
         private static string Normalize(string s) =>
             new string(s.Where(ch => !char.IsWhiteSpace(ch)).ToArray());
 
-        /// <summary>
-        /// Safe setter for date-like properties that may be DateOnly/DateTime (nullable or not).
-        /// </summary>
         private static void SetDateProperty(object obj, string propertyName, int year, int month, int day)
         {
             var prop = obj.GetType().GetProperty(propertyName, BindingFlags.Public | BindingFlags.Instance)
@@ -41,7 +38,6 @@ namespace BankingManagmentApp.Tests.Services.Pdf
             if (coreType == typeof(DateOnly))
             {
                 var value = new DateOnly(year, month, day);
-                // box as nullable if needed
                 object boxed = isNullable ? (DateOnly?)value : value;
                 prop.SetValue(obj, boxed);
             }
@@ -80,7 +76,6 @@ namespace BankingManagmentApp.Tests.Services.Pdf
                     }
                 };
 
-                // Set dates safely regardless of model type (DateOnly/DateTime)
                 SetDateProperty(loan, "Term", 2026, 12, 31);
                 SetDateProperty(loan, "ApprovalDate", 2025, 1, 15);
 
@@ -97,16 +92,14 @@ namespace BankingManagmentApp.Tests.Services.Pdf
                 Assert.Contains("ClientName:IvanPetrov", norm);
                 Assert.Contains("LoanID:42", norm);
 
-                // сума с локалното форматиране (bg-BG, N2) + " BGN"
                 var amountFormatted = loan.ApprovedAmount.ToString("N2", CultureInfo.CurrentCulture);
                 Assert.Contains(Normalize($"Loan Amount: {amountFormatted} BGN"), norm);
 
-                // очекувани датуми (текстот во PDF е без празнини по Normalize)
                 Assert.Contains("LoanTerm:until31.12.2026", norm);
                 Assert.Contains("ApprovalDate:15.01.2025", norm);
 
                 Assert.Contains("TermsandConditions:", norm);
-                Assert.Contains("Client’sSignature", norm); // може да се појави и како "Client's"
+                Assert.Contains("Client’sSignature", norm); 
             }
             finally
             {
@@ -122,7 +115,6 @@ namespace BankingManagmentApp.Tests.Services.Pdf
             {
                 Id = 7,
                 ApprovedAmount = 5000m,
-                // намерно null клиент (ако е ненулабилен во моделот, ова е тест-случај)
                 Customer = null!
             };
 
@@ -137,7 +129,6 @@ namespace BankingManagmentApp.Tests.Services.Pdf
 
             var norm = Normalize(ExtractAllText(pdf));
 
-            // Редът с името съществува, дори и да е празен
             Assert.Contains("ClientName:", norm);
             Assert.Contains("LoanID:7", norm);
             Assert.Contains("BGN", norm);

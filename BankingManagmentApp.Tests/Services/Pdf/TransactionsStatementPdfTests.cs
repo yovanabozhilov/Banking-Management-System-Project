@@ -24,13 +24,12 @@ namespace BankingManagmentApp.Tests.Services.Pdf
             return sb.ToString();
         }
 
-        // по-устойчива нормализация: маха whitespace, NBSP/zero-width, и разплита лигатури (ﬀ/ﬁ/ﬂ/ﬃ/ﬄ)
         private static string Normalize(string s)
         {
             if (s == null) return string.Empty;
 
-            s = s.Replace("\u00A0", " ")   // NBSP
-                 .Replace("\u200B", "")    // zero-width space
+            s = s.Replace("\u00A0", " ")   
+                 .Replace("\u200B", "")    
                  .Replace("\uFB00", "ff")
                  .Replace("\uFB01", "fi")
                  .Replace("\uFB02", "fl")
@@ -107,7 +106,6 @@ namespace BankingManagmentApp.Tests.Services.Pdf
             var text = ExtractAllText(pdf);
             var norm = Normalize(text);
 
-            // Заглавие: позволяваме и ед. число, и разплитаме лигатури (напр. Oﬀicial)
             Assert.True(
                 norm.Contains("OfficialTransactionsStatement") ||
                 norm.Contains("OfficialTransactionStatement"),
@@ -118,7 +116,6 @@ namespace BankingManagmentApp.Tests.Services.Pdf
             Assert.Contains("IBAN:BG80BNBG96611020345678", norm);
             Assert.Contains("Currency:BGN", norm);
 
-            // Период: някои рендери слагат '-' вместо '–'
             Assert.True(
                 norm.Contains("Period:01.01.2025–31.01.2025") ||
                 norm.Contains("Period:01.01.2025-31.01.2025"),
@@ -136,13 +133,11 @@ namespace BankingManagmentApp.Tests.Services.Pdf
 
             var norm = Normalize(ExtractAllText(doc.GeneratePdf()));
 
-            // Общо транзакции
             Assert.Contains("Totaltransactions:3", norm);
 
-            // Суми: credits=1500+200=1700, debits=300, net=1400 (форматирани с bg-BG "N2")
-            string fCredits = (1500m + 200m).ToString("N2", ci); // 1 700,00 => нормализирано: 1700,00
-            string fDebits  = (300m).ToString("N2", ci);         // 300,00
-            string fNet     = (1700m - 300m).ToString("N2", ci); // 1 400,00
+            string fCredits = (1500m + 200m).ToString("N2", ci); 
+            string fDebits  = (300m).ToString("N2", ci);        
+            string fNet     = (1700m - 300m).ToString("N2", ci); 
 
             Assert.Contains(Normalize($"Credits (+): {fCredits}"), norm);
             Assert.Contains(Normalize($"Debits (-): {fDebits}"), norm);
@@ -159,7 +154,6 @@ namespace BankingManagmentApp.Tests.Services.Pdf
 
             var norm = Normalize(ExtractAllText(doc.GeneratePdf()));
 
-            // Хедъри на таблицата
             Assert.Contains("Date", norm);
             Assert.Contains("Description", norm);
             Assert.Contains("Type", norm);
@@ -168,12 +162,10 @@ namespace BankingManagmentApp.Tests.Services.Pdf
             Assert.Contains("Ref.", norm);
             Assert.Contains("IBAN", norm);
 
-            // Префикси +/-
             Assert.Contains("+1500,00", norm);
             Assert.Contains("-300,00",  norm);
             Assert.Contains("+200,00",  norm);
 
-            // Референции и валута
             Assert.Contains("123", norm);
             Assert.Contains("456", norm);
             Assert.Contains("789", norm);
