@@ -1,194 +1,240 @@
-using System;
-using System.IO;
-using System.Linq;
 using BankingManagmentApp.ViewModels.Reports;
-using ClosedXML.Excel;
+using QuestPDF.Fluent;
+using QuestPDF.Helpers;
+using QuestPDF.Infrastructure;
+using System;
+using System.Linq;
 
-namespace BankingManagmentApp.Services.Excel
+namespace BankingManagmentApp.Services.Pdf
 {
-    public static class FinancialReportExcel
+    public class FinancialReportPdf : IDocument
     {
-        public static byte[] Build(ReportResultVm vm)
+        private readonly ReportResultVm _vm;
+        public FinancialReportPdf(ReportResultVm vm) => _vm = vm;
+
+        public DocumentMetadata GetMetadata() => new DocumentMetadata
         {
-            using var wb = new XLWorkbook();
+            Title = "Financial Report",
+            Author = "BankingManagementApp",
+            Subject = "Aggregated transactions report"
+        };
 
-            var wsSummary = wb.AddWorksheet("Summary");
-            int r = 1;
-
-            wsSummary.Cell(r++, 1).Value = "Financial Report";
-            wsSummary.Cell(r++, 1).Value = $"Period: {vm.Filters.From:yyyy-MM-dd} → {vm.Filters.To:yyyy-MM-dd}";
-            wsSummary.Cell(r++, 1).Value = $"Group by: {vm.Filters.GroupBy}";
-            wsSummary.Cell(r++, 1).Value = $"Account: {vm.Filters.SelectedAccountLabel}";
-            if (!string.IsNullOrWhiteSpace(vm.SelectedCustomerName) || !string.IsNullOrWhiteSpace(vm.SelectedCustomerId))
-                wsSummary.Cell(r++, 1).Value = $"Client: {vm.SelectedCustomerName} ({vm.SelectedCustomerId})";
-            r++;
-
-            var kpiStart = r;
-            wsSummary.Cell(r, 1).Value = "Transactions";
-            wsSummary.Cell(r++, 2).Value = vm.GrandTotalTransactions;
-
-            wsSummary.Cell(r, 1).Value = "Credits";
-            wsSummary.Cell(r++, 2).Value = vm.TotalCredits;
-
-            wsSummary.Cell(r, 1).Value = "Debits";
-            wsSummary.Cell(r++, 2).Value = vm.TotalDebits;
-
-            wsSummary.Cell(r, 1).Value = "Net Flow";
-            wsSummary.Cell(r++, 2).Value = vm.NetFlow;
-
-            wsSummary.Range(kpiStart, 1, r - 1, 1).Style.Font.SetBold();
-            wsSummary.Range(kpiStart, 2, r - 1, 2).Style.NumberFormat.Format = "#,##0.00";
-
-            r += 1;
-
-            if (vm.TotalsByType != null && vm.TotalsByType.Any())
+        public void Compose(IDocumentContainer container)
+        {
+            container.Page(page =>
             {
-                wsSummary.Cell(r++, 1).Value = "Totals by Transaction Type";
-                wsSummary.Cell(r, 1).Value = "Type";
-                wsSummary.Cell(r, 2).Value = "Amount";
-                wsSummary.Cell(r, 3).Value = "Percent";
-                wsSummary.Range(r, 1, r, 3).Style.Font.SetBold();
-                r++;
+                page.Size(PageSizes.A4);
+                page.Margin(30);
+                page.DefaultTextStyle(x => x.FontSize(10));  
 
-                var total = vm.TotalByTypeAll;
-                foreach (var kv in vm.TotalsByType.OrderByDescending(x => x.Value))
+                page.Header().Column(col =>
                 {
-                    wsSummary.Cell(r, 1).Value = string.IsNullOrWhiteSpace(kv.Key) ? "Unknown" : kv.Key;
-                    wsSummary.Cell(r, 2).Value = kv.Value;
-                    wsSummary.Cell(r, 3).Value = total == 0 ? 0 : Math.Round((kv.Value / total) * 100m, 2);
-                    r++;
-                }
+                    col.Item().Text("Financial Report").FontSize(14).SemiBold();
 
-                wsSummary.Range(kpiStart, 2, r - 1, 2).Style.NumberFormat.Format = "#,##0.00";
-                wsSummary.Range(kpiStart, 3, r - 1, 3).Style.NumberFormat.Format = "0.00%";
-                r += 1;
-            }
-
-            if (vm.TopDescriptionsByType != null && vm.TopDescriptionsByType.Any())
-            {
-                wsSummary.Cell(r++, 1).Value = "Top References by Type";
-                wsSummary.Cell(r, 1).Value = "Type";
-                wsSummary.Cell(r, 2).Value = "Reference";
-                wsSummary.Cell(r, 3).Value = "Amount";
-                wsSummary.Range(r, 1, r, 3).Style.Font.SetBold();
-                r++;
-
-                foreach (var type in vm.TopDescriptionsByType.Keys.OrderBy(k => k))
-                {
-                    foreach (var d in vm.TopDescriptionsByType[type].OrderByDescending(x => x.Total))
+                    col.Item().Text(t =>
                     {
-                        wsSummary.Cell(r, 1).Value = string.IsNullOrWhiteSpace(type) ? "Unknown" : type;
-                        wsSummary.Cell(r, 2).Value = string.IsNullOrWhiteSpace(d.Description) ? "—" : d.Description;
-                        wsSummary.Cell(r, 3).Value = d.Total;
-                        r++;
+                        t.Span("Period: ").SemiBold();
+                        t.Span($"{_vm.Filters.From:yyyy-MM-dd} → {_vm.Filters.To:yyyy-MM-dd}");
+                    });
+
+                    col.Item().Text(t =>
+                    {
+                        t.Span("Group by: ").SemiBold();
+                        t.Span(_vm.Filters.GroupBy.ToString());
+                    });
+
+                    col.Item().Text(t =>
+                    {
+                        t.Span("Account: ").SemiBold();
+                        t.Span(_vm.Filters.SelectedAccountLabel ?? "All accounts");
+                    });
+
+                    if (!string.IsNullOrWhiteSpace(_vm.SelectedCustomerName) ||
+                        !string.IsNullOrWhiteSpace(_vm.SelectedCustomerId))
+                    {
+                        col.Item().Text(t =>
+                        {
+                            t.Span("Client: ").SemiBold();
+                            t.Span($"{_vm.SelectedCustomerName} ({_vm.SelectedCustomerId})");
+                        });
                     }
-                }
-                wsSummary.Range(kpiStart, 3, r - 1, 3).Style.NumberFormat.Format = "#,##0.00";
-            }
 
-            wsSummary.Columns().AdjustToContents();
+                    col.Item().PaddingTop(8).Height(1).Background(Colors.Grey.Lighten2);
+                });
 
-
-            var ws = wb.AddWorksheet("Results");
-            r = 1;
-
-            int c = 1;
-            ws.Cell(r, c++).Value = "Year";
-            if (vm.Filters.GroupBy == ReportGroupBy.Monthly)
-                ws.Cell(r, c++).Value = "Month";
-            ws.Cell(r, c++).Value = "Transactions";
-            ws.Cell(r, c++).Value = "Total Amount";
-            ws.Cell(r, c++).Value = "Net Flow";
-            ws.Cell(r, c++).Value = "By type";
-            ws.Cell(r, c++).Value = "Client";
-            ws.Cell(r, c++).Value = "Client ID";
-            ws.Range(r, 1, r, c - 1).Style.Font.SetBold();
-            r++;
-
-            foreach (var row in vm.Rows.OrderBy(x => x.Year).ThenBy(x => x.Month ?? 0))
-            {
-                c = 1;
-                ws.Cell(r, c++).Value = row.Year;
-                if (vm.Filters.GroupBy == ReportGroupBy.Monthly)
-                    ws.Cell(r, c++).Value = row.Month;
-
-                ws.Cell(r, c++).Value = row.TotalTransactions;
-                ws.Cell(r, c).Value = row.TotalAmount; ws.Cell(r, c++).Style.NumberFormat.Format = "#,##0.00";
-                ws.Cell(r, c).Value = row.NetFlow;     ws.Cell(r, c++).Style.NumberFormat.Format = "#,##0.00";
-
-                var byType = string.Join("  •  ",
-                    (row.AmountByType ?? new())
-                        .OrderBy(x => x.Key)
-                        .Select(x => $"{(string.IsNullOrWhiteSpace(x.Key) ? "Unknown" : x.Key)}: {x.Value:N2}"));
-
-                ws.Cell(r, c++).Value = byType;
-
-                var clientLabel = vm.SelectedCustomerName
-                    ?? (string.IsNullOrEmpty(vm.Filters.CustomerName) && string.IsNullOrEmpty(vm.Filters.CustomerId)
-                        ? "All / Multiple"
-                        : (vm.Filters.CustomerName ?? "Filtered"));
-
-                ws.Cell(r, c++).Value = clientLabel;
-                ws.Cell(r, c++).Value = vm.SelectedCustomerId ?? (string.IsNullOrEmpty(vm.Filters.CustomerId) ? "—" : vm.Filters.CustomerId);
-                r++;
-            }
-
-            c = 1;
-            ws.Cell(r, c++).Value = "Total";
-            if (vm.Filters.GroupBy == ReportGroupBy.Monthly) c++;
-            ws.Cell(r, c++).Value = vm.GrandTotalTransactions;
-            ws.Cell(r, c).Value = vm.GrandTotalAmount; ws.Cell(r, c++).Style.NumberFormat.Format = "#,##0.00";
-            ws.Cell(r, c).Value = vm.NetFlow;          ws.Cell(r, c++).Style.NumberFormat.Format = "#,##0.00";
-            ws.Range(r, 1, r, c - 1).Style.Font.SetBold();
-
-            ws.Columns().AdjustToContents();
-
-
-            var ws2 = wb.AddWorksheet("By Type");
-            int rr = 1;
-            ws2.Cell(rr, 1).Value = "Type";
-            ws2.Cell(rr, 2).Value = "Amount";
-            ws2.Cell(rr, 3).Value = "Percent";
-            ws2.Range(rr, 1, rr, 3).Style.Font.SetBold();
-            rr++;
-
-            var totalByType = vm.TotalByTypeAll;
-            foreach (var kv in vm.TotalsByType.OrderByDescending(x => x.Value))
-            {
-                ws2.Cell(rr, 1).Value = string.IsNullOrWhiteSpace(kv.Key) ? "Unknown" : kv.Key;
-                ws2.Cell(rr, 2).Value = kv.Value;
-                ws2.Cell(rr, 3).Value = totalByType == 0 ? 0 : Math.Round((kv.Value / totalByType) * 100m, 2);
-                rr++;
-            }
-            ws2.Range(2, 2, rr - 1, 2).Style.NumberFormat.Format = "#,##0.00";
-            ws2.Range(2, 3, rr - 1, 3).Style.NumberFormat.Format = "0.00%";
-            ws2.Columns().AdjustToContents();
-
-            
-            var ws3 = wb.AddWorksheet("References");
-            int rx = 1;
-            ws3.Cell(rx, 1).Value = "Type";
-            ws3.Cell(rx, 2).Value = "Reference";
-            ws3.Cell(rx, 3).Value = "Amount";
-            ws3.Range(rx, 1, rx, 3).Style.Font.SetBold();
-            rx++;
-
-            foreach (var type in vm.TopDescriptionsByType.Keys.OrderBy(k => k))
-            {
-                foreach (var d in vm.TopDescriptionsByType[type].OrderByDescending(x => x.Total))
+                page.Content().PaddingTop(10).Column(col =>
                 {
-                    ws3.Cell(rx, 1).Value = string.IsNullOrWhiteSpace(type) ? "Unknown" : type;
-                    ws3.Cell(rx, 2).Value = string.IsNullOrWhiteSpace(d.Description) ? "—" : d.Description;
-                    ws3.Cell(rx, 3).Value = d.Total;
-                    rx++;
-                }
-            }
-            ws3.Range(2, 3, rx - 1, 3).Style.NumberFormat.Format = "#,##0.00";
-            ws3.Columns().AdjustToContents();
+                    if (_vm.TotalsByType != null && _vm.TotalsByType.Any())
+                    {
+                        col.Item().PaddingBottom(6)
+                                  .Text("Totals by Transaction Type").FontSize(12).SemiBold();
 
-            using var ms = new MemoryStream();
-            wb.SaveAs(ms);
-            return ms.ToArray();
+                        col.Item().PaddingBottom(10).Table(t =>
+                        {
+                            t.ColumnsDefinition(c =>
+                            {
+                                c.RelativeColumn(6); 
+                                c.RelativeColumn(3); 
+                                c.RelativeColumn(3); 
+                            });
+
+                            t.Header(h =>
+                            {
+                                h.Cell().Element(CellHeader).Text("Type");
+                                h.Cell().Element(CellHeader).AlignRight().Text("Amount");
+                                h.Cell().Element(CellHeader).AlignRight().Text("Percent");
+                            });
+
+                            var total = _vm.TotalByTypeAll;
+                            int i = 0;
+                            foreach (var kv in _vm.TotalsByType.OrderByDescending(x => x.Value))
+                            {
+                                var bg = (i++ % 2 == 0) ? Colors.White : Colors.Grey.Lighten5;
+                                var type = string.IsNullOrWhiteSpace(kv.Key) ? "Unknown" : kv.Key;
+                                var pct = total == 0 ? 0 : Math.Round((kv.Value / total) * 100m, 2);
+
+                                t.Cell().Element(c => CellBody(c, bg)).Text(type);
+                                t.Cell().Element(c => CellBody(c, bg)).AlignRight().Text(kv.Value.ToString("N2"));
+                                t.Cell().Element(c => CellBody(c, bg)).AlignRight().Text($"{pct:N2}%");
+                            }
+                        });
+                    }
+
+                    if (_vm.TopDescriptionsByType != null && _vm.TopDescriptionsByType.Any())
+                    {
+                        col.Item().PaddingBottom(6)
+                                  .Text("Top References by Type").FontSize(12).SemiBold();
+
+                        col.Item().PaddingBottom(10).Table(t =>
+                        {
+                            t.ColumnsDefinition(c =>
+                            {
+                                c.RelativeColumn(3);  
+                                c.RelativeColumn(6); 
+                                c.RelativeColumn(3);  
+                            });
+
+                            t.Header(h =>
+                            {
+                                h.Cell().Element(CellHeader).Text("Type");
+                                h.Cell().Element(CellHeader).Text("Reference");
+                                h.Cell().Element(CellHeader).AlignRight().Text("Amount");
+                            });
+
+                            int i = 0;
+                            foreach (var typeEntry in _vm.TopDescriptionsByType.OrderBy(k => k.Key))
+                            {
+                                var type = string.IsNullOrWhiteSpace(typeEntry.Key) ? "Unknown" : typeEntry.Key;
+
+                                foreach (var d in typeEntry.Value.OrderByDescending(x => x.Total))
+                                {
+                                    var bg = (i++ % 2 == 0) ? Colors.White : Colors.Grey.Lighten5;
+                                    var desc = string.IsNullOrWhiteSpace(d.Description) ? "—" : d.Description;
+
+                                    t.Cell().Element(c => CellBody(c, bg)).Text(type);
+                                    t.Cell().Element(c => CellBody(c, bg)).Text(desc);
+                                    t.Cell().Element(c => CellBody(c, bg)).AlignRight().Text(d.Total.ToString("N2"));
+                                }
+                            }
+                        });
+                    }
+
+                    col.Item().PaddingBottom(6)
+                              .Text("Detailed Results").FontSize(12).SemiBold();
+
+                    col.Item().Table(t =>
+                    {
+                        var hasMonth = _vm.Filters.GroupBy == ReportGroupBy.Monthly;
+
+                        t.ColumnsDefinition(c =>
+                        {
+                            c.RelativeColumn(1.4f); 
+                            if (hasMonth) c.RelativeColumn(1.4f); 
+                            c.RelativeColumn(1.6f);
+                            c.RelativeColumn(2.0f); 
+                            c.RelativeColumn(2.0f); 
+                            c.RelativeColumn(4.0f); 
+                            c.RelativeColumn(2.5f); 
+                            c.RelativeColumn(3.0f); 
+                        });
+
+                        t.Header(h =>
+                        {
+                            h.Cell().Element(CellHeader).Text("Year");
+                            if (hasMonth) h.Cell().Element(CellHeader).Text("Month");
+                            h.Cell().Element(CellHeader).AlignRight().Text("Transactions");
+                            h.Cell().Element(CellHeader).AlignRight().Text("Total Amount");
+                            h.Cell().Element(CellHeader).AlignRight().Text("Net Flow");
+                            h.Cell().Element(CellHeader).Text("By Type");
+                            h.Cell().Element(CellHeader).Text("Client");
+                            h.Cell().Element(CellHeader).Text("Client ID");
+                        });
+
+                        int i = 0;
+                        foreach (var r in _vm.Rows.OrderBy(x => x.Year).ThenBy(x => x.Month ?? 0))
+                        {
+                            var bg = (i++ % 2 == 0) ? Colors.White : Colors.Grey.Lighten5;
+
+                            var custLabel = _vm.SelectedCustomerName
+                                ?? (string.IsNullOrEmpty(_vm.Filters.CustomerName) && string.IsNullOrEmpty(_vm.Filters.CustomerId)
+                                    ? "All / Multiple"
+                                    : (_vm.Filters.CustomerName ?? "Filtered"));
+
+                            var custId = _vm.SelectedCustomerId
+                                ?? (string.IsNullOrEmpty(_vm.Filters.CustomerId) ? "—" : _vm.Filters.CustomerId);
+
+                            t.Cell().Element(c => CellBody(c, bg)).Text(r.Year.ToString());
+                            if (hasMonth) t.Cell().Element(c => CellBody(c, bg)).Text(r.Month?.ToString() ?? "");
+                            t.Cell().Element(c => CellBody(c, bg)).AlignRight().Text(r.TotalTransactions.ToString("N0"));
+                            t.Cell().Element(c => CellBody(c, bg)).AlignRight().Text(r.TotalAmount.ToString("N2"));
+                            t.Cell().Element(c => CellBody(c, bg)).AlignRight().Text(r.NetFlow.ToString("N2"));
+
+                            var byType = (r.AmountByType ?? new())
+                                .OrderBy(x => x.Key)
+                                .Select(x => $"{(string.IsNullOrWhiteSpace(x.Key) ? "Unknown" : x.Key)}: {x.Value:N2}");
+                            t.Cell().Element(c => CellBody(c, bg)).Text(string.Join("  •  ", byType));
+
+                            t.Cell().Element(c => CellBody(c, bg)).Text(custLabel);
+                            t.Cell().Element(c => CellBody(c, bg)).Text(custId);
+                        }
+
+                        t.Footer(f =>
+                        {
+                            f.Cell().Element(CellHeader).Text("Total");
+                            if (hasMonth) f.Cell().Element(CellHeader).Text("");
+                            f.Cell().Element(CellHeader).AlignRight().Text(_vm.GrandTotalTransactions.ToString("N0"));
+                            f.Cell().Element(CellHeader).AlignRight().Text(_vm.GrandTotalAmount.ToString("N2"));
+                            f.Cell().Element(CellHeader).AlignRight().Text(_vm.NetFlow.ToString("N2"));
+                            f.Cell().Element(CellHeader).Text("");
+                            f.Cell().Element(CellHeader).Text("");
+                            f.Cell().Element(CellHeader).Text("");
+                        });
+                    });
+                });
+
+                page.Footer().Row(r =>
+                {
+                    r.RelativeItem().Text($"Generated {DateTime.Now:yyyy-MM-dd HH:mm}")
+                        .FontSize(9).FontColor(Colors.Grey.Darken2);
+                    r.ConstantItem(120).AlignRight().Text(x =>
+                    {
+                        x.Span("Page ").FontSize(9).FontColor(Colors.Grey.Darken2);
+                        x.CurrentPageNumber().FontSize(9).FontColor(Colors.Grey.Darken2);
+                        x.Span(" / ").FontSize(9).FontColor(Colors.Grey.Darken2);
+                        x.TotalPages().FontSize(9).FontColor(Colors.Grey.Darken2);
+                    });
+                });
+            });
         }
+
+        static IContainer CellHeader(IContainer c) =>
+            c.DefaultTextStyle(x => x.SemiBold())
+             .Background(Colors.Grey.Lighten3)
+             .Padding(4);
+
+        static IContainer CellBody(IContainer c, string bg) =>
+            c.Background(bg)
+             .PaddingVertical(2)
+             .PaddingHorizontal(3);
     }
 }
