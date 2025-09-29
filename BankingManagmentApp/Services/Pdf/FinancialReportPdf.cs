@@ -12,48 +12,70 @@ namespace BankingManagmentApp.Services.Pdf
         private readonly ReportResultVm _vm;
         public FinancialReportPdf(ReportResultVm vm) => _vm = vm;
 
-        public DocumentMetadata GetMetadata() => DocumentMetadata.Default;
+        public DocumentMetadata GetMetadata() => new DocumentMetadata
+        {
+            Title = "Financial Report",
+            Author = "BankingManagementApp",
+            Subject = "Aggregated transactions report"
+        };
 
         public void Compose(IDocumentContainer container)
         {
             container.Page(page =>
             {
+                page.Size(PageSizes.A4);
                 page.Margin(30);
+                page.DefaultTextStyle(x => x.FontSize(10));  
 
-                page.Header().Row(row =>
+                page.Header().Column(col =>
                 {
-                    row.RelativeItem().Column(col =>
+                    col.Item().Text("Financial Report").FontSize(14).SemiBold();
+
+                    col.Item().Text(t =>
                     {
-                        col.Item().Text("Financial Report").SemiBold().FontSize(18);
-
-                        col.Item().Text(txt =>
-                        {
-                            txt.Span("Period: ").SemiBold();
-                            txt.Span($"{_vm.Filters.From:yyyy-MM-dd} → {_vm.Filters.To:yyyy-MM-dd}");
-                        });
-
-                        col.Item().Text($"Group by: {_vm.Filters.GroupBy}");
-                        col.Item().Text($"Account: {_vm.Filters.SelectedAccountLabel}");
-
-                        if (!string.IsNullOrEmpty(_vm.SelectedCustomerName) || !string.IsNullOrEmpty(_vm.SelectedCustomerId))
-                            col.Item().Text($"Client: {_vm.SelectedCustomerName} ({_vm.SelectedCustomerId})");
+                        t.Span("Period: ").SemiBold();
+                        t.Span($"{_vm.Filters.From:yyyy-MM-dd} → {_vm.Filters.To:yyyy-MM-dd}");
                     });
+
+                    col.Item().Text(t =>
+                    {
+                        t.Span("Group by: ").SemiBold();
+                        t.Span(_vm.Filters.GroupBy.ToString());
+                    });
+
+                    col.Item().Text(t =>
+                    {
+                        t.Span("Account: ").SemiBold();
+                        t.Span(_vm.Filters.SelectedAccountLabel ?? "All accounts");
+                    });
+
+                    if (!string.IsNullOrWhiteSpace(_vm.SelectedCustomerName) ||
+                        !string.IsNullOrWhiteSpace(_vm.SelectedCustomerId))
+                    {
+                        col.Item().Text(t =>
+                        {
+                            t.Span("Client: ").SemiBold();
+                            t.Span($"{_vm.SelectedCustomerName} ({_vm.SelectedCustomerId})");
+                        });
+                    }
+
+                    col.Item().PaddingTop(8).Height(1).Background(Colors.Grey.Lighten2);
                 });
 
                 page.Content().PaddingTop(10).Column(col =>
                 {
-                    if (_vm.TotalsByType.Any())
+                    if (_vm.TotalsByType != null && _vm.TotalsByType.Any())
                     {
-                        col.Item().Element(e => e.PaddingBottom(4))
-                                  .Text("Totals by Type").SemiBold().FontSize(14);
+                        col.Item().PaddingBottom(6)
+                                  .Text("Totals by Transaction Type").FontSize(12).SemiBold();
 
-                        col.Item().Element(e => e.PaddingBottom(10)).Table(t =>
+                        col.Item().PaddingBottom(10).Table(t =>
                         {
                             t.ColumnsDefinition(c =>
                             {
-                                c.RelativeColumn(4);
-                                c.RelativeColumn(3);
-                                c.RelativeColumn(3);
+                                c.RelativeColumn(6); 
+                                c.RelativeColumn(3); 
+                                c.RelativeColumn(3); 
                             });
 
                             t.Header(h =>
@@ -64,18 +86,61 @@ namespace BankingManagmentApp.Services.Pdf
                             });
 
                             var total = _vm.TotalByTypeAll;
+                            int i = 0;
                             foreach (var kv in _vm.TotalsByType.OrderByDescending(x => x.Value))
                             {
+                                var bg = (i++ % 2 == 0) ? Colors.White : Colors.Grey.Lighten5;
+                                var type = string.IsNullOrWhiteSpace(kv.Key) ? "Unknown" : kv.Key;
                                 var pct = total == 0 ? 0 : Math.Round((kv.Value / total) * 100m, 2);
-                                t.Cell().Text(kv.Key);
-                                t.Cell().AlignRight().Text(kv.Value.ToString("N2"));
-                                t.Cell().AlignRight().Text($"{pct}%");
+
+                                t.Cell().Element(c => CellBody(c, bg)).Text(type);
+                                t.Cell().Element(c => CellBody(c, bg)).AlignRight().Text(kv.Value.ToString("N2"));
+                                t.Cell().Element(c => CellBody(c, bg)).AlignRight().Text($"{pct:N2}%");
                             }
                         });
                     }
 
-                    col.Item().Element(e => e.PaddingTop(6).PaddingBottom(4))
-                              .Text("Results").SemiBold().FontSize(14);
+                    if (_vm.TopDescriptionsByType != null && _vm.TopDescriptionsByType.Any())
+                    {
+                        col.Item().PaddingBottom(6)
+                                  .Text("Top References by Type").FontSize(12).SemiBold();
+
+                        col.Item().PaddingBottom(10).Table(t =>
+                        {
+                            t.ColumnsDefinition(c =>
+                            {
+                                c.RelativeColumn(3);  
+                                c.RelativeColumn(6); 
+                                c.RelativeColumn(3);  
+                            });
+
+                            t.Header(h =>
+                            {
+                                h.Cell().Element(CellHeader).Text("Type");
+                                h.Cell().Element(CellHeader).Text("Reference");
+                                h.Cell().Element(CellHeader).AlignRight().Text("Amount");
+                            });
+
+                            int i = 0;
+                            foreach (var typeEntry in _vm.TopDescriptionsByType.OrderBy(k => k.Key))
+                            {
+                                var type = string.IsNullOrWhiteSpace(typeEntry.Key) ? "Unknown" : typeEntry.Key;
+
+                                foreach (var d in typeEntry.Value.OrderByDescending(x => x.Total))
+                                {
+                                    var bg = (i++ % 2 == 0) ? Colors.White : Colors.Grey.Lighten5;
+                                    var desc = string.IsNullOrWhiteSpace(d.Description) ? "—" : d.Description;
+
+                                    t.Cell().Element(c => CellBody(c, bg)).Text(type);
+                                    t.Cell().Element(c => CellBody(c, bg)).Text(desc);
+                                    t.Cell().Element(c => CellBody(c, bg)).AlignRight().Text(d.Total.ToString("N2"));
+                                }
+                            }
+                        });
+                    }
+
+                    col.Item().PaddingBottom(6)
+                              .Text("Detailed Results").FontSize(12).SemiBold();
 
                     col.Item().Table(t =>
                     {
@@ -83,13 +148,14 @@ namespace BankingManagmentApp.Services.Pdf
 
                         t.ColumnsDefinition(c =>
                         {
-                            c.RelativeColumn(2); 
-                            if (hasMonth) c.RelativeColumn(2); 
-                            c.RelativeColumn(2); 
-                            c.RelativeColumn(3); 
-                            c.RelativeColumn(5); 
-                            c.RelativeColumn(4); 
-                            c.RelativeColumn(5); 
+                            c.RelativeColumn(1.4f); 
+                            if (hasMonth) c.RelativeColumn(1.4f); 
+                            c.RelativeColumn(1.6f);
+                            c.RelativeColumn(2.0f); 
+                            c.RelativeColumn(2.0f); 
+                            c.RelativeColumn(4.0f); 
+                            c.RelativeColumn(2.5f); 
+                            c.RelativeColumn(3.0f); 
                         });
 
                         t.Header(h =>
@@ -98,27 +164,38 @@ namespace BankingManagmentApp.Services.Pdf
                             if (hasMonth) h.Cell().Element(CellHeader).Text("Month");
                             h.Cell().Element(CellHeader).AlignRight().Text("Transactions");
                             h.Cell().Element(CellHeader).AlignRight().Text("Total Amount");
-                            h.Cell().Element(CellHeader).Text("By type");
+                            h.Cell().Element(CellHeader).AlignRight().Text("Net Flow");
+                            h.Cell().Element(CellHeader).Text("By Type");
                             h.Cell().Element(CellHeader).Text("Client");
                             h.Cell().Element(CellHeader).Text("Client ID");
                         });
 
-                        foreach (var r in _vm.Rows)
+                        int i = 0;
+                        foreach (var r in _vm.Rows.OrderBy(x => x.Year).ThenBy(x => x.Month ?? 0))
                         {
+                            var bg = (i++ % 2 == 0) ? Colors.White : Colors.Grey.Lighten5;
+
                             var custLabel = _vm.SelectedCustomerName
                                 ?? (string.IsNullOrEmpty(_vm.Filters.CustomerName) && string.IsNullOrEmpty(_vm.Filters.CustomerId)
                                     ? "All / Multiple"
                                     : (_vm.Filters.CustomerName ?? "Filtered"));
 
-                            var custId = _vm.SelectedCustomerId ?? (string.IsNullOrEmpty(_vm.Filters.CustomerId) ? "—" : _vm.Filters.CustomerId);
+                            var custId = _vm.SelectedCustomerId
+                                ?? (string.IsNullOrEmpty(_vm.Filters.CustomerId) ? "—" : _vm.Filters.CustomerId);
 
-                            t.Cell().Text(r.Year.ToString());
-                            if (hasMonth) t.Cell().Text(r.Month?.ToString() ?? "");
-                            t.Cell().AlignRight().Text(r.TotalTransactions.ToString("N0"));
-                            t.Cell().AlignRight().Text(r.TotalAmount.ToString("N2"));
-                            t.Cell().Text(string.Join("  •  ", r.AmountByType.OrderBy(x => x.Key).Select(x => $"{x.Key}: {x.Value:N2}")));
-                            t.Cell().Text(custLabel);
-                            t.Cell().Text(custId);
+                            t.Cell().Element(c => CellBody(c, bg)).Text(r.Year.ToString());
+                            if (hasMonth) t.Cell().Element(c => CellBody(c, bg)).Text(r.Month?.ToString() ?? "");
+                            t.Cell().Element(c => CellBody(c, bg)).AlignRight().Text(r.TotalTransactions.ToString("N0"));
+                            t.Cell().Element(c => CellBody(c, bg)).AlignRight().Text(r.TotalAmount.ToString("N2"));
+                            t.Cell().Element(c => CellBody(c, bg)).AlignRight().Text(r.NetFlow.ToString("N2"));
+
+                            var byType = (r.AmountByType ?? new())
+                                .OrderBy(x => x.Key)
+                                .Select(x => $"{(string.IsNullOrWhiteSpace(x.Key) ? "Unknown" : x.Key)}: {x.Value:N2}");
+                            t.Cell().Element(c => CellBody(c, bg)).Text(string.Join("  •  ", byType));
+
+                            t.Cell().Element(c => CellBody(c, bg)).Text(custLabel);
+                            t.Cell().Element(c => CellBody(c, bg)).Text(custId);
                         }
 
                         t.Footer(f =>
@@ -127,6 +204,7 @@ namespace BankingManagmentApp.Services.Pdf
                             if (hasMonth) f.Cell().Element(CellHeader).Text("");
                             f.Cell().Element(CellHeader).AlignRight().Text(_vm.GrandTotalTransactions.ToString("N0"));
                             f.Cell().Element(CellHeader).AlignRight().Text(_vm.GrandTotalAmount.ToString("N2"));
+                            f.Cell().Element(CellHeader).AlignRight().Text(_vm.NetFlow.ToString("N2"));
                             f.Cell().Element(CellHeader).Text("");
                             f.Cell().Element(CellHeader).Text("");
                             f.Cell().Element(CellHeader).Text("");
@@ -134,17 +212,29 @@ namespace BankingManagmentApp.Services.Pdf
                     });
                 });
 
-                page.Footer().AlignCenter().Text(x =>
+                page.Footer().Row(r =>
                 {
-                    x.Span("Generated ").SemiBold();
-                    x.Span($"{DateTime.Now:yyyy-MM-dd HH:mm}");
+                    r.RelativeItem().Text($"Generated {DateTime.Now:yyyy-MM-dd HH:mm}")
+                        .FontSize(9).FontColor(Colors.Grey.Darken2);
+                    r.ConstantItem(120).AlignRight().Text(x =>
+                    {
+                        x.Span("Page ").FontSize(9).FontColor(Colors.Grey.Darken2);
+                        x.CurrentPageNumber().FontSize(9).FontColor(Colors.Grey.Darken2);
+                        x.Span(" / ").FontSize(9).FontColor(Colors.Grey.Darken2);
+                        x.TotalPages().FontSize(9).FontColor(Colors.Grey.Darken2);
+                    });
                 });
             });
         }
 
-        static IContainer CellHeader(IContainer c)
-            => c.DefaultTextStyle(x => x.SemiBold())
-                .Background(Colors.Grey.Lighten3)
-                .Padding(4);
+        static IContainer CellHeader(IContainer c) =>
+            c.DefaultTextStyle(x => x.SemiBold())
+             .Background(Colors.Grey.Lighten3)
+             .Padding(4);
+
+        static IContainer CellBody(IContainer c, string bg) =>
+            c.Background(bg)
+             .PaddingVertical(2)
+             .PaddingHorizontal(3);
     }
 }
