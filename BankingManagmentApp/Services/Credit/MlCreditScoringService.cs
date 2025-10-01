@@ -125,6 +125,9 @@ namespace BankingManagmentApp.Services
             return string.Join("\n", lines);
         }
 
+        private static int RiskFromScore(int s)
+            => s >= 720 ? 1 : s >= 660 ? 2 : s >= 600 ? 3 : 4;
+
         public async Task<CreditScoreResult?> ComputeAsync(string userId)
         {
             await TrainIfNeededAsync();
@@ -155,14 +158,17 @@ namespace BankingManagmentApp.Services
             var pred    = engine.Predict(row);
             var cluster = (int)pred.PredictedClusterId;
 
-            var risk = _clusterToRisk.TryGetValue(cluster, out var r)
-                ? r
-                : MaxRiskLevels;
-            
-            var score = ScoreFromRiskAndFeatures(risk, row);
-            
+            // Клъстерът влияе само на базата на скoра
+            var mappedRisk = _clusterToRisk.TryGetValue(cluster, out var mapped) ? mapped : MaxRiskLevels;
+            var score      = ScoreFromRiskAndFeatures(mappedRisk, row);
+
+            // Рискът винаги се извежда от скoра, за да няма 838 → Medium
+            var risk = RiskFromScore(score);
+
             var notes = ComposeUserNote(snap);
-            
+            // По избор за дебъг: разкоментирай следния ред
+            // notes += $"\n(Cluster={cluster}, MappedRisk={mappedRisk})";
+
             return new CreditScoreResult
             {
                 Score     = score,
@@ -205,9 +211,7 @@ namespace BankingManagmentApp.Services
             }
 
             var finalScore = Math.Clamp(baseRes.Score + scoreAdj, 300, 850);
-            int risk = finalScore >= 720 ? 1 :
-                       finalScore >= 660 ? 2 :
-                       finalScore >= 600 ? 3 : 4;
+            int risk = RiskFromScore(finalScore);
 
             return new CreditScoreResult
             {
@@ -487,10 +491,7 @@ namespace BankingManagmentApp.Services
 
             var final = ClampScore((int)Math.Round(baseScore));
 
-            var risk =
-                final >= 720 ? 1 :
-                final >= 660 ? 2 :
-                final >= 600 ? 3 : 4;
+            var risk = RiskFromScore(final);
 
             var notes = ComposeUserNote(s);
 
