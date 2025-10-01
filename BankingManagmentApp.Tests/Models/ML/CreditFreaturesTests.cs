@@ -42,9 +42,9 @@ namespace BankingManagmentApp.Tests.Models.ML
             else
             {
                 var host = Environment.GetEnvironmentVariable("TEST_SQLSERVER_HOST") ?? "localhost";
-                var port = Environment.GetEnvironmentVariable("TEST_SQLSERVER_PORT") ?? "1433";
-                var user = Environment.GetEnvironmentVariable("TEST_SQLSERVER_USER") ?? "sa";
-                var pass = Environment.GetEnvironmentVariable("TEST_SQLSERVER_PASS") ?? "StrongPwd!2025";
+                var port = Environment.GetEnvironmentVariable("TEST_SQLSERVER_PORT") ?? "";
+                var user = Environment.GetEnvironmentVariable("TEST_SQLSERVER_USER") ?? "";
+                var pass = Environment.GetEnvironmentVariable("TEST_SQLSERVER_PASS") ?? "";
 
                 var baseCstr = $"Server={host},{port};User Id={user};Password={pass};TrustServerCertificate=True;Connect Timeout=2;";
                 _dbName = $"test_cf_{Guid.NewGuid():N}";
